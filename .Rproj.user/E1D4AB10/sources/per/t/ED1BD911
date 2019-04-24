@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1552479307326.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1060396069",
+    "id" : "ED1BD911",
+    "lastKnownWriteTime" : 1556111590,
+    "last_content_update" : 1556111590294,
+    "path" : "E:/wcomp/R/API.R",
+    "project_path" : "R/API.R",
+    "properties" : {
+        "cursorPosition" : "135,46",
+        "scrollLine" : "112"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

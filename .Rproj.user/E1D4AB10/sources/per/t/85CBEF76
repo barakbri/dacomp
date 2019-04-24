@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1556111657400.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "649991373",
+    "id" : "85CBEF76",
+    "lastKnownWriteTime" : 1556112018,
+    "last_content_update" : 1556112046730,
+    "path" : "E:/wcomp/src/rcpp_internals.cpp",
+    "project_path" : "src/rcpp_internals.cpp",
+    "properties" : {
+        "cursorPosition" : "11,17",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 11,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "cpp"
+}

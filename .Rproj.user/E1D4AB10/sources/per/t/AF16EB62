@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1552479348999.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3936571271",
+    "id" : "AF16EB62",
+    "lastKnownWriteTime" : 1556111198,
+    "last_content_update" : 1556111198852,
+    "path" : "E:/wcomp/R/wcomp_main_function.R",
+    "project_path" : "R/wcomp_main_function.R",
+    "properties" : {
+        "cursorPosition" : "13,3",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

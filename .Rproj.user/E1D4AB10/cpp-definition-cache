@@ -1,0 +1,209 @@
+[
+    {
+        "definitions" : [
+            {
+                "column" : 8,
+                "file" : "E:/MCB3/CompositionalAnalysis_CodeBase/Packages/subzero/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 9,
+                "name" : "Compute_Wilcoxon_Stat(NumericVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@Compute_Wilcoxon_Stat#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/MCB3/CompositionalAnalysis_CodeBase/Packages/subzero/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 19,
+                "name" : "rcpp_Wilcoxon_PermTest(NumericVector, IntegerVector, IntegerVector, IntegerVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_Wilcoxon_PermTest#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#S1_#S1_#S1_#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/MCB3/CompositionalAnalysis_CodeBase/Packages/subzero/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 95,
+                "name" : "rcpp_Wilcoxon_PermTest_Given_Permutations(NumericVector, IntegerMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_Wilcoxon_PermTest_Given_Permutations#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 8,
+                "file" : "E:/MCB3/CompositionalAnalysis_CodeBase/Packages/subzero/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 108,
+                "name" : "Compute_TwoPartTest(NumericVector, IntegerVector, NumericVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@Compute_TwoPartTest#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#S0_#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/MCB3/CompositionalAnalysis_CodeBase/Packages/subzero/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 175,
+                "name" : "rcpp_TwoPartTest(NumericVector, IntegerVector, IntegerVector, IntegerVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_TwoPartTest#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#S1_#S1_#S1_#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/MCB3/CompositionalAnalysis_CodeBase/Packages/subzero/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 228,
+                "name" : "rcpp_TwoPartTest_Given_Permutations(NumericVector, IntegerMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_TwoPartTest_Given_Permutations#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 15,
+                "file" : "E:/MCB3/CompositionalAnalysis_CodeBase/Packages/subzero/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 240,
+                "name" : "rcpp_Compute_Wilcoxon_Signed_Rank_Stat(NumericVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_Compute_Wilcoxon_Signed_Rank_Stat#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            }
+        ],
+        "file" : "E:/MCB3/CompositionalAnalysis_CodeBase/Packages/subzero/src/rcpp_internals.cpp",
+        "file_last_write" : 1544204558
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 8,
+                "file" : "E:/WCOMP/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 9,
+                "name" : "Compute_Wilcoxon_Stat(NumericVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@Compute_Wilcoxon_Stat#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/WCOMP/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 19,
+                "name" : "rcpp_Wilcoxon_PermTest(NumericVector, IntegerVector, IntegerVector, IntegerVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_Wilcoxon_PermTest#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#S1_#S1_#S1_#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/WCOMP/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 95,
+                "name" : "rcpp_Wilcoxon_PermTest_Given_Permutations(NumericVector, IntegerMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_Wilcoxon_PermTest_Given_Permutations#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 8,
+                "file" : "E:/WCOMP/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 108,
+                "name" : "Compute_TwoPartTest(NumericVector, IntegerVector, NumericVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@Compute_TwoPartTest#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#S0_#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/WCOMP/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 175,
+                "name" : "rcpp_TwoPartTest(NumericVector, IntegerVector, IntegerVector, IntegerVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_TwoPartTest#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#S1_#S1_#S1_#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/WCOMP/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 228,
+                "name" : "rcpp_TwoPartTest_Given_Permutations(NumericVector, IntegerMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_TwoPartTest_Given_Permutations#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 15,
+                "file" : "E:/WCOMP/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 240,
+                "name" : "rcpp_Compute_Wilcoxon_Signed_Rank_Stat(NumericVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_Compute_Wilcoxon_Signed_Rank_Stat#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            }
+        ],
+        "file" : "E:/WCOMP/src/rcpp_internals.cpp",
+        "file_last_write" : 1544204558
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 8,
+                "file" : "E:/wcomp/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 9,
+                "name" : "Compute_Wilcoxon_Stat(NumericVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@Compute_Wilcoxon_Stat#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/wcomp/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 19,
+                "name" : "rcpp_Wilcoxon_PermTest(NumericVector, IntegerVector, IntegerVector, IntegerVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_Wilcoxon_PermTest#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#S1_#S1_#S1_#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/wcomp/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 94,
+                "name" : "rcpp_Wilcoxon_PermTest_Given_Permutations(NumericVector, IntegerMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_Wilcoxon_PermTest_Given_Permutations#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 8,
+                "file" : "E:/wcomp/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 106,
+                "name" : "Compute_TwoPartTest(NumericVector, IntegerVector, NumericVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@Compute_TwoPartTest#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#S0_#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/wcomp/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 171,
+                "name" : "rcpp_TwoPartTest(NumericVector, IntegerVector, IntegerVector, IntegerVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_TwoPartTest#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#S1_#S1_#S1_#"
+            },
+            {
+                "column" : 6,
+                "file" : "E:/wcomp/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 223,
+                "name" : "rcpp_TwoPartTest_Given_Permutations(NumericVector, IntegerMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_TwoPartTest_Given_Permutations#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 15,
+                "file" : "E:/wcomp/src/rcpp_internals.cpp",
+                "kind" : 6,
+                "line" : 235,
+                "name" : "rcpp_Compute_Wilcoxon_Signed_Rank_Stat(NumericVector, IntegerVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@rcpp_Compute_Wilcoxon_Signed_Rank_Stat#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            }
+        ],
+        "file" : "E:/wcomp/src/rcpp_internals.cpp",
+        "file_last_write" : 1556112018
+    }
+]

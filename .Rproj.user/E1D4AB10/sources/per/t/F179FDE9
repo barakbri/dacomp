@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1556111475399.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3070591062",
+    "id" : "F179FDE9",
+    "lastKnownWriteTime" : 1556111487,
+    "last_content_update" : 1556111487951,
+    "path" : "E:/wcomp/man/wcomp-package.Rd",
+    "project_path" : "man/wcomp-package.Rd",
+    "properties" : {
+        "cursorPosition" : "24,19",
+        "scrollLine" : "3"
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_doc"
+}
