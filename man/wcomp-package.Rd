@@ -19,8 +19,10 @@ Barak Brill, email optional.
 Maintainer: Barak Brill <barakbri@mail.tau.ac.il>
 }
 \references{
-  This optional section can contain literature or other references for
-  background information.
+  Testing for differential abundance in compositional counts data, with application to microbiome studies
+  Barak Brill, Amnon Amir, Ruth Heller, arXiv preprint arXiv:1904.08937
+  
+  Discrete false-discovery rate improves identification of differentially abundant microbes, Jiang et. al. ,2017, MSystems.
 }
 \keyword{ package }
 \seealso{

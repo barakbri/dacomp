@@ -20,10 +20,8 @@
 #' @examples
 wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,verbose = F){
   
-  nr_rarefactions_multiple_X = 1
-  if(nr_rarefactions_multiple_X != 1){
-    stop("Multiple rarefactions currently not supported")
-  }
+  nr_rarefactions_multiple_X = 1 # Multiple rarefactions currently not supported
+  
   p = ncol(X)
   n = nrow(X)
   min_value_array = rep(NA,p)
@@ -73,7 +71,7 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
     
     if(verbose)
       if(i%% ceiling(p/100) == 1)
-        cat(paste0('Testing taxon : ',i,'/',m,' \n\r'))
+        cat(paste0('Testing taxon : ',i,'/',p,' \n\r'))
     
     nom = X[,i]
     dnom = reference_values
