@@ -13,6 +13,10 @@
 #' @examples
 wcomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_strength_as_change_in_microbial_load = 0.1){
   
+  input_check_result = check.input.wcomp.generate_example_dataset(n_X,n_Y,m1, signal_strength_as_change_in_microbial_load)
+  if(!input_check_result)
+    stop('Input check failed on wcomp.generate_example_dataset')
+  
   library(phyloseq)
   filepath = system.file("extdata", "study_1457_split_library_seqs_and_mapping.zip", package="phyloseq")
   kostic = microbio_me_qiime(filepath)
@@ -53,4 +57,8 @@ wcomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_stre
              group_labels = group_labels,
              select_diff_abundant = select_diff_abundant)
   return(ret)
+}
+
+check.input.wcomp.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_change_in_microbial_load){
+  return(TRUE)
 }

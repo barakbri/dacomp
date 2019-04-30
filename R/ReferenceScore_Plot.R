@@ -13,6 +13,11 @@
 #'
 #' @examples
 wcomp.plot_reference_scores = function(ref_select,label="Histogram of medianSD statstic for reference selection",quantiles_to_plot = c(0.5,0.7,0.9), breaks_param = 30){
+  
+  input_check_result = check.input.wcomp.plot_reference_scores(ref_select,label,quantiles_to_plot,breaks_param)
+  if(!input_check_result)
+    stop('Input check failed on wcomp.plot_reference_scores')
+  
   Target_MinAbundance_values = ref_select$target_abundance
   hist(ref_select$scores,breaks = breaks_param,main = label,xlab = "medianSD statistic")
   sorted_scores = sort(ref_select$scores)
@@ -26,6 +31,9 @@ wcomp.plot_reference_scores = function(ref_select,label="Histogram of medianSD s
   }
 }
 
+check.input.wcomp.plot_reference_scores = function(ref_select,label,quantiles_to_plot,breaks_param){
+  return(TRUE)  
+}
 
 
 

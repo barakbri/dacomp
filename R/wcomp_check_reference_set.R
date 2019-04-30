@@ -1,4 +1,4 @@
-
+CLASS.LABEL.REFERENCE_VALIDATION_RESULT_OBJECT = "wcomp.reference.validation.result.object"
 library(vegan)
 library(HHG)
 library(energy)
@@ -14,7 +14,11 @@ library(energy)
 #' @export
 #'
 #' @examples
-wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm=1000,verbose = F){
+wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm=10^4,verbose = F){
+  
+  input_check_result = check.input.wcomp.check_reference_set_is_valid(X_ref,Y,nr.perm,verbose)
+  if(!input_check_result)
+    stop('Input check failed on wcomp.check_reference_set_is_valid')
   
   if(dim(X_ref)[2] == 1){
     ret = list()
@@ -36,7 +40,7 @@ wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm=1000,verbose = F){
   rarefy_depth = min(as.numeric(apply(X_ref,1,sum)))
   X_ref = vegan::rrarefy(X_ref,rarefy_depth)
   if(verbose)
-    cat(paste0('D Matrices\n\r'))
+    cat(paste0('Computing distance matrices:\n\r'))
   
   dist_obj_L2 =dist(X_ref,method = "euclidean", diag = TRUE, upper = TRUE)
   dist_obj_L1 =dist(X_ref,method = "manhattan", diag = TRUE, upper = TRUE)
@@ -82,6 +86,10 @@ wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm=1000,verbose = F){
   ret$p.value.permanova_L1 = permanova_L1$aov.tab[1,6]
   ret$p.value.permanova_BC = permanova_BC$aov.tab[1,6]
   
+  class(ret) = CLASS.LABEL.REFERENCE_VALIDATION_RESULT_OBJECT
   return(ret)
 }
 
+check.input.wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm,verbose){
+  return(TRUE)
+}

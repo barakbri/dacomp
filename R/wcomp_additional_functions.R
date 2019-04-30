@@ -71,7 +71,12 @@ Compute.resample.test = function(X_matrix,Y_matrix,lambda,statistic = 'Wilcoxon'
 
 
 
-dfdr_find_thresholds = function(stats,q=0.05){
+dfdr_find_thresholds = function(stats,q=0.05,verbose = F){
+  
+  if(verbose){
+    cat(paste0('computing rejection threshold for DS-FDR\n\r'))
+  }
+  
   #convert to pvalues
   for(j in 1:ncol(stats)){
     stats[,j] = (nrow(stats) +1+1 - rank(stats[,j],ties.method = 'min'))/(nrow(stats)+1) # one +1 is for permutations, one +1 is because rank is 1 based

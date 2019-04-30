@@ -1,3 +1,5 @@
+CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "wcomp.reference.selection.object"
+
 #' Title
 #'
 #' @param X 
@@ -12,57 +14,46 @@
 #' @export
 #'
 #' @examples
-wcomp.select_references = function(X, median_SD_threshold = 1.3, 
+wcomp.select_references = function(X, median_SD_threshold, 
                                                            minimal_TA = 10,
                                                            maximal_TA = 200,
                                                            Psuedo_Count_used = 1,
                                                            verbose = F,
                                                            select_from = NULL){
-  factor_by_Median_Score = F
+  input_check_result = check.input.wcomp.select_references(X, median_SD_threshold, minimal_TA,maximal_TA, Psuedo_Count_used, verbose, select_from)
+  if(!input_check_result)
+    stop('Input check failed on wcomp.select_references')
+  
   adjustment = 0
-  MIN_PREV = 0.0
-  MAX_PREV = 1.0
   PSUEDOCOUNT_IS_PREVALENCE = F
   PSUEDOCOUNT_IS_ABUNDANCE_COMPLETION = F
   m = dim(X)[2]
-  X_r  = X
+  
   
   if(is.null(select_from)){
     select_from = 1:m
   }
   
   ratio_matrix = matrix(NA, ncol = m, nrow = m)
-  PS_VEC = as.numeric(apply(X_r>0,2,mean))
-  if(!PSUEDOCOUNT_IS_PREVALENCE){
-    PS_VEC = rep(Psuedo_Count_used,ncol(X_r))
-  }
-  TOTAL_COUNTS_PER_SUBJECT = as.numeric(apply(X_r,1,sum))
-  X_r_PS = X_r
-  for(i in 1:nrow(X_r_PS)){
-    X_r_PS[i,] = X_r_PS[i,]/TOTAL_COUNTS_PER_SUBJECT[i]
-  }
-  p_by_taxa = as.numeric(apply(X_r_PS,2,mean))
   
   for( i in 1:(m-1) ){
-    if(verbose)
-      print(paste0('Computing ratio for taxa ',i))
+    if(verbose && i%%(floor(m/100))==1)
+      cat(paste0('Computing pairwise ratios for taxon ',i,'/',m,'\n\r'))
     
     for( j in (i+1):m ){
       
-      X_i = X_r[,i]
-      X_j = X_r[,j]
-      r = log(((X_i+PS_VEC[i]) / (X_j+PS_VEC[j])))
-      if(PSUEDOCOUNT_IS_ABUNDANCE_COMPLETION)
-        r = log(((X_i+pmin(1,TOTAL_COUNTS_PER_SUBJECT*p_by_taxa[i])) / (X_j+pmin(1,TOTAL_COUNTS_PER_SUBJECT*p_by_taxa[j]))))
+      X_i = X[,i]
+      X_j = X[,j]
+      r = log(((X_i+Psuedo_Count_used) / (X_j+Psuedo_Count_used)))
       ratio_matrix[i,j] = sd(r)
       ratio_matrix[j,i] = ratio_matrix[i,j]
     }
   }
 
-  scores         = apply(ratio_matrix,2,function(x){median(x,na.rm = T)}) #mean
+  scores         = apply(ratio_matrix,2,function(x){median(x,na.rm = T)}) 
   prevalence_mat = 1*(X > 0)
   mean_prevalance = apply(prevalence_mat,2,mean)
-  filter_cols = which(mean_prevalance>=MIN_PREV & mean_prevalance <= MAX_PREV)
+  filter_cols = 1:m
   filter_cols = filter_cols[which(filter_cols %in% select_from)]
   scores = scores[filter_cols]
   sorted_columns = order(scores)
@@ -92,8 +83,6 @@ wcomp.select_references = function(X, median_SD_threshold = 1.3,
   scores_possible_cut_points = sorted_scores[possible_cut_points]
   
   threshold_to_use = median_SD_threshold
-  if(factor_by_Median_Score)
-    threshold_to_use = median(sorted_scores)*median_SD_threshold
   
   possible_cut_points_above_threshold = which(scores_possible_cut_points >= threshold_to_use)
   if(length(possible_cut_points_above_threshold)>0)
@@ -114,6 +103,11 @@ wcomp.select_references = function(X, median_SD_threshold = 1.3,
   ret$median_SD_threshold = median_SD_threshold
   ret$minimal_TA = minimal_TA
   ret$maximal_TA = maximal_TA
+  class(ret) = CLASS.LABEL.REFERENCE_SELECTION_OBJECT
   return(ret)
+}
+
+check.input.wcomp.select_references = function(X, median_SD_threshold, minimal_TA,maximal_TA, Psuedo_Count_used, verbose, select_from){
+  return(T)  
 }
 

@@ -1,3 +1,4 @@
+CLASS.LABEL.WCOMP_RESULT_OBJECT = "wcomp.reference.selection.object"
 
 #' Title
 #' @param X 
@@ -18,10 +19,19 @@
 #' @author foo
 #'
 #' @examples
-wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,verbose = F){
+wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,return_results_also_on_reference_validation_fail = F, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))),nr_perms_reference_validation = 10^4,T1E_reference_validation = 0.01, disable_DSFDR = F,verbose = F){
   
-  nr_rarefactions_multiple_X = 1 # Multiple rarefactions currently not supported
+  #in case a user inserted a reference selection object, with take the indices from the object
+  if(class(ind_reference_taxa) == CLASS.LABEL.REFERENCE_SELECTION_OBJECT){
+    ind_reference_taxa = ind_reference_taxa$selected_references
+  }
   
+  #Check input validity
+  input_check_result = check.input.wcomp.main(X,y,ind_reference_taxa,test, q,return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation,T1E_reference_validation, disable_DSFDR,verbose)
+  if(!input_check_result)
+    stop('Input check failed on wcomp.test')
+      
+  #definitions
   p = ncol(X)
   n = nrow(X)
   min_value_array = rep(NA,p)
@@ -31,7 +41,6 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
   taxa_nr_res = rep(NA,p)
   reference_values = rep(NA,n)
   lambda_selected = rep(NA,p)
-  remaining_Y = list()
   
   # Compute reference values
   if(length(ind_reference_taxa)>1){
@@ -43,7 +52,7 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
   }
   
   stats_matrix = matrix(NA, ncol = p, nrow = nr_perm+1)
-  rarefaction_matrix = matrix(NA,nrow = n,ncol = nr_rarefactions_multiple_X)
+  rarefaction_matrix = matrix(NA,nrow = n,ncol = 1)
   
   #We compute the permutation matrix
   Y_matrix = matrix(NA, ncol = nr_perm+1, nrow = n)
@@ -69,6 +78,10 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
 
   for(i in 1:p){
     
+    if(i %in% ind_reference_taxa){
+      next
+    }
+    
     if(verbose)
       if(i%% ceiling(p/100) == 1)
         cat(paste0('Testing taxon : ',i,'/',p,' \n\r'))
@@ -76,20 +89,12 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
     nom = X[,i]
     dnom = reference_values
     
-    #
-    if(i %in% ind_reference_taxa){
-      nom = X[,i]
-      dnom = reference_values - nom 
-    }
-      
-    
-    
     #choose rarefaction depth
     total_reads_per_subject = nom+dnom
     
     min_value = min(total_reads_per_subject)
     min_value_array[i] = min_value
-    to_keep = which(total_reads_per_subject >= min_value) # no filtration of samples.
+    to_keep = 1:length(y) # no filtration of samples allowed, see paper for details on how sample filtration at this point can induce bias
     
     z_keep = z
     
@@ -106,7 +111,6 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
     nom_keep = nom[to_keep]
     dnom_keep = dnom[to_keep]
     y_keep = y[to_keep]
-    remaining_Y[[i]] = y_keep
     rarefied_data_length_array[i] = length(nom_keep)
     
     # perform the actual subsample,
@@ -114,11 +118,11 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
     dnom_keep_original = dnom_keep
     
     #perform subsample and test
-    for(s in 1:nr_rarefactions_multiple_X){
-      temp_subsampled =  rhyper(n, nom_keep_original, dnom_keep_original,min_value)  
-      rarefaction_matrix[,s] = temp_subsampled 
-    }
+    
+    temp_subsampled =  rhyper(n, nom_keep_original, dnom_keep_original,min_value)  
+    rarefaction_matrix[,1] = temp_subsampled 
     stats_matrix[,i] = Compute.resample.test(rarefaction_matrix,Y_matrix,min_value,statistic = test)
+    
   }
   
   stats = stats_matrix
@@ -128,23 +132,45 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
   }
   
   if(!disable_DSFDR){
-    C_test = dfdr_find_thresholds(stats[,-ind_reference_taxa,drop=F],q)  
+    dsfdr_threshold = dfdr_find_thresholds(stats[,-ind_reference_taxa,drop=F],q,verbose)  
   }
-  
   p.values.test = p.values; p.values.test[ind_reference_taxa] = NA
-  p.values.ref = p.values; p.values.ref[-ind_reference_taxa] = NA
   
-  ret = list()
-  ret$lambda = min_value_array
-  ret$stats_matrix = stats_matrix
-  ret$p.values.test = p.values.test
-  ret$p.values.ref = p.values.ref
+  if(verbose)
+    cat(paste0('Running test to validate reference set\n\r'))
   
-  if(!disable_DSFDR){
-    ret$rejected = which(p.values.test<=C_test)
-    ret$C_test = C_test  
+  test.reference.set.validity = wcomp.check_reference_set_is_valid(X_ref = X[,ind_reference_taxa],
+                                                             Y = y, nr.perm = nr_perms_reference_validation,
+                                                             verbose = verbose)
+  possible_problem_in_reference_set_detected = F
+  if(any(unlist(test.reference.set.validity)<=T1E_reference_validation)){
+    possible_problem_in_reference_set_detected = T
+    warning_msg = paste0('Warning: One are more tests for validating that no differentially abundant taxa have entered the reference set has rejected it\'s null hypothesis at level T1E_reference_validation = ',T1E_reference_validation,'. A different reference set of taxon or reference selection method may be considered. To return p.values and rejections toghether with this warning, set parameter \'return_results_also_on_reference_validation_fail\' to TRUE\n\r')
+    warning(warning_msg)
   }
+    
+  ret = list()
+  ret$test.reference.set.validity = test.reference.set.validity
+  if(possible_problem_in_reference_set_detected){
+    ret$warning_msg = warning_msg
+  }
+  
+  if(return_results_also_on_reference_validation_fail | !possible_problem_in_reference_set_detected){
+    ret$lambda = min_value_array
+    ret$stats_matrix = stats_matrix
+    ret$p.values.test = p.values.test
+    
+    if(!disable_DSFDR){
+      ret$rejected = which(p.values.test<=dsfdr_threshold)
+      ret$dsfdr_threshold = dsfdr_threshold  
+    }
+  }
+  class(ret) = CLASS.LABEL.WCOMP_RESULT_OBJECT
   return(ret)
 }
 
+#internal function for validating inputs on wcomp.test
+check.input.wcomp.main = function(X, y, ind_reference_taxa, test, q, return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation, T1E_reference_validation, disable_DSFDR, verbose){
+  return(TRUE)
+}
 
