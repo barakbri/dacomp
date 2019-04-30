@@ -5,21 +5,6 @@
 
 using namespace Rcpp;
 
-// rcpp_Wilcoxon_PermTest
-List rcpp_Wilcoxon_PermTest(NumericVector X, IntegerVector Y, IntegerVector B, IntegerVector DoWald, IntegerVector ReportPerm);
-RcppExport SEXP _wcomp_rcpp_Wilcoxon_PermTest(SEXP XSEXP, SEXP YSEXP, SEXP BSEXP, SEXP DoWaldSEXP, SEXP ReportPermSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type X(XSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type B(BSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type DoWald(DoWaldSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type ReportPerm(ReportPermSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_Wilcoxon_PermTest(X, Y, B, DoWald, ReportPerm));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rcpp_Wilcoxon_PermTest_Given_Permutations
 List rcpp_Wilcoxon_PermTest_Given_Permutations(NumericVector X, IntegerMatrix Y);
 RcppExport SEXP _wcomp_rcpp_Wilcoxon_PermTest_Given_Permutations(SEXP XSEXP, SEXP YSEXP) {
@@ -29,21 +14,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type X(XSEXP);
     Rcpp::traits::input_parameter< IntegerMatrix >::type Y(YSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_Wilcoxon_PermTest_Given_Permutations(X, Y));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_TwoPartTest
-List rcpp_TwoPartTest(NumericVector X, IntegerVector Y, IntegerVector B, IntegerVector DoWald, IntegerVector ReportPerm);
-RcppExport SEXP _wcomp_rcpp_TwoPartTest(SEXP XSEXP, SEXP YSEXP, SEXP BSEXP, SEXP DoWaldSEXP, SEXP ReportPermSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type X(XSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type B(BSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type DoWald(DoWaldSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type ReportPerm(ReportPermSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_TwoPartTest(X, Y, B, DoWald, ReportPerm));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -73,9 +43,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_wcomp_rcpp_Wilcoxon_PermTest", (DL_FUNC) &_wcomp_rcpp_Wilcoxon_PermTest, 5},
     {"_wcomp_rcpp_Wilcoxon_PermTest_Given_Permutations", (DL_FUNC) &_wcomp_rcpp_Wilcoxon_PermTest_Given_Permutations, 2},
-    {"_wcomp_rcpp_TwoPartTest", (DL_FUNC) &_wcomp_rcpp_TwoPartTest, 5},
     {"_wcomp_rcpp_TwoPartTest_Given_Permutations", (DL_FUNC) &_wcomp_rcpp_TwoPartTest_Given_Permutations, 2},
     {"_wcomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat", (DL_FUNC) &_wcomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat, 2},
     {NULL, NULL, 0}
