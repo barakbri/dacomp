@@ -1,3 +1,4 @@
+#class label for results of the wcomp test function
 CLASS.LABEL.WCOMP_RESULT_OBJECT = "wcomp.reference.selection.object"
 
 #' Title
@@ -31,7 +32,7 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
   if(!input_check_result)
     stop('Input check failed on wcomp.test')
       
-  #definitions
+  #definitions and allocations:
   p = ncol(X)
   n = nrow(X)
   min_value_array = rep(NA,p)
@@ -54,7 +55,7 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
   stats_matrix = matrix(NA, ncol = p, nrow = nr_perm+1)
   rarefaction_matrix = matrix(NA,nrow = n,ncol = 1)
   
-  #We compute the permutation matrix
+  #We compute the permutation matrix. Note that this dependes on the type of test. If it is a signed rank test, permutations are only in each pair of subjects
   Y_matrix = matrix(NA, ncol = nr_perm+1, nrow = n)
   if(test == 'SignedWilcoxon'){
     Y_matrix[,1] = 1:n
@@ -76,8 +77,10 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
     }
   }
 
+  #iterate over taxa and test
   for(i in 1:p){
     
+    #no need to test reference taxa
     if(i %in% ind_reference_taxa){
       next
     }
@@ -89,7 +92,7 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
     nom = X[,i]
     dnom = reference_values
     
-    #choose rarefaction depth
+    #choose rarefaction depth:
     total_reads_per_subject = nom+dnom
     
     min_value = min(total_reads_per_subject)
@@ -98,7 +101,7 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
     
     z_keep = z
     
-    #enforcing pairs to have both items
+    #enforcing pairs to have two measurements for each subject, subjects with less or more measurements are excluded
     if(!is.null(z)){
       z_keep = z[to_keep]
       counts_for_subject = table(z_keep)
@@ -121,41 +124,48 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
     
     temp_subsampled =  rhyper(n, nom_keep_original, dnom_keep_original,min_value)  
     rarefaction_matrix[,1] = temp_subsampled 
-    stats_matrix[,i] = Compute.resample.test(rarefaction_matrix,Y_matrix,min_value,statistic = test)
+    stats_matrix[,i] = Compute.resample.test(rarefaction_matrix,Y_matrix,statistic = test)
     
   }
   
+  #computes pvalues:
   stats = stats_matrix
   p.values = rep(NA,ncol(stats))
   for(i in 1:ncol(stats)){
     p.values[i] = mean(stats[,i]>=stats[1,i])
   }
   
+  #compute DS-FDR:
   if(!disable_DSFDR){
-    dsfdr_threshold = dfdr_find_thresholds(stats[,-ind_reference_taxa,drop=F],q,verbose)  
+    dsfdr_threshold = dsfdr_find_thresholds(stats[,-ind_reference_taxa,drop=F],q,verbose)  
   }
+  
   p.values.test = p.values; p.values.test[ind_reference_taxa] = NA
   
+  #test reference validity:
   if(verbose)
     cat(paste0('Running test to validate reference set\n\r'))
   
   test.reference.set.validity = wcomp.check_reference_set_is_valid(X_ref = X[,ind_reference_taxa],
                                                              Y = y, nr.perm = nr_perms_reference_validation,
                                                              verbose = verbose)
+  # handle a case of signal detected in the reference set:
   possible_problem_in_reference_set_detected = F
   if(any(unlist(test.reference.set.validity)<=T1E_reference_validation)){
     possible_problem_in_reference_set_detected = T
     warning_msg = paste0('Warning: One are more tests for validating that no differentially abundant taxa have entered the reference set has rejected it\'s null hypothesis at level T1E_reference_validation = ',T1E_reference_validation,'. A different reference set of taxon or reference selection method may be considered. To return p.values and rejections toghether with this warning, set parameter \'return_results_also_on_reference_validation_fail\' to TRUE\n\r')
     warning(warning_msg)
   }
-    
+  
+  #return results:
+  
   ret = list()
   ret$test.reference.set.validity = test.reference.set.validity
-  if(possible_problem_in_reference_set_detected){
+  if(possible_problem_in_reference_set_detected){ #put warning if needed:
     ret$warning_msg = warning_msg
   }
   
-  if(return_results_also_on_reference_validation_fail | !possible_problem_in_reference_set_detected){
+  if(return_results_also_on_reference_validation_fail | !possible_problem_in_reference_set_detected){ #if reference validation procedure failed, dont put result. Only if the user specifically asked
     ret$lambda = min_value_array
     ret$stats_matrix = stats_matrix
     ret$p.values.test = p.values.test

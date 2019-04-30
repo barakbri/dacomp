@@ -1,7 +1,10 @@
+#Class label for object with results of a reference validation procedure
 CLASS.LABEL.REFERENCE_VALIDATION_RESULT_OBJECT = "wcomp.reference.validation.result.object"
+
 library(vegan)
 library(HHG)
 library(energy)
+
 
 #' Title
 #'
@@ -15,12 +18,14 @@ library(energy)
 #'
 #' @examples
 wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm=10^4,verbose = F){
-  
+  # check inputs
   input_check_result = check.input.wcomp.check_reference_set_is_valid(X_ref,Y,nr.perm,verbose)
   if(!input_check_result)
     stop('Input check failed on wcomp.check_reference_set_is_valid')
   
+  #the reference validation procedure works on reference sets with at least two taxa.
   if(dim(X_ref)[2] == 1){
+    warning(' reference validation procedure cannot be run - a single reference taxon has been selected')
     ret = list()
     
     ret$p.value.HHG.L2 = 1
@@ -37,8 +42,11 @@ wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm=10^4,verbose = F){
     return(ret)
   }
   
+  #find the rarefaction depth, and rarefy all reference samples to this depth
   rarefy_depth = min(as.numeric(apply(X_ref,1,sum)))
   X_ref = vegan::rrarefy(X_ref,rarefy_depth)
+  
+  #compute distance matrices
   if(verbose)
     cat(paste0('Computing distance matrices:\n\r'))
   
@@ -49,6 +57,8 @@ wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm=10^4,verbose = F){
   Dx_ref_L2 = as.matrix(dist_obj_L2)
   Dx_ref_L1 = as.matrix(dist_obj_L1)
   Dx_ref_BC = as.matrix(dist_obj_BC)
+  # run the different tests: HHG, Permanova and DISCO
+  # with L1,L2 and Bray-Curtis distance (BC actually not a distance...)
   
   if(verbose)
     cat(paste0('HHG\n\r'))
@@ -56,7 +66,6 @@ wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm=10^4,verbose = F){
   hhg.res.L2 = HHG::hhg.test.k.sample(Dx_ref_L2,Y,nr.threads = 1,nr.perm = nr.perm,perm.stats.wanted = T)
   hhg.res.L1 = HHG::hhg.test.k.sample(Dx_ref_L1,Y,nr.threads = 1,nr.perm = nr.perm,perm.stats.wanted = T)
   hhg.res.BC = HHG::hhg.test.k.sample(Dx_ref_BC,Y,nr.threads = 1,nr.perm = nr.perm,perm.stats.wanted = T)
-  
   
   if(verbose)
     cat(paste0('DISCO \n\r'))
@@ -72,6 +81,7 @@ wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm=10^4,verbose = F){
   permanova_L1 = vegan::adonis(dist_obj_L1~Y,permutations = nr.perm)
   permanova_BC = vegan::adonis(dist_obj_BC~Y,permutations = nr.perm)
   
+  #return results
   ret = list()
   
   ret$p.value.HHG.L2 = hhg.res.L2$perm.pval.hhg.sc
