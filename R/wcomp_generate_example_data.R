@@ -18,18 +18,17 @@ wcomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_stre
   if(!input_check_result)
     stop('Input check failed on wcomp.generate_example_dataset')
   #load phyloseq and prepare data
+  
   library(phyloseq)
   filepath = system.file("extdata", "study_1457_split_library_seqs_and_mapping.zip", package="phyloseq")
-  kostic = microbio_me_qiime(filepath)
-  kostic <- subset_samples(kostic, DIAGNOSIS != "None")
-  kostic <- prune_samples(sample_sums(kostic) > 500, kostic) #prune samples with a low number of counts
+  sink(tempfile())
+  kostic = (suppressWarnings(microbio_me_qiime(filepath)))
+  sink()
+  kostic = subset_samples(kostic, DIAGNOSIS == "Healthy") 
+  kostic = prune_samples(sample_sums(kostic) > 500, kostic) #prune samples with a low number of counts
   kostic_counts = as.matrix(t(otu_table(kostic)))
   kostic_sample_data = sample_data(kostic)
-  #keep only healthy subjects:
-  kostic_sample_names_healthy = as.character(kostic_sample_data$X.SampleID)[ 
-    which(kostic_sample_data$BSP_DIAGNOSIS == 'None')
-    ]
-  kostic_counts_data_healthy = kostic_counts[which(rownames(kostic_counts) %in% kostic_sample_names_healthy),]
+  kostic_counts_data_healthy = kostic_counts
   #keep taxa that appear in  at least 2 subjects:
   kostic_counts_data_healthy= kostic_counts_data_healthy[ , apply(kostic_counts_data_healthy>0,2,sum) >= 2 ]
   kostic_N_reads = median(apply(kostic_counts_data_healthy,1,sum))
@@ -67,5 +66,10 @@ wcomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_stre
 
 #internal function for checking inputs:
 check.input.wcomp.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_change_in_microbial_load){
+  # 
+  # n_X, - sample sizes
+  # n_Y, - samples sizes
+  # m1 - number of diff abundant taxa - should be between 0 and 100
+  # signal_strength_as_change_in_microbial_load - should be between 0 and 0.5
   return(TRUE)
 }
