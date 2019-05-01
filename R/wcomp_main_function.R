@@ -26,6 +26,11 @@ wcomp.test = function(X,y,ind_reference_taxa,test = WCOMP.TEST.NAME.WILCOXON, q=
     ind_reference_taxa = ind_reference_taxa$selected_references
   }
   
+  #if test is in TEST.DEF.Y.IS.0.OR.1, convert Y to 0 and 1
+  if(test %in% TEST.DEF.Y.IS.0.OR.1){
+    y = as.numeric( as.factor(y) ) - 1
+  }
+     
   #Check input validity
   input_check_result = check.input.wcomp.main(X,y,ind_reference_taxa,test, q,return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation,T1E_reference_validation, disable_DSFDR,verbose)
   if(!input_check_result)
@@ -74,7 +79,7 @@ wcomp.test = function(X,y,ind_reference_taxa,test = WCOMP.TEST.NAME.WILCOXON, q=
       Y_matrix[,i] = sample(y)
     }
   }
-
+  
   #iterate over taxa and test
   for(i in 1:p){
     
@@ -167,6 +172,7 @@ check.input.wcomp.main = function(X, y, ind_reference_taxa, test, q, return_resu
   ##List of checks:
   ##  wcomp.test: test X is numeric matrix of counts, 
   ##test y is valid - 0 or 1 for the relevant tests, has two groups are more for KW, disregarded in signed rank test
+  #Y is null for signed rank test
   ##q is valid,
   ##return_results_also_on_reference_validation_fail is valid 
   ##nr_perm is valid,

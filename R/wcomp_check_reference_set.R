@@ -48,7 +48,7 @@ wcomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verb
   
   #compute distance matrices
   if(verbose)
-    cat(paste0('Computing distance matrices:\n\r'))
+    cat(paste0('Computing distance matrices\n\r'))
   
   dist_obj_L2 =dist(X_ref,method = "euclidean", diag = TRUE, upper = TRUE)
   dist_obj_L1 =dist(X_ref,method = "manhattan", diag = TRUE, upper = TRUE)
@@ -61,21 +61,21 @@ wcomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verb
   # with L1,L2 and Bray-Curtis distance (BC actually not a distance...)
   
   if(verbose)
-    cat(paste0('HHG\n\r'))
+    cat(paste0('Testing reference set by HHG\n\r'))
   
   hhg.res.L2 = HHG::hhg.test.k.sample(Dx_ref_L2,Y,nr.threads = 1,nr.perm = nr.perm,perm.stats.wanted = T)
   hhg.res.L1 = HHG::hhg.test.k.sample(Dx_ref_L1,Y,nr.threads = 1,nr.perm = nr.perm,perm.stats.wanted = T)
   hhg.res.BC = HHG::hhg.test.k.sample(Dx_ref_BC,Y,nr.threads = 1,nr.perm = nr.perm,perm.stats.wanted = T)
   
   if(verbose)
-    cat(paste0('DISCO \n\r'))
+    cat(paste0('Testing reference set by DISCO \n\r'))
   
   energy_L2 = energy::disco(Dx_ref_L2,factors = Y,distance = T,R = nr.perm)
   energy_L1 = energy::disco(Dx_ref_L1,factors = Y,distance = T,R = nr.perm)
   energy_BC = energy::disco(Dx_ref_BC,factors = Y,distance = T,R = nr.perm)
   
   if(verbose)
-    cat(paste0('Permanova \n\r'))
+    cat(paste0('Testing reference set by Permanova \n\r'))
   
   permanova_L2 = vegan::adonis(dist_obj_L2~Y,permutations = nr.perm)
   permanova_L1 = vegan::adonis(dist_obj_L1~Y,permutations = nr.perm)
@@ -101,5 +101,11 @@ wcomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verb
 }
 
 check.input.wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm,verbose){
+  
+  # X_ref, - check is numeric matrix
+  # Y, - check is a group of values, same number of measurements as X_ref
+  # nr.perm, number of permuatations should be valid
+  # verbose - should be logical
+  
   return(TRUE)
 }
