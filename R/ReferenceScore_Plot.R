@@ -33,6 +33,11 @@ wcomp.plot_reference_scores = function(ref_select,label="Histogram of medianSD s
 
 #internal function for checking inputs
 check.input.wcomp.plot_reference_scores = function(ref_select,label,quantiles_to_plot,breaks_param){
+  # ref_select - is class
+  # label,
+  # quantiles_to_plot - are between 0 and 1
+  # breaks_param- breaks on the graph
+  
   return(TRUE)  
 }
 

@@ -125,6 +125,14 @@ wcomp.select_references = function(X, median_SD_threshold,
 }
 
 check.input.wcomp.select_references = function(X, median_SD_threshold, minimal_TA,maximal_TA, Psuedo_Count_used, verbose, select_from){
+  
+  # X - matrix of counts
+  # median_SD_threshold - should be a valid, not positive number. Print out warnings
+  # minimal_TA, - should be interger, reasonable range (warning), smaller then maximal_TA
+  # maximal_TA,
+  # Psuedo_Count_used,- should be valid integer
+  # verbose, - should be logical
+  # select_from - should be entirely contained in 1:m
   return(T)  
 }
 

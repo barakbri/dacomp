@@ -17,7 +17,7 @@ library(energy)
 #' @export
 #'
 #' @examples
-wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm=10^4,verbose = F){
+wcomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verbose = F){
   # check inputs
   input_check_result = check.input.wcomp.check_reference_set_is_valid(X_ref,Y,nr.perm,verbose)
   if(!input_check_result)

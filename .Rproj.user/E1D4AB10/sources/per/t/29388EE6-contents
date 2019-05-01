@@ -1,4 +1,0 @@
-useDynLib(wcomp, .registration=TRUE)
-#exportPattern("^[[:alpha:]]+")
-exportPattern("wcomp.")
-importFrom(Rcpp, evalCpp)

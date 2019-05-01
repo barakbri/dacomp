@@ -2,25 +2,24 @@
 CLASS.LABEL.WCOMP_RESULT_OBJECT = "wcomp.reference.selection.object"
 
 #' Title
+#'
 #' @param X 
 #' @param y 
 #' @param ind_reference_taxa 
-#' @param z 
 #' @param test 
 #' @param q 
+#' @param return_results_also_on_reference_validation_fail 
 #' @param nr_perm 
+#' @param nr_perms_reference_validation 
+#' @param T1E_reference_validation 
 #' @param disable_DSFDR 
 #' @param verbose 
-#' 
-#' @details 
-#' 
+#'
 #' @return
-#'   
-#' @references foo
-#' @author foo
+#' @export
 #'
 #' @examples
-wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,return_results_also_on_reference_validation_fail = F, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))),nr_perms_reference_validation = 10^4,T1E_reference_validation = 0.01, disable_DSFDR = F,verbose = F){
+wcomp.test = function(X,y,ind_reference_taxa,test = WCOMP.TEST.NAME.WILCOXON, q=0.05,return_results_also_on_reference_validation_fail = F, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))),nr_perms_reference_validation = 10^4,T1E_reference_validation = 0.01, disable_DSFDR = F,verbose = F){
   
   #in case a user inserted a reference selection object, with take the indices from the object
   if(class(ind_reference_taxa) == CLASS.LABEL.REFERENCE_SELECTION_OBJECT){
@@ -36,7 +35,6 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
   p = ncol(X)
   n = nrow(X)
   min_value_array = rep(NA,p)
-  rarefied_data_length_array = rep(NA,p)
   pval_res = rep(NA,p)
   pval_res.CVM = rep(NA,p)
   taxa_nr_res = rep(NA,p)
@@ -57,7 +55,7 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
   
   #We compute the permutation matrix. Note that this dependes on the type of test. If it is a signed rank test, permutations are only in each pair of subjects
   Y_matrix = matrix(NA, ncol = nr_perm+1, nrow = n)
-  if(test == 'SignedWilcoxon'){
+  if(test %in% TEST.DEF.TESTS.ON.PAIRS){
     Y_matrix[,1] = 1:n
     for( i in 2:ncol(Y_matrix)){
       #generate a permutation over signed subjects
@@ -97,32 +95,10 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
     
     min_value = min(total_reads_per_subject)
     min_value_array[i] = min_value
-    to_keep = 1:length(y) # no filtration of samples allowed, see paper for details on how sample filtration at this point can induce bias
-    
-    z_keep = z
-    
-    #enforcing pairs to have two measurements for each subject, subjects with less or more measurements are excluded
-    if(!is.null(z)){
-      z_keep = z[to_keep]
-      counts_for_subject = table(z_keep)
-      z_to_keep = as.numeric(which(counts_for_subject == 2))
-      z_values_to_keep = as.numeric(names(counts_for_subject)[z_to_keep])
-      to_keep = which(z %in% z_values_to_keep) # we already filtered once by minimum value
-      z_keep = z[to_keep]
-    }
-    
-    nom_keep = nom[to_keep]
-    dnom_keep = dnom[to_keep]
-    y_keep = y[to_keep]
-    rarefied_data_length_array[i] = length(nom_keep)
-    
-    # perform the actual subsample,
-    nom_keep_original = nom_keep
-    dnom_keep_original = dnom_keep
-    
+
     #perform subsample and test
     
-    temp_subsampled =  rhyper(n, nom_keep_original, dnom_keep_original,min_value)  
+    temp_subsampled =  rhyper(n, nom, dnom,min_value)  
     rarefaction_matrix[,1] = temp_subsampled 
     stats_matrix[,i] = Compute.resample.test(rarefaction_matrix,Y_matrix,statistic = test)
     
@@ -145,17 +121,23 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
   #test reference validity:
   if(verbose)
     cat(paste0('Running test to validate reference set\n\r'))
-  
-  test.reference.set.validity = wcomp.check_reference_set_is_valid(X_ref = X[,ind_reference_taxa],
-                                                             Y = y, nr.perm = nr_perms_reference_validation,
-                                                             verbose = verbose)
-  # handle a case of signal detected in the reference set:
-  possible_problem_in_reference_set_detected = F
-  if(any(unlist(test.reference.set.validity)<=T1E_reference_validation)){
-    possible_problem_in_reference_set_detected = T
-    warning_msg = paste0('Warning: One are more tests for validating that no differentially abundant taxa have entered the reference set has rejected it\'s null hypothesis at level T1E_reference_validation = ',T1E_reference_validation,'. A different reference set of taxon or reference selection method may be considered. To return p.values and rejections toghether with this warning, set parameter \'return_results_also_on_reference_validation_fail\' to TRUE\n\r')
-    warning(warning_msg)
+  test.reference.set.validity = "NOT TESTED,see run time warnings for additional details"
+  if(test %in% TEST.DEF.TEST.THAT.ALLOW.RVP){
+    test.reference.set.validity = wcomp.check_reference_set_is_valid.k_groups(X_ref = X[,ind_reference_taxa],
+                                                                     Y = y, nr.perm = nr_perms_reference_validation,
+                                                                     verbose = verbose)
+    # handle a case of signal detected in the reference set:
+    possible_problem_in_reference_set_detected = F
+    if(any(unlist(test.reference.set.validity)<=T1E_reference_validation)){
+      possible_problem_in_reference_set_detected = T
+      warning_msg = paste0('Warning: One are more tests for validating that no differentially abundant taxa have entered the reference set has rejected it\'s null hypothesis at level T1E_reference_validation = ',T1E_reference_validation,'. A different reference set of taxon or reference selection method may be considered. To return p.values and rejections toghether with this warning, set parameter \'return_results_also_on_reference_validation_fail\' to TRUE\n\r')
+      warning(warning_msg)
+    }
+  }else{
+    warning('WARNING: The reference validation procedure does not support the current reference set. This does not mean that the reference set is invalid, just that it wasn\'t tested')
   }
+  
+ 
   
   #return results:
   
@@ -181,6 +163,18 @@ wcomp.test = function(X,y,ind_reference_taxa,z = NULL,test = 'Wilcoxon', q=0.05,
 
 #internal function for validating inputs on wcomp.test
 check.input.wcomp.main = function(X, y, ind_reference_taxa, test, q, return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation, T1E_reference_validation, disable_DSFDR, verbose){
+  
+  ##List of checks:
+  ##  wcomp.test: test X is numeric matrix of counts, 
+  ##test y is valid - 0 or 1 for the relevant tests, has two groups are more for KW, disregarded in signed rank test
+  ##q is valid,
+  ##return_results_also_on_reference_validation_fail is valid 
+  ##nr_perm is valid,
+  ##nr_perms_reference_validation is valid, 
+  ##T1E_reference_validation is valid, 
+  ##disable_DSFDR is valid 
+  ##verbose is valid
+  
   return(TRUE)
 }
 
