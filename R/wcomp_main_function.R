@@ -135,7 +135,7 @@ wcomp.test = function(X,y,ind_reference_taxa,test = WCOMP.TEST.NAME.WILCOXON, q=
     possible_problem_in_reference_set_detected = F
     if(any(unlist(test.reference.set.validity)<=T1E_reference_validation)){
       possible_problem_in_reference_set_detected = T
-      warning_msg = paste0('Warning: One are more tests for validating that no differentially abundant taxa have entered the reference set has rejected it\'s null hypothesis at level T1E_reference_validation = ',T1E_reference_validation,'. A different reference set of taxon or reference selection method may be considered. To return p.values and rejections toghether with this warning, set parameter \'return_results_also_on_reference_validation_fail\' to TRUE\n\r')
+      warning_msg = paste0('Warning: One are more tests for validating that no differentially abundant taxa have entered the reference set has rejected it\'s null hypothesis at T1E level = ',T1E_reference_validation,'. A different reference set of taxa or reference selection method may need to be considered. To return p.values and rejections together with this warning, set parameter \'return_results_also_on_reference_validation_fail\' to TRUE\n\r')
       warning(warning_msg)
     }
   }else{

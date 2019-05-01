@@ -66,10 +66,24 @@ wcomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_stre
 
 #internal function for checking inputs:
 check.input.wcomp.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_change_in_microbial_load){
-  # 
-  # n_X, - sample sizes
-  # n_Y, - samples sizes
+   
+  # n_X,n_Y - sample sizes
+  if(n_X!= as.integer(n_X) | n_Y!= as.integer(n_Y))
+    stop('n_X and n_Y must be integers')
+  if(n_X<5 | n_Y<5 )
+    stop('Minimum number of 5 samples in each study group is required')
+  
   # m1 - number of diff abundant taxa - should be between 0 and 100
+  if(m1!=as.integer(m1))
+    stop('m1 must be integer')
+  if(m1<1 | m1>100)
+    stop('m1 must be between 1 and 100')
+  
   # signal_strength_as_change_in_microbial_load - should be between 0 and 0.5
+  if(!is.numeric(signal_strength_as_change_in_microbial_load))
+    stop('signal_strength_as_change_in_microbial_load must be between 0 and 0.5')
+  if(signal_strength_as_change_in_microbial_load<0 | signal_strength_as_change_in_microbial_load>0.5)
+    stop('signal_strength_as_change_in_microbial_load must be between 0 and 0.5')
+  
   return(TRUE)
 }

@@ -7,7 +7,7 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "wcomp.reference.selection.object"
 #' @param median_SD_threshold 
 #' @param minimal_TA 
 #' @param maximal_TA 
-#' @param Psuedo_Count_used 
+#' @param Pseudo_Count_used 
 #' @param verbose 
 #' @param select_from 
 #'
@@ -18,11 +18,11 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "wcomp.reference.selection.object"
 wcomp.select_references = function(X, median_SD_threshold, 
                                                            minimal_TA = 10,
                                                            maximal_TA = 200,
-                                                           Psuedo_Count_used = 1,
+                                                           Pseudo_Count_used = 1,
                                                            verbose = F,
                                                            select_from = NULL){
   #check inputs
-  input_check_result = check.input.wcomp.select_references(X, median_SD_threshold, minimal_TA,maximal_TA, Psuedo_Count_used, verbose, select_from)
+  input_check_result = check.input.wcomp.select_references(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from)
   if(!input_check_result)
     stop('Input check failed on wcomp.select_references')
   
@@ -44,7 +44,7 @@ wcomp.select_references = function(X, median_SD_threshold,
       
       X_i = X[,i]
       X_j = X[,j]
-      r = log(((X_i+Psuedo_Count_used) / (X_j+Psuedo_Count_used)))
+      r = log(((X_i+Pseudo_Count_used) / (X_j+Pseudo_Count_used)))
       ratio_matrix[i,j] = sd(r)
       ratio_matrix[j,i] = ratio_matrix[i,j]
     }
@@ -124,15 +124,49 @@ wcomp.select_references = function(X, median_SD_threshold,
   return(ret)
 }
 
-check.input.wcomp.select_references = function(X, median_SD_threshold, minimal_TA,maximal_TA, Psuedo_Count_used, verbose, select_from){
-  
+check.input.wcomp.select_references = function(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from){
   # X - matrix of counts
+  MSG_X = 'X must be a valid counts matrix'
+  if(!is.matrix(X))
+    stop(MSG_X)
+  if(any(!is.integer(X)))
+    stop(MSG_X)
+  if(any(X<0))
+    stop(MSG_X)
+  
   # median_SD_threshold - should be a valid, not positive number. Print out warnings
-  # minimal_TA, - should be interger, reasonable range (warning), smaller then maximal_TA
-  # maximal_TA,
-  # Psuedo_Count_used,- should be valid integer
+  MSG_median_SD_threshold = "median_SD_threshold must be a valid numeric value, for most data types has values in the range [0.5,1.5]"
+  if(!is.numeric(median_SD_threshold))
+    stop(MSG_median_SD_threshold)
+  if(median_SD_threshold <= 0)
+    stop(MSG_median_SD_threshold)
+  
+  if(median_SD_threshold < 0.5 | median_SD_threshold > 1.5)
+    warning('median_SD_threshold set to abnormal value, normally in range [0.5,1.5]')
+  
+  # minimal_TA,maximal_TA - should be interger, reasonable range (warning), smaller then maximal_TA
+  MSG_minimal_TA = "minimal_TA, maximal_TA should be positive integers, valid range for the minimal number of counts in reference taxa, across subjects"
+  if( (minimal_TA != as.integer(minimal_TA))| (maximal_TA != as.integer(maximal_TA)))
+    stop(MSG_minimal_TA)
+  if(minimal_TA>=maximal_TA | minimal_TA < 1)
+    stop(MSG_minimal_TA)
+  
+  # Pseudo_Count_used,- should be valid integer
+  MSG_Pseudo_Count_used = "Pseudo_Count_used must be a number, greater than zero."
+  if(!is.numeric(Pseudo_Count_used))
+    stop(MSG_Pseudo_Count_used)
+  if(Pseudo_Count_used <= 0)
+    stop(MSG_Pseudo_Count_used)
+  
   # verbose, - should be logical
+  if(!is.logical(verbose))
+    stop('verbose should be a valid logical value')
+  
   # select_from - should be entirely contained in 1:m
+  if(!is.null(select_from))
+    if(any(!(select_from %in% (1:ncol(X)))))
+      stop('select_from must be a subset of 1:ncol(X)')
+  
   return(T)  
 }
 

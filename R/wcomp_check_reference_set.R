@@ -61,21 +61,21 @@ wcomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verb
   # with L1,L2 and Bray-Curtis distance (BC actually not a distance...)
   
   if(verbose)
-    cat(paste0('Testing reference set by HHG\n\r'))
+    cat(paste0('Testing reference set validity by HHG\n\r'))
   
   hhg.res.L2 = HHG::hhg.test.k.sample(Dx_ref_L2,Y,nr.threads = 1,nr.perm = nr.perm,perm.stats.wanted = T)
   hhg.res.L1 = HHG::hhg.test.k.sample(Dx_ref_L1,Y,nr.threads = 1,nr.perm = nr.perm,perm.stats.wanted = T)
   hhg.res.BC = HHG::hhg.test.k.sample(Dx_ref_BC,Y,nr.threads = 1,nr.perm = nr.perm,perm.stats.wanted = T)
   
   if(verbose)
-    cat(paste0('Testing reference set by DISCO \n\r'))
+    cat(paste0('Testing reference set validity by DISCO \n\r'))
   
   energy_L2 = energy::disco(Dx_ref_L2,factors = Y,distance = T,R = nr.perm)
   energy_L1 = energy::disco(Dx_ref_L1,factors = Y,distance = T,R = nr.perm)
   energy_BC = energy::disco(Dx_ref_BC,factors = Y,distance = T,R = nr.perm)
   
   if(verbose)
-    cat(paste0('Testing reference set by Permanova \n\r'))
+    cat(paste0('Testing reference set validity by Permanova \n\r'))
   
   permanova_L2 = vegan::adonis(dist_obj_L2~Y,permutations = nr.perm)
   permanova_L1 = vegan::adonis(dist_obj_L1~Y,permutations = nr.perm)
@@ -103,9 +103,32 @@ wcomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verb
 check.input.wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm,verbose){
   
   # X_ref, - check is numeric matrix
+  MSG_X_REF = 'X_ref must be a valid counts matrix'
+  
+  if(!is.matrix(X_ref))
+    stop(MSG_X_REF)
+  if(any(!is.integer(X_ref)))
+    stop(MSG_X_REF)
+  if(any(X_ref<0))
+    stop(MSG_X_REF)
+  
   # Y, - check is a group of values, same number of measurements as X_ref
+  
+  if(length(Y)!= nrow(X_ref))
+    stop('length of Y must be same as number of rows in X_ref')
+  if(any(is.na(Y))|any(is.nan(Y)))
+    stop(MSG_X_REF)
+  
   # nr.perm, number of permuatations should be valid
+  MSG_NR_PERM = 'nr.perm must be at integer, at least 1000'
+  if(nr.perm != as.integer(nr.perm))
+    stop(MSG_NR_PERM)
+  if(nr.perm<1000)
+    stop(MSG_NR_PERM)
+  
   # verbose - should be logical
+  if(!is.logical(verbose))
+    stop('Verbose must be logical')
   
   return(TRUE)
 }
