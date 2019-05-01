@@ -117,7 +117,7 @@ check.input.wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm,verbos
   if(length(Y)!= nrow(X_ref))
     stop('length of Y must be same as number of rows in X_ref')
   if(any(is.na(Y))|any(is.nan(Y)))
-    stop(MSG_X_REF)
+    stop('Y has NA or NaNs - invalid observations')
   
   # nr.perm, number of permuatations should be valid
   MSG_NR_PERM = 'nr.perm must be at integer, at least 1000'

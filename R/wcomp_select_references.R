@@ -37,7 +37,7 @@ wcomp.select_references = function(X, median_SD_threshold,
   ratio_matrix = matrix(NA, ncol = m, nrow = m)
   
   for( i in 1:(m-1) ){
-    if(verbose && i%%(floor(m/100))==1)
+    if(verbose && i%%(floor(m/10))==1)
       cat(paste0('Computing pairwise ratios for taxon ',i,'/',m,'\n\r'))
     
     for( j in (i+1):m ){
@@ -76,7 +76,6 @@ wcomp.select_references = function(X, median_SD_threshold,
     cummulative_sorted_X_mat[i,] = cumsum(cummulative_sorted_X_mat[i,])
   }
     
-  
   # minimum abundance across taxa, for each possible set of references, by including one additional taxon at a time in the reference set:
   mean_prevalence_over_the_sorted = as.numeric(apply(cummulative_sorted_prevalence_mat,2,mean))
   min_abundance_over_the_sorted = as.numeric(apply(cummulative_sorted_X_mat,2,min))

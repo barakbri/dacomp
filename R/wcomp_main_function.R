@@ -83,14 +83,14 @@ wcomp.test = function(X,y,ind_reference_taxa,test = WCOMP.TEST.NAME.WILCOXON, q=
   #iterate over taxa and test
   for(i in 1:p){
     
+    if(verbose)
+      if(i%% ceiling(p/10) == 1)
+        cat(paste0('Testing taxon : ',i,'/',p,' \n\r'))
+    
     #no need to test reference taxa
     if(i %in% ind_reference_taxa){
       next
     }
-    
-    if(verbose)
-      if(i%% ceiling(p/100) == 1)
-        cat(paste0('Testing taxon : ',i,'/',p,' \n\r'))
     
     nom = X[,i]
     dnom = reference_values
@@ -169,17 +169,94 @@ wcomp.test = function(X,y,ind_reference_taxa,test = WCOMP.TEST.NAME.WILCOXON, q=
 #internal function for validating inputs on wcomp.test
 check.input.wcomp.main = function(X, y, ind_reference_taxa, test, q, return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation, T1E_reference_validation, disable_DSFDR, verbose){
   
-  ##List of checks:
   ##  wcomp.test: test X is numeric matrix of counts, 
+  MSG_X = 'X must be a valid counts matrix'
+  if(!is.matrix(X))
+    stop(MSG_X)
+  if(any(!is.integer(X)))
+    stop(MSG_X)
+  if(any(X<0))
+    stop(MSG_X)
+  
   ##test y is valid - 0 or 1 for the relevant tests, has two groups are more for KW, disregarded in signed rank test
+  if(!(test %in% TEST.DEF.TESTS.ON.PAIRS)){
+    if(length(y)!= nrow(X))
+      stop('length of y must be same as number of rows in X_ref')
+    if(any(is.na(y))|any(is.nan(y)))
+      stop('y has NA or NaNs - invalid observations')
+    if(min(table(y))<5)
+      warning('Note: at least one sample group with less than 5 observations\n\r')
+  }
+  
+  if(test %in% TEST.DEF.Y.IS.0.OR.1){
+    MSG_two_groups_not_available = paste0('y has more than two levels - cannot use test = ',test)
+    if(length(unique(y))!=2)
+      stop(MSG_two_groups_not_available)
+    if(!all.equal(sort(unique(y)),c(0,1))){
+      stop(MSG_two_groups_not_available)
+    }
+  }
+  if(test %in% TEST.DEF.TESTS.OVER.GROUPS){
+    if(length(unique(y))<2)
+      stop('y has only one level, cannot use test for groups')
+  }
+  
   #Y is null for signed rank test
-  ##q is valid,
+  if(test %in% TEST.DEF.TESTS.ON.PAIRS){
+    if(!is.null(y)){
+      stop('For paired data, y has to be set to NULL, and the rows of X set such that the first N rows ')
+    }
+    if(nrow(X) %%2 ==1)
+      stop('For paired data, X should have an even number of rows, but it has an odd number')
+  }
+  
+  ##q is valid
+  MSG_q = "q sets the required FDR level for the DS-FDR algorithm. Must be a number, >0"
+  if(!is.numeric(q))
+    stop(MSG_q)
+  if(q <= 0)
+    stop(MSG_q)
+  
+  if(q > 0.1)
+    warning('Note: you have set q for DS-FDR to be greater than 0.1, irregular parameter setting.\n\r')
+  
+  
   ##return_results_also_on_reference_validation_fail is valid 
+  if(!is.logical(return_results_also_on_reference_validation_fail))
+    stop('Verbose must be logical')
+  
   ##nr_perm is valid,
+  MSG_NR_PERM = 'nr.perm must be at integer, at least 1000'
+  if(nr_perm != as.integer(nr_perm))
+    stop(MSG_NR_PERM)
+  if(nr_perm<1000)
+    stop(MSG_NR_PERM)
+  
   ##nr_perms_reference_validation is valid, 
+  MSG_NR_PERM_VALIDATION = 'nr_perms_reference_validation must be at integer, at least 1000'
+  if(nr_perms_reference_validation != as.integer(nr_perms_reference_validation))
+    stop(MSG_NR_PERM_VALIDATION)
+  if(nr_perms_reference_validation<1000)
+    stop(MSG_NR_PERM_VALIDATION)
+  
   ##T1E_reference_validation is valid, 
+  MSG_T1E_reference_validation = "T1E_reference_validation must be a number, >0"
+  if(!is.numeric(T1E_reference_validation))
+    stop(MSG_T1E_reference_validation)
+  if(T1E_reference_validation <= 0)
+    stop(MSG_T1E_reference_validation)
+  
+  if(T1E_reference_validation > 0.05)
+    warning('Note: you have set T1E_reference_validation to be greater than 0.05, irregular parameter setting.\n\r')
+  
+  
   ##disable_DSFDR is valid 
+  if(!is.logical(disable_DSFDR))
+    stop('disable_DSFDR must be logical')
+  
   ##verbose is valid
+  if(!is.logical(verbose))
+    stop('Verbose must be logical')
   
   return(TRUE)
 }
