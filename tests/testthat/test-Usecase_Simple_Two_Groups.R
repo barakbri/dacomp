@@ -10,20 +10,27 @@ test_that("Simple Use Case", {
   
   set.seed(1)
   
+  ###************************************************
+  #generate data:
+  ###************************************************
+  
   data = wcomp.generate_example_dataset(m1 = 100,
                                         n_X = 50,
                                         n_Y = 50,
                                         signal_strength_as_change_in_microbial_load = 0.1)
   
-  
+  ###************************************************
   #select references: (may take a minute)
+  ###************************************************
   result.selected.references = wcomp.select_references(X = data$counts,
                                                        median_SD_threshold = 0.6, 
                                                        verbose = T)
   
   length(result.selected.references$selected_references)
   
+  ###************************************************
   #plot the reference selection scores (can be used to better set the threshold...)
+  ###************************************************
   wcomp.plot_reference_scores(result.selected.references)
   
   DIFF_ABUNDANT_TAXA_IN_REFERENCE_SET = sum(result.selected.references$selected_references %in% data$select_diff_abundant)
@@ -31,6 +38,9 @@ test_that("Simple Use Case", {
   
   q_BH = q_DSFDR = 0.1
   
+  ###************************************************
+  # Run wcomp
+  ###************************************************
   result.test = wcomp.test(X = data$counts,
                            y = data$group_labels,
                            ind_reference_taxa = result.selected.references$selected_references,verbose = T,q = q_DSFDR) # can also use for example , test = 'TwoPartWilcoxon', show example
@@ -52,6 +62,9 @@ test_that("Simple Use Case", {
   cat(paste0('True positives: ',TP,', FDR: ',round(FDR,2),'\n\r'))
   
   
+  ###************************************************
+  # Run reference validation
+  ###************************************************
   result.ref.validity = wcomp.check_reference_set_is_valid.k_groups(X_ref = data$counts[,result.selected.references$selected_references],Y = data$group_labels,nr.perm = 10000,verbose = T)
   
   result.ref.validity

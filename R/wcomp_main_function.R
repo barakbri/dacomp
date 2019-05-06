@@ -178,6 +178,10 @@ check.input.wcomp.main = function(X, y, ind_reference_taxa, test, q, return_resu
   if(any(X<0))
     stop(MSG_X)
   
+  if(!(test%in% wcomp::WCOMP.POSSIBLE.TEST.NAMES)){
+    stop(paste0('Test ',test,' not part of list WCOMP.POSSIBLE.TEST.NAMES'))
+  }
+  
   ##test y is valid - 0 or 1 for the relevant tests, has two groups are more for KW, disregarded in signed rank test
   if(!(test %in% TEST.DEF.TESTS.ON.PAIRS)){
     if(length(y)!= nrow(X))
@@ -257,6 +261,9 @@ check.input.wcomp.main = function(X, y, ind_reference_taxa, test, q, return_resu
   ##verbose is valid
   if(!is.logical(verbose))
     stop('Verbose must be logical')
+  
+  if(any(!(ind_reference_taxa %in% 1:ncol(X))))
+    stop('ind_reference_taxa must be subset of 1:ncol(X)')
   
   return(TRUE)
 }

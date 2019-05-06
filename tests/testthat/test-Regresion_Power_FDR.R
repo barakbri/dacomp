@@ -3,10 +3,13 @@ test_that("Regression tests to paper, power and FDR", {
   
   if(!exists('DO_REGRESSION_TESTING'))
     skip('DO_REGRESSION_TESTING not defined, skipping')
-  if(!DO_REGRESSION_TESTING )
+  if(!DO_REGRESSION_TESTING)
     skip('DO_REGRESSION_TESTING is false, skipping')
   
   
+  ###************************************************
+  # Function for estimating FDR and TP rate for a single scenario
+  ###************************************************
   
   SCENARIO_run_backwards_compatability = function(scenario_ID,nr.reps = 10,q_BH = 0.1 , q_DSFDR = 0.1,verbose = T){
     
@@ -15,8 +18,8 @@ test_that("Regression tests to paper, power and FDR", {
     set.seed(1)
     
     original_wd = getwd()
-    setwd('E:/MCB3/CompositionalAnalysis_CodeBase/MCB_Simulation/')
-    source(paste0('REFSIM_GenerateSettings_Index.R'))
+    setwd(CompositionalAnalysis_CodeBase_Location)
+    source(paste0('MCB_Simulation/REFSIM_GenerateSettings_Index.R'))
     setwd(original_wd)
     
     mean_TP_BH = 0
@@ -73,14 +76,20 @@ test_that("Regression tests to paper, power and FDR", {
                 mean_FDR_DSFDR = mean_FDR_DSFDR/nr.reps))
   }
   
+  ###************************************************
+  # Run scenarios, print results and compare to hash value
+  ###************************************************
+  
   library(doRNG)
   library(doParallel)
   cl <- makeCluster(detectCores()-1)
   registerDoParallel(cl)
   start_scenario = 1
-  end_scenario = 25
-  nr.reps = 10
-  scenario_results = foreach(s=start_scenario:end_scenario, .options.RNG=1234) %dorng% { SCENARIO_run_backwards_compatability(s,nr.reps = nr.reps,q_BH = 0.1,q_DSFDR = 0.1) }
+  end_scenario = 25 #25 #DEBUG
+  nr.reps = 1 #10 #DEBUG
+  scenario_results = foreach(s=start_scenario:end_scenario, .options.RNG=1234) %dorng% {
+    SCENARIO_run_backwards_compatability(s,nr.reps = nr.reps,q_BH = 0.1,q_DSFDR = 0.1)
+  }
   stopCluster(cl)
   result_table = unlist(scenario_results[[1]])
   for(i in 2:length(scenario_results)){
@@ -89,6 +98,7 @@ test_that("Regression tests to paper, power and FDR", {
   print(result_table)
   library(digest)
   hash_computation_result = digest(result_table, algo="md5")
+  cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
   hash_gold_standard = "c8bd697a35f4b892d10e779c46e21779"
   expect_equal(hash_computation_result,hash_gold_standard)
 })

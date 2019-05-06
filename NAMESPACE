@@ -1,3 +1,4 @@
 useDynLib(wcomp, .registration=TRUE)
 exportPattern("wcomp.")
+exportPattern("WCOMP.")
 importFrom(Rcpp, evalCpp)
