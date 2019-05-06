@@ -34,7 +34,7 @@ test_that("Simple Use Case", {
   wcomp.plot_reference_scores(result.selected.references)
   
   DIFF_ABUNDANT_TAXA_IN_REFERENCE_SET = sum(result.selected.references$selected_references %in% data$select_diff_abundant)
-  cat(paste0('DIFF_ABUNDANT_TAXA_IN_REFERENCE_SET: ',DIFF_ABUNDANT_TAXA_IN_REFERENCE_SET))
+  cat(paste0('DIFF_ABUNDANT_TAXA_IN_REFERENCE_SET: ',DIFF_ABUNDANT_TAXA_IN_REFERENCE_SET,'\n\r'))
   
   q_BH = q_DSFDR = 0.1
   

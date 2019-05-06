@@ -107,7 +107,7 @@ check.input.wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm,verbos
   
   if(!is.matrix(X_ref))
     stop(MSG_X_REF)
-  if(any(!is.integer(X_ref)))
+  if(any(X_ref!=as.integer(X_ref)))
     stop(MSG_X_REF)
   if(any(X_ref<0))
     stop(MSG_X_REF)

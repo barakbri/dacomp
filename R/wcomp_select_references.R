@@ -128,7 +128,7 @@ check.input.wcomp.select_references = function(X, median_SD_threshold, minimal_T
   MSG_X = 'X must be a valid counts matrix'
   if(!is.matrix(X))
     stop(MSG_X)
-  if(any(!is.integer(X)))
+  if(any(X!=as.integer(X)))
     stop(MSG_X)
   if(any(X<0))
     stop(MSG_X)

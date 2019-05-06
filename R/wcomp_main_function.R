@@ -173,7 +173,7 @@ check.input.wcomp.main = function(X, y, ind_reference_taxa, test, q, return_resu
   MSG_X = 'X must be a valid counts matrix'
   if(!is.matrix(X))
     stop(MSG_X)
-  if(any(!is.integer(X)))
+  if(any(X!=as.integer(X)))
     stop(MSG_X)
   if(any(X<0))
     stop(MSG_X)
