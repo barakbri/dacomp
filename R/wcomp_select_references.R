@@ -10,45 +10,84 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "wcomp.reference.selection.object"
 #' @param Pseudo_Count_used 
 #' @param verbose 
 #' @param select_from 
-#'
+#' @param Previous_Reference_Selection_Object
 #' @return
 #' @export
 #'
 #' @examples
+#' #' \dontrun{
+#' library(wcomp)
+#' 
+#' set.seed(1)
+#' 
+#' data = wcomp.generate_example_dataset(m1 = 100,
+#'        n_X = 50,
+#'        n_Y = 50,
+#'        signal_strength_as_change_in_microbial_load = 0.1)
+#' 
+#' # Select references: (may take a minute)
+#' result.selected.references = wcomp.select_references(X = data$counts,
+#'                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+#'                                                      verbose = T)
+#' 
+#' length(result.selected.references$selected_references)
+#'
+#' # Plot the reference selection scores (can also be used to better set the median SD threshold)
+#' wcomp.plot_reference_scores(result.selected.references)
+#' 
+#' # Select a reference set with a different (lower) threshold. user can use the function argument
+#' # 'Previous_Reference_Selection_Object' to provide a previous reference seleciton object for this data, to speed up computation.
+#' 
+#' result.selected.references.different.threshold = wcomp.select_references(X = data$counts,
+#'           median_SD_threshold = 0.5, 
+#'           verbose = F,
+#'           Previous_Reference_Selection_Object = result.selected.references)
+#'
+#'
+#' } 
 wcomp.select_references = function(X, median_SD_threshold, 
                                                            minimal_TA = 10,
                                                            maximal_TA = 200,
                                                            Pseudo_Count_used = 1,
                                                            verbose = F,
-                                                           select_from = NULL){
+                                                           select_from = NULL,
+                                                           Previous_Reference_Selection_Object = NULL){
   #check inputs
-  input_check_result = check.input.wcomp.select_references(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from)
+  input_check_result = check.input.wcomp.select_references(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from, Previous_Reference_Selection_Object)
   if(!input_check_result)
     stop('Input check failed on wcomp.select_references')
+  if(is.null(Previous_Reference_Selection_Object)){
+    m = dim(X)[2]
+    
+    #compute the SD_{j,k}, see paper for definition
+    ratio_matrix = matrix(NA, ncol = m, nrow = m)
+    
+    for( i in 1:(m-1) ){
+      if(verbose && i%%(floor(m/10))==1)
+        cat(paste0('Computing pairwise ratios for taxon ',i,'/',m,'\n\r'))
+      
+      for( j in (i+1):m ){
+        
+        X_i = X[,i]
+        X_j = X[,j]
+        r = log(((X_i+Pseudo_Count_used) / (X_j+Pseudo_Count_used)))
+        ratio_matrix[i,j] = sd(r)
+        ratio_matrix[j,i] = ratio_matrix[i,j]
+      }
+    }
+    
+  }else{
+    m = ncol(Previous_Reference_Selection_Object$ratio_matrix)
+    ratio_matrix = Previous_Reference_Selection_Object$ratio_matrix
+  }
+    
   
-  m = dim(X)[2]
   
   # for the default, null, all taxa can serve as reference
   if(is.null(select_from)){
     select_from = 1:m
   }
   
-  #compute the SD_{j,k}, see paper for definition
-  ratio_matrix = matrix(NA, ncol = m, nrow = m)
-  
-  for( i in 1:(m-1) ){
-    if(verbose && i%%(floor(m/10))==1)
-      cat(paste0('Computing pairwise ratios for taxon ',i,'/',m,'\n\r'))
-    
-    for( j in (i+1):m ){
-      
-      X_i = X[,i]
-      X_j = X[,j]
-      r = log(((X_i+Pseudo_Count_used) / (X_j+Pseudo_Count_used)))
-      ratio_matrix[i,j] = sd(r)
-      ratio_matrix[j,i] = ratio_matrix[i,j]
-    }
-  }
 
   #compute the different median SD scores
   scores         = apply(ratio_matrix,2,function(x){median(x,na.rm = T)}) 
@@ -123,7 +162,8 @@ wcomp.select_references = function(X, median_SD_threshold,
   return(ret)
 }
 
-check.input.wcomp.select_references = function(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from){
+check.input.wcomp.select_references = function(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from, Previous_Reference_Selection_Object){
+  
   # X - matrix of counts
   MSG_X = 'X must be a valid counts matrix'
   if(!is.matrix(X))
@@ -131,7 +171,7 @@ check.input.wcomp.select_references = function(X, median_SD_threshold, minimal_T
   if(any(X!=as.integer(X)))
     stop(MSG_X)
   if(any(X<0))
-    stop(MSG_X)
+    stop(MSG_X)  
   
   # median_SD_threshold - should be a valid, not positive number. Print out warnings
   MSG_median_SD_threshold = "median_SD_threshold must be a valid numeric value, for most data types has values in the range [0.5,1.5]"
@@ -165,6 +205,11 @@ check.input.wcomp.select_references = function(X, median_SD_threshold, minimal_T
   if(!is.null(select_from))
     if(any(!(select_from %in% (1:ncol(X)))))
       stop('select_from must be a subset of 1:ncol(X)')
+  
+  if(!is.null(Previous_Reference_Selection_Object)){
+    if(class(Previous_Reference_Selection_Object)!= CLASS.LABEL.REFERENCE_SELECTION_OBJECT)
+      stop(paste0('Previous_Reference_Selection_Object is used to reselect a set of references, with a different Median SD threshold, given a previous object of type ',CLASS.LABEL.REFERENCE_SELECTION_OBJECT,'. This is used in order to save computation time. Otherwise, the argument of Previous_Reference_Selection_Object should be set to the default value of NULL'))
+  }
   
   return(T)  
 }

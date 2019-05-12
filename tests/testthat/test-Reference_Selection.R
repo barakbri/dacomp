@@ -61,6 +61,10 @@ test_that("multiplication works", {
                                                        median_SD_threshold = 0.6, 
                                                        verbose = F)
   
+  result.selected.references.different.threshold = wcomp.select_references(X = data$counts,
+                                                       median_SD_threshold = 0.5, 
+                                                       verbose = F,Previous_Reference_Selection_Object = result.selected.references)
+  
   
   ###************************************************
   #check returned fields
@@ -73,13 +77,24 @@ test_that("multiplication works", {
   expect_equal(names(result.selected.references),c("selected_references","mean_prevalence_over_the_sorted", "min_abundance_over_the_sorted", "ratio_matrix",                 
                              "scores","selected_MinAbundance","median_SD_threshold","minimal_TA", "maximal_TA"))
   
+  expect(result.selected.references$selected_MinAbundance >= result.selected.references.different.threshold$selected_MinAbundance,failure_message = 'selected_MinAbundance must be monotone non decreasing with threshold.')
+  
+  expect(!any(!(result.selected.references.different.threshold$selected_references %in% result.selected.references$selected_references)) ,failure_message = 'as medianSD threshold increases, taxa should only join the refernece set, not leave it.')
+  
+  result.selected.references.same.threshold = wcomp.select_references(X = data$counts,
+                                                                           median_SD_threshold = 0.6, 
+                                                                           verbose = F,Previous_Reference_Selection_Object = result.selected.references)
+  expect_equal(
+    digest::digest(result.selected.references, algo="md5"),
+    digest::digest(result.selected.references.same.threshold, algo="md5"), info = "Selected references object by using previous computation of rations is not identical to original result"
+               )
   
   ###************************************************
   # regression check on results
   ###************************************************
   
   library(digest)
-  hash_computation_result = digest(result.selected.references, algo="md5")
+  hash_computation_result = digest::digest(result.selected.references, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
   hash_gold_standard = "61ed2ab005ef9c1735b7c722fa2feb41"
   expect_equal(hash_computation_result,hash_gold_standard)
