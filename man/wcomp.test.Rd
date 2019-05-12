@@ -4,9 +4,11 @@
 \alias{wcomp.test}
 \title{Title}
 \usage{
-wcomp.test(X, y, ind_reference_taxa, z = NULL, test = "Wilcoxon",
-  q = 0.05, nr_perm = 1/(q/(ncol(X) - length(ind_reference_taxa))),
-  disable_DSFDR = F, verbose = F)
+wcomp.test(X, y, ind_reference_taxa, test = WCOMP.TEST.NAME.WILCOXON,
+  q = 0.05, return_results_also_on_reference_validation_fail = F,
+  nr_perm = 1/(q/(ncol(X) - length(ind_reference_taxa))),
+  nr_perms_reference_validation = 10^4,
+  T1E_reference_validation = 0.01, disable_DSFDR = F, verbose = F)
 }
 \arguments{
 \item{X}{}
@@ -15,30 +17,69 @@ wcomp.test(X, y, ind_reference_taxa, z = NULL, test = "Wilcoxon",
 
 \item{ind_reference_taxa}{}
 
-\item{z}{}
-
 \item{test}{}
 
 \item{q}{}
 
+\item{return_results_also_on_reference_validation_fail}{}
+
 \item{nr_perm}{}
+
+\item{nr_perms_reference_validation}{}
+
+\item{T1E_reference_validation}{}
 
 \item{disable_DSFDR}{}
 
 \item{verbose}{}
 }
-\value{
-
-}
 \description{
 Title
 }
-\details{
+\examples{
+#' \dontrun{
+library(wcomp)
 
-}
-\references{
-foo
-}
-\author{
-foo
+set.seed(1)
+
+data = wcomp.generate_example_dataset(m1 = 100,
+       n_X = 50,
+       n_Y = 50,
+       signal_strength_as_change_in_microbial_load = 0.1)
+
+#select references: (may take a minute)
+result.selected.references = wcomp.select_references(X = data$counts,
+                                                     median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                                                     verbose = T)
+
+length(result.selected.references$selected_references)
+
+#plot the reference selection scores (can also be used to better set the median SD threshold)
+wcomp.plot_reference_scores(result.selected.references)
+
+#multiplicity correction levels for the BH and DS-FDR methods
+q_BH = q_DSFDR = 0.1
+
+#Perform testing:
+result.test = wcomp.test(X = data$counts,
+                      y = data$group_labels,
+                      ind_reference_taxa = result.selected.references,
+                      verbose = T,q = q_DSFDR)
+
+rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
+rejected_DSFDR = result.test$rejected
+
+
+TP = sum((rejected_BH \%in\% data$select_diff_abundant))
+FDR = ifelse(length(rejected_BH)>0,
+             sum(!(rejected_BH \%in\% data$select_diff_abundant))/length(rejected_BH),0)
+cat(paste0('True positives: ',TP,', FDR: ',round(FDR,2),', while using BH multiplicity correction\\n\\r'))
+
+TP_DSFDR = sum((rejected_DSFDR \%in\% data$select_diff_abundant))
+FDR_DSFDR = ifelse(length(rejected_DSFDR)>0,
+             sum(!(rejected_DSFDR \%in\% data$select_diff_abundant))/length(rejected_DSFDR),0)
+
+cat(paste0('True positives: ',TP_DSFDR,', FDR: ',round(FDR_DSFDR,2),', while using DS-FDR multiplicity correction\\n\\r'))
+
+} 
 }

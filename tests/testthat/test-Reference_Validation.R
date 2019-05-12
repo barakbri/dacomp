@@ -79,7 +79,7 @@ test_that("Reference Validation", {
   ###************************************************
   
   library(digest)
-  hash_computation_result = digest(result.ref.validity, algo="md5")
+  hash_computation_result = digest::digest(result.ref.validity, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
   hash_gold_standard = "6a42b8624f524e322ebcdfbaff1f60b2"
   expect_equal(hash_computation_result,hash_gold_standard)

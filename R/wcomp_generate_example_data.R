@@ -11,6 +11,18 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' library(wcomp)
+#'
+#' set.seed(1)
+#' data = wcomp.generate_example_dataset(m1 = 100,
+#'        n_X = 50,
+#'        n_Y = 50,
+#'        signal_strength_as_change_in_microbial_load = 0.1)
+#'
+#'
+#'
+#' } 
 wcomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_strength_as_change_in_microbial_load = 0.1){
   
   #check inputs

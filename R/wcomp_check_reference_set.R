@@ -17,6 +17,36 @@ library(energy)
 #' @export
 #'
 #' @examples
+#' #' #' \dontrun{
+#'
+#' library(wcomp)
+#' 
+#' set.seed(1)
+#' 
+#' data = wcomp.generate_example_dataset(m1 = 100, 
+#'        n_X = 50, n_Y = 50,
+#'        signal_strength_as_change_in_microbial_load = 0.1)
+#' 
+#' #select references: (may take a minute)
+#' 
+#' result.selected.references = wcomp.select_references(X = data$counts,
+#'                                  median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+#'                                  verbose = T)
+#' 
+#' length(result.selected.references$selected_references)
+#' 
+#' #plot the reference selection scores (can be used to better set the median SD threshold...)
+#' wcomp.plot_reference_scores(result.selected.references)
+#' 
+#' result.ref.validity = wcomp.check_reference_set_is_valid.k_groups(
+#'                         X_ref = data$counts[,result.selected.references$selected_references],
+#'                         Y = data$group_labels,
+#'                         nr.perm = 10000,
+#'                         verbose = T)
+
+#' result.ref.validity
+#'
+#' } 
 wcomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verbose = F){
   # check inputs
   input_check_result = check.input.wcomp.check_reference_set_is_valid(X_ref,Y,nr.perm,verbose)

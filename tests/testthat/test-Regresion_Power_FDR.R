@@ -87,7 +87,7 @@ test_that("Regression tests to paper, power and FDR", {
   
   print(result_table)
   library(digest)
-  hash_computation_result = digest(result_table, algo="md5")
+  hash_computation_result = digest::digest(result_table, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
   hash_gold_standard = "cba9aab1bab68d5a33180ce2f178279e"
   expect_equal(hash_computation_result,hash_gold_standard)

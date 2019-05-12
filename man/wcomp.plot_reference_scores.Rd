@@ -4,8 +4,9 @@
 \alias{wcomp.plot_reference_scores}
 \title{Title}
 \usage{
-wcomp.plot_reference_scores(ref_select, label, quantiles_to_plot = c(0.5,
-  0.7, 0.9), breaks_param = 30)
+wcomp.plot_reference_scores(ref_select,
+  label = "Histogram of medianSD statistic, across taxa",
+  quantiles_to_plot = c(0.5, 0.7, 0.9), breaks_param = 30)
 }
 \arguments{
 \item{ref_select}{}
@@ -18,4 +19,27 @@ wcomp.plot_reference_scores(ref_select, label, quantiles_to_plot = c(0.5,
 }
 \description{
 Title
+}
+\examples{
+\dontrun{
+library(wcomp)
+
+set.seed(1)
+
+data = wcomp.generate_example_dataset(m1 = 100,
+       n_X = 50,
+       n_Y = 50,
+       signal_strength_as_change_in_microbial_load = 0.1)
+
+#select references: (may take a minute)
+result.selected.references = wcomp.select_references(X = data$counts,
+                                                     median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                                                     verbose = T)
+
+length(result.selected.references$selected_references)
+
+#plot the reference selection scores (can also be used to better set the median SD threshold)
+wcomp.plot_reference_scores(result.selected.references)
+
+} 
 }

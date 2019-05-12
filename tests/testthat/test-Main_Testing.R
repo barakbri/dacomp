@@ -123,7 +123,7 @@ test_that("Test wcomp test function", {
   #regression test
   ###************************************************
   library(digest)
-  hash_computation_result = digest(result.test, algo="md5")
+  hash_computation_result = digest::digest(result.test, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
   hash_gold_standard = "2304439ec05f9c5871b185749fb25251"
   expect_equal(hash_computation_result,hash_gold_standard)
