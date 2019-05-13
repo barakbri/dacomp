@@ -1,0 +1,71 @@
+---
+title: wcomp - Nonparametric Differential Abundance Framework for Microbiome Counts
+  Data
+author: "Barak Brill"
+date: "May 13, 2019"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{wcomp}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+foo
+
+## Model 
+
+$$ \vec{X}_{i} | \vec{P}_{i}, N_i^X \sim multinom\left( N^{X}_i , \vec{P}_{i} \right) ,\quad\quad \vec{P}_{i}\sim\mathcal{P}\quad ,0\leq P_{i,j}, \sum_{j=1}^{m}P_{i,j} = 1 , $$
+
+
+$$ \vec{Y}_{l} | \vec{Q}_{l}, N_l^Y \sim multinom\left( N^{Y}_l , \vec{Q}_{l} \right) ,\quad\quad \vec{Q}_{l}\sim\mathcal{Q}\quad ,0\leq Q_{l,j}, \sum_{j=1}^{m}Q_{l,j} = 1 .$$
+
+$$\frac{\left(P_{v_1},P_{v_2},...,P_{v_{k}}\right)}{\sum_{k'=1}^{k} P_{v_{k'}}}\stackrel{d}{=}\frac{\left(Q_{v_1},Q_{v_2},...,Q_{v_{k}}\right)}{\sum_{k'=1}^{k} Q_{v_{k'}}} $$
+
+$$ H_0^{(j)}:\quad \frac{\left(P_j,P_{b_1},P_{b_2},...,P_{b_{r}}\right)}{P_j + \sum_{k=1}^{r} P_{b_k}}\stackrel{d}{=}\frac{\left(Q_j,Q_{b_1},Q_{b_2},...,Q_{b_{r}}\right)}{Q_j + \sum_{k=1}^{r} Q_{b_k}}.$$
+
+
+$$\tilde{H}_0^{(j)}: \tilde{X}_{i,j} \stackrel{d}{=} \tilde{Y}_{l,j} $$
+
+### Choosing reference taxa
+
+$$ SD_{j,k} = \mathop{\large{\mathrm{sd}}}^{n_X+n_Y}_{i=1}\left(log_{10}\left(\frac{Z_{i,j}+1}{Z_{i,k}+1}\right)\right), $$
+
+foo
+
+$$ S_j = \mathop{\large{\mathrm{median}}}^{m}_{k=1, k\ne j}\left(SD_{j,k}\right).$$
+
+$$ Select\, B: \quad B = \{j|S_j \leq S_{crit}\}. $$
+
+
+## Workflow - testing for taxa for differential abundance between two sample groups
+
+### Selecting reference taxa
+
+### Testing for differential abundance
+
+### Using different non parametric tests
+
+## Testing for differential abundance with $K$ sample groups
+
+## Testing for differential abundance in paired study design
+
+## Testing for differential abundance with a continous covariate
+
+## Development
+
+### Using different references selection methods
+  
+### Using tests for differential abundance other than the ones given in the package
+  
+
+
+
+
+
+#

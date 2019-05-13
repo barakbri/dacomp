@@ -11,4 +11,5 @@ Imports: Rcpp (>= 0.12.17), phyloseq,vegan,HHG,energy
 LinkingTo: Rcpp
 RoxygenNote: 6.1.1
 Suggests: 
-    testthat (>= 2.1.0), digest
+    testthat (>= 2.1.0), digest, knitr
+VignetteBuilder: knitr
