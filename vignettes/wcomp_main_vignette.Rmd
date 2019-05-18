@@ -3,7 +3,11 @@ title: wcomp - Nonparametric Differential Abundance Framework for Microbiome Cou
   Data
 author: "Barak Brill"
 date: "May 13, 2019"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+  
 vignette: >
   %\VignetteIndexEntry{wcomp}
   %\VignetteEngine{knitr::rmarkdown}
@@ -14,11 +18,11 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Introduction
+# Introduction
 
 foo
 
-## Model 
+# Model 
 
 $$ \vec{X}_{i} | \vec{P}_{i}, N_i^X \sim multinom\left( N^{X}_i , \vec{P}_{i} \right) ,\quad\quad \vec{P}_{i}\sim\mathcal{P}\quad ,0\leq P_{i,j}, \sum_{j=1}^{m}P_{i,j} = 1 , $$
 
@@ -32,7 +36,7 @@ $$ H_0^{(j)}:\quad \frac{\left(P_j,P_{b_1},P_{b_2},...,P_{b_{r}}\right)}{P_j + \
 
 $$\tilde{H}_0^{(j)}: \tilde{X}_{i,j} \stackrel{d}{=} \tilde{Y}_{l,j} $$
 
-### Choosing reference taxa
+## Choosing reference taxa
 
 $$ SD_{j,k} = \mathop{\large{\mathrm{sd}}}^{n_X+n_Y}_{i=1}\left(log_{10}\left(\frac{Z_{i,j}+1}{Z_{i,k}+1}\right)\right), $$
 
@@ -43,25 +47,25 @@ $$ S_j = \mathop{\large{\mathrm{median}}}^{m}_{k=1, k\ne j}\left(SD_{j,k}\right)
 $$ Select\, B: \quad B = \{j|S_j \leq S_{crit}\}. $$
 
 
-## Workflow - testing for taxa for differential abundance between two sample groups
+# Workflow - testing for taxa for differential abundance between two sample groups
 
-### Selecting reference taxa
+## Selecting reference taxa
 
-### Testing for differential abundance
+## Testing for differential abundance
 
-### Using different non parametric tests
+## Using different non parametric tests
 
-## Testing for differential abundance with $K$ sample groups
+# Testing for differential abundance with $K$ sample groups
 
-## Testing for differential abundance in paired study design
+# Testing for differential abundance in paired study design
 
-## Testing for differential abundance with a continous covariate
+# Testing for differential abundance with a continous covariate
 
-## Development
+# Development
 
-### Using different references selection methods
+## Using different references selection methods
   
-### Using tests for differential abundance other than the ones given in the package
+## Using tests for differential abundance other than the ones given in the package
   
 
 

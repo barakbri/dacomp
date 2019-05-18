@@ -1,6 +1,6 @@
 
-Run_Test_Modular = function(report_file = 'E:/temp/wcomp_test_results.txt',
-                            package_location = 'E:/wcomp/',
+Run_Test_Modular = function(report_file = 'E:/temp/dacomp_test_results.txt',
+                            package_location = 'E:/dacomp/',
                             CompositionalAnalysis_CodeBase_Location = 'E:/MCB3/CompositionalAnalysis_CodeBase/MCB_Simulation/'){
   sink(file = report_file)
   
@@ -16,7 +16,7 @@ Run_Test_Modular = function(report_file = 'E:/temp/wcomp_test_results.txt',
   DO_REFERENCE_VALIDATION <<- T
   DO_PLOTTING <<- T
   DO_MAIN_TESTING <<- T
-  DO_REGRESSION_TESTING <<- F
+  DO_REGRESSION_TESTING <<- T
   devtools::test()
   sink()  
 }

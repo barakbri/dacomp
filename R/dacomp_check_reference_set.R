@@ -1,5 +1,5 @@
 #Class label for object with results of a reference validation procedure
-CLASS.LABEL.REFERENCE_VALIDATION_RESULT_OBJECT = "wcomp.reference.validation.result.object"
+CLASS.LABEL.REFERENCE_VALIDATION_RESULT_OBJECT = "dacomp.reference.validation.result.object"
 
 library(vegan)
 library(HHG)
@@ -19,26 +19,26 @@ library(energy)
 #' @examples
 #' #' #' \dontrun{
 #'
-#' library(wcomp)
+#' library(dacomp)
 #' 
 #' set.seed(1)
 #' 
-#' data = wcomp.generate_example_dataset(m1 = 100, 
+#' data = dacomp.generate_example_dataset(m1 = 100, 
 #'        n_X = 50, n_Y = 50,
 #'        signal_strength_as_change_in_microbial_load = 0.1)
 #' 
 #' #select references: (may take a minute)
 #' 
-#' result.selected.references = wcomp.select_references(X = data$counts,
+#' result.selected.references = dacomp.select_references(X = data$counts,
 #'                                  median_SD_threshold = 0.6, #APPLICATION SPECIFIC
 #'                                  verbose = T)
 #' 
 #' length(result.selected.references$selected_references)
 #' 
 #' #plot the reference selection scores (can be used to better set the median SD threshold...)
-#' wcomp.plot_reference_scores(result.selected.references)
+#' dacomp.plot_reference_scores(result.selected.references)
 #' 
-#' result.ref.validity = wcomp.check_reference_set_is_valid.k_groups(
+#' result.ref.validity = dacomp.check_reference_set_is_valid.k_groups(
 #'                         X_ref = data$counts[,result.selected.references$selected_references],
 #'                         Y = data$group_labels,
 #'                         nr.perm = 10000,
@@ -47,11 +47,11 @@ library(energy)
 #' result.ref.validity
 #'
 #' } 
-wcomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verbose = F){
+dacomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verbose = F){
   # check inputs
-  input_check_result = check.input.wcomp.check_reference_set_is_valid(X_ref,Y,nr.perm,verbose)
+  input_check_result = check.input.dacomp.check_reference_set_is_valid(X_ref,Y,nr.perm,verbose)
   if(!input_check_result)
-    stop('Input check failed on wcomp.check_reference_set_is_valid')
+    stop('Input check failed on dacomp.check_reference_set_is_valid')
   
   #the reference validation procedure works on reference sets with at least two taxa.
   if(dim(X_ref)[2] == 1){
@@ -130,7 +130,7 @@ wcomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verb
   return(ret)
 }
 
-check.input.wcomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm,verbose){
+check.input.dacomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm,verbose){
   
   # X_ref, - check is numeric matrix
   MSG_X_REF = 'X_ref must be a valid counts matrix'

@@ -1,5 +1,5 @@
-#class label for results of the wcomp test function
-CLASS.LABEL.WCOMP_RESULT_OBJECT = "wcomp.reference.selection.object"
+#class label for results of the dacomp test function
+CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.reference.selection.object"
 
 #' Title
 #'
@@ -20,30 +20,30 @@ CLASS.LABEL.WCOMP_RESULT_OBJECT = "wcomp.reference.selection.object"
 #'
 #' @examples
 #' #' \dontrun{
-#' library(wcomp)
+#' library(dacomp)
 #' 
 #' set.seed(1)
 #' 
-#' data = wcomp.generate_example_dataset(m1 = 100,
+#' data = dacomp.generate_example_dataset(m1 = 100,
 #'        n_X = 50,
 #'        n_Y = 50,
 #'        signal_strength_as_change_in_microbial_load = 0.1)
 #' 
 #' #select references: (may take a minute)
-#' result.selected.references = wcomp.select_references(X = data$counts,
+#' result.selected.references = dacomp.select_references(X = data$counts,
 #'                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
 #'                                                      verbose = T)
 #' 
 #' length(result.selected.references$selected_references)
 #'
 #' #plot the reference selection scores (can also be used to better set the median SD threshold)
-#' wcomp.plot_reference_scores(result.selected.references)
+#' dacomp.plot_reference_scores(result.selected.references)
 #' 
 #' #multiplicity correction levels for the BH and DS-FDR methods
 #' q_BH = q_DSFDR = 0.1
 #' 
 #' #Perform testing:
-#' result.test = wcomp.test(X = data$counts,
+#' result.test = dacomp.test(X = data$counts,
 #'                       y = data$group_labels,
 #'                       ind_reference_taxa = result.selected.references,
 #'                       verbose = T,q = q_DSFDR)
@@ -64,7 +64,7 @@ CLASS.LABEL.WCOMP_RESULT_OBJECT = "wcomp.reference.selection.object"
 #' cat(paste0('True positives: ',TP_DSFDR,', FDR: ',round(FDR_DSFDR,2),', while using DS-FDR multiplicity correction\n\r'))
 #' 
 #' } 
-wcomp.test = function(X,y,ind_reference_taxa,test = WCOMP.TEST.NAME.WILCOXON, q=0.05,return_results_also_on_reference_validation_fail = F, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))),nr_perms_reference_validation = 10^4,T1E_reference_validation = 0.01, disable_DSFDR = F,verbose = F){
+dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, q=0.05,return_results_also_on_reference_validation_fail = F, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))),nr_perms_reference_validation = 10^4,T1E_reference_validation = 0.01, disable_DSFDR = F,verbose = F){
   
   #in case a user inserted a reference selection object, with take the indices from the object
   if(class(ind_reference_taxa) == CLASS.LABEL.REFERENCE_SELECTION_OBJECT){
@@ -77,9 +77,9 @@ wcomp.test = function(X,y,ind_reference_taxa,test = WCOMP.TEST.NAME.WILCOXON, q=
   }
      
   #Check input validity
-  input_check_result = check.input.wcomp.main(X,y,ind_reference_taxa,test, q,return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation,T1E_reference_validation, disable_DSFDR,verbose)
+  input_check_result = check.input.dacomp.main(X,y,ind_reference_taxa,test, q,return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation,T1E_reference_validation, disable_DSFDR,verbose)
   if(!input_check_result)
-    stop('Input check failed on wcomp.test')
+    stop('Input check failed on dacomp.test')
       
   #definitions and allocations:
   p = ncol(X)
@@ -173,7 +173,7 @@ wcomp.test = function(X,y,ind_reference_taxa,test = WCOMP.TEST.NAME.WILCOXON, q=
     cat(paste0('Running test to validate reference set\n\r'))
   test.reference.set.validity = "NOT TESTED,see run time warnings for additional details"
   if(test %in% TEST.DEF.TEST.THAT.ALLOW.RVP){
-    test.reference.set.validity = wcomp.check_reference_set_is_valid.k_groups(X_ref = X[,ind_reference_taxa],
+    test.reference.set.validity = dacomp.check_reference_set_is_valid.k_groups(X_ref = X[,ind_reference_taxa],
                                                                      Y = y, nr.perm = nr_perms_reference_validation,
                                                                      verbose = verbose)
     # handle a case of signal detected in the reference set:
@@ -207,14 +207,14 @@ wcomp.test = function(X,y,ind_reference_taxa,test = WCOMP.TEST.NAME.WILCOXON, q=
       ret$dsfdr_threshold = dsfdr_threshold  
     }
   }
-  class(ret) = CLASS.LABEL.WCOMP_RESULT_OBJECT
+  class(ret) = CLASS.LABEL.DACOMP_RESULT_OBJECT
   return(ret)
 }
 
-#internal function for validating inputs on wcomp.test
-check.input.wcomp.main = function(X, y, ind_reference_taxa, test, q, return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation, T1E_reference_validation, disable_DSFDR, verbose){
+#internal function for validating inputs on dacomp.test
+check.input.dacomp.main = function(X, y, ind_reference_taxa, test, q, return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation, T1E_reference_validation, disable_DSFDR, verbose){
   
-  ##  wcomp.test: test X is numeric matrix of counts, 
+  ##  dacomp.test: test X is numeric matrix of counts, 
   MSG_X = 'X must be a valid counts matrix'
   if(!is.matrix(X))
     stop(MSG_X)
@@ -223,8 +223,8 @@ check.input.wcomp.main = function(X, y, ind_reference_taxa, test, q, return_resu
   if(any(X<0))
     stop(MSG_X)
   
-  if(!(test%in% wcomp::WCOMP.POSSIBLE.TEST.NAMES)){
-    stop(paste0('Test ',test,' not part of list WCOMP.POSSIBLE.TEST.NAMES'))
+  if(!(test%in% dacomp::DACOMP.POSSIBLE.TEST.NAMES)){
+    stop(paste0('Test ',test,' not part of list DACOMP.POSSIBLE.TEST.NAMES'))
   }
   
   ##test y is valid - 0 or 1 for the relevant tests, has two groups are more for KW, disregarded in signed rank test

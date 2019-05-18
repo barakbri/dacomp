@@ -7,7 +7,7 @@ test_that("Regression tests to paper, power and FDR", {
   if(!DO_REGRESSION_TESTING)
     skip('DO_REGRESSION_TESTING is false, skipping')
   
-  library(wcomp)
+  library(dacomp)
   
   ###************************************************
   # Function for estimating FDR and TP rate for a single scenario
@@ -15,7 +15,7 @@ test_that("Regression tests to paper, power and FDR", {
   
   SCENARIO_run_backwards_compatability = function(scenario_ID,nr.reps = 10,q_BH = 0.1 , q_DSFDR = 0.1,verbose = T,CompositionalAnalysis_CodeBase_Location = 'E:/MCB3/CompositionalAnalysis_CodeBase/'){
     
-    library(wcomp)
+    library(dacomp)
     mean_TP_BH = 0
     mean_FDR_BH = 0
     mean_TP_DSFDR = 0
@@ -25,7 +25,7 @@ test_that("Regression tests to paper, power and FDR", {
         cat(paste0('Running scenario ID ',scenario_ID,', rep: ',b,' / ',nr.reps,'\n\r'))
       }
       data = REFSIM_generate_setting_wrapper(REFSIM_SETTINGS_LIST[[scenario_ID]])
-      result.selected.references = wcomp.select_references(X = data$X,
+      result.selected.references = dacomp.select_references(X = data$X,
                                                            median_SD_threshold = 1.3, 
                                                            verbose = F)
       
@@ -35,7 +35,7 @@ test_that("Regression tests to paper, power and FDR", {
       
       
       
-      result.test = wcomp.test(X = data$X,
+      result.test = dacomp.test(X = data$X,
                                y = data$Y,
                                ind_reference_taxa = result.selected.references$selected_references,
                                verbose = F,q = q_DSFDR,nr_perm = 10000,

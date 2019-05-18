@@ -1,5 +1,5 @@
 #object label for reference selection results
-CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "wcomp.reference.selection.object"
+CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "dacomp.reference.selection.object"
 
 #' Title
 #'
@@ -16,36 +16,36 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "wcomp.reference.selection.object"
 #'
 #' @examples
 #' #' \dontrun{
-#' library(wcomp)
+#' library(dacomp)
 #' 
 #' set.seed(1)
 #' 
-#' data = wcomp.generate_example_dataset(m1 = 100,
+#' data = dacomp.generate_example_dataset(m1 = 100,
 #'        n_X = 50,
 #'        n_Y = 50,
 #'        signal_strength_as_change_in_microbial_load = 0.1)
 #' 
 #' # Select references: (may take a minute)
-#' result.selected.references = wcomp.select_references(X = data$counts,
+#' result.selected.references = dacomp.select_references(X = data$counts,
 #'                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
 #'                                                      verbose = T)
 #' 
 #' length(result.selected.references$selected_references)
 #'
 #' # Plot the reference selection scores (can also be used to better set the median SD threshold)
-#' wcomp.plot_reference_scores(result.selected.references)
+#' dacomp.plot_reference_scores(result.selected.references)
 #' 
 #' # Select a reference set with a different (lower) threshold. user can use the function argument
 #' # 'Previous_Reference_Selection_Object' to provide a previous reference seleciton object for this data, to speed up computation.
 #' 
-#' result.selected.references.different.threshold = wcomp.select_references(X = data$counts,
+#' result.selected.references.different.threshold = dacomp.select_references(X = data$counts,
 #'           median_SD_threshold = 0.5, 
 #'           verbose = F,
 #'           Previous_Reference_Selection_Object = result.selected.references)
 #'
 #'
 #' } 
-wcomp.select_references = function(X, median_SD_threshold, 
+dacomp.select_references = function(X, median_SD_threshold, 
                                                            minimal_TA = 10,
                                                            maximal_TA = 200,
                                                            Pseudo_Count_used = 1,
@@ -53,9 +53,9 @@ wcomp.select_references = function(X, median_SD_threshold,
                                                            select_from = NULL,
                                                            Previous_Reference_Selection_Object = NULL){
   #check inputs
-  input_check_result = check.input.wcomp.select_references(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from, Previous_Reference_Selection_Object)
+  input_check_result = check.input.dacomp.select_references(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from, Previous_Reference_Selection_Object)
   if(!input_check_result)
-    stop('Input check failed on wcomp.select_references')
+    stop('Input check failed on dacomp.select_references')
   if(is.null(Previous_Reference_Selection_Object)){
     m = dim(X)[2]
     
@@ -162,7 +162,7 @@ wcomp.select_references = function(X, median_SD_threshold,
   return(ret)
 }
 
-check.input.wcomp.select_references = function(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from, Previous_Reference_Selection_Object){
+check.input.dacomp.select_references = function(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from, Previous_Reference_Selection_Object){
   
   # X - matrix of counts
   MSG_X = 'X must be a valid counts matrix'

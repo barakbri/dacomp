@@ -6,7 +6,7 @@ test_that("Simple Use Case", {
   if(!DO_SIMPLE_USE_CASE)
     skip('DO_SIMPLE_USE_CASE is false, skipping')
   library(HHG)
-  library(wcomp)
+  library(dacomp)
   
   set.seed(1)
   
@@ -14,7 +14,7 @@ test_that("Simple Use Case", {
   #generate data:
   ###************************************************
   
-  data = wcomp.generate_example_dataset(m1 = 100,
+  data = dacomp.generate_example_dataset(m1 = 100,
                                         n_X = 50,
                                         n_Y = 50,
                                         signal_strength_as_change_in_microbial_load = 0.1)
@@ -22,7 +22,7 @@ test_that("Simple Use Case", {
   ###************************************************
   #select references: (may take a minute)
   ###************************************************
-  result.selected.references = wcomp.select_references(X = data$counts,
+  result.selected.references = dacomp.select_references(X = data$counts,
                                                        median_SD_threshold = 0.6, 
                                                        verbose = T)
   
@@ -31,7 +31,7 @@ test_that("Simple Use Case", {
   ###************************************************
   #plot the reference selection scores (can be used to better set the threshold...)
   ###************************************************
-  wcomp.plot_reference_scores(result.selected.references)
+  dacomp.plot_reference_scores(result.selected.references)
   
   DIFF_ABUNDANT_TAXA_IN_REFERENCE_SET = sum(result.selected.references$selected_references %in% data$select_diff_abundant)
   cat(paste0('DIFF_ABUNDANT_TAXA_IN_REFERENCE_SET: ',DIFF_ABUNDANT_TAXA_IN_REFERENCE_SET,'\n\r'))
@@ -39,9 +39,9 @@ test_that("Simple Use Case", {
   q_BH = q_DSFDR = 0.1
   
   ###************************************************
-  # Run wcomp
+  # Run dacomp
   ###************************************************
-  result.test = wcomp.test(X = data$counts,
+  result.test = dacomp.test(X = data$counts,
                            y = data$group_labels,
                            ind_reference_taxa = result.selected.references$selected_references,verbose = T,q = q_DSFDR) # can also use for example , test = 'TwoPartWilcoxon', show example
   
@@ -65,11 +65,11 @@ test_that("Simple Use Case", {
   ###************************************************
   # Run reference validation
   ###************************************************
-  result.ref.validity = wcomp.check_reference_set_is_valid.k_groups(X_ref = data$counts[,result.selected.references$selected_references],Y = data$group_labels,nr.perm = 10000,verbose = T)
+  result.ref.validity = dacomp.check_reference_set_is_valid.k_groups(X_ref = data$counts[,result.selected.references$selected_references],Y = data$group_labels,nr.perm = 10000,verbose = T)
   
   result.ref.validity
   
-  expect_is(result.selected.references, wcomp::CLASS.LABEL.REFERENCE_SELECTION_OBJECT)
-  expect_is(result.test, wcomp::CLASS.LABEL.WCOMP_RESULT_OBJECT)
-  expect_is(result.ref.validity, wcomp::CLASS.LABEL.REFERENCE_VALIDATION_RESULT_OBJECT)
+  expect_is(result.selected.references, dacomp:::CLASS.LABEL.REFERENCE_SELECTION_OBJECT)
+  expect_is(result.test, dacomp:::CLASS.LABEL.DACOMP_RESULT_OBJECT)
+  expect_is(result.ref.validity, dacomp:::CLASS.LABEL.REFERENCE_VALIDATION_RESULT_OBJECT)
 })

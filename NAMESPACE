@@ -1,4 +1,4 @@
-useDynLib(wcomp, .registration=TRUE)
-exportPattern("wcomp.")
-exportPattern("WCOMP.")
+useDynLib(dacomp, .registration=TRUE)
+exportPattern("dacomp.")
+exportPattern("DACOMP.")
 importFrom(Rcpp, evalCpp)

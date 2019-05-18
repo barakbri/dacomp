@@ -2,14 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 rcpp_Wilcoxon_PermTest_Given_Permutations <- function(X, Y) {
-    .Call(`_wcomp_rcpp_Wilcoxon_PermTest_Given_Permutations`, X, Y)
+    .Call(`_dacomp_rcpp_Wilcoxon_PermTest_Given_Permutations`, X, Y)
 }
 
 rcpp_TwoPartTest_Given_Permutations <- function(X, Y) {
-    .Call(`_wcomp_rcpp_TwoPartTest_Given_Permutations`, X, Y)
+    .Call(`_dacomp_rcpp_TwoPartTest_Given_Permutations`, X, Y)
 }
 
 rcpp_Compute_Wilcoxon_Signed_Rank_Stat <- function(RankedDifferences, SecondGroupBigger) {
-    .Call(`_wcomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat`, RankedDifferences, SecondGroupBigger)
+    .Call(`_dacomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat`, RankedDifferences, SecondGroupBigger)
 }
 

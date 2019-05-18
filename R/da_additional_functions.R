@@ -1,45 +1,45 @@
-WCOMP.TEST.NAME.WILCOXON = 'Wilcoxon'
-WCOMP.TEST.NAME.DIFFERENCE_IN_MEANS = 'Avg.Diff'
-WCOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS = 'Log.Avg.Diff'
-WCOMP.TEST.NAME.TWO_PART_WILCOXON = 'TwoPartWilcoxon'
-WCOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST = 'SignedWilcoxon'
-WCOMP.TEST.NAME.KRUSKAL_WALLIS = 'KW'
+DACOMP.TEST.NAME.WILCOXON = 'Wilcoxon'
+DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS = 'Avg.Diff'
+DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS = 'Log.Avg.Diff'
+DACOMP.TEST.NAME.TWO_PART_WILCOXON = 'TwoPartWilcoxon'
+DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST = 'SignedWilcoxon'
+DACOMP.TEST.NAME.KRUSKAL_WALLIS = 'KW'
 
 #define test properties:
 #Tests that require Y to be 0 or 1 strictly:
-TEST.DEF.Y.IS.0.OR.1 = c(WCOMP.TEST.NAME.WILCOXON,
-                         WCOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
-                         WCOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
-                         WCOMP.TEST.NAME.TWO_PART_WILCOXON,
-                         WCOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST)
+TEST.DEF.Y.IS.0.OR.1 = c(DACOMP.TEST.NAME.WILCOXON,
+                         DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
+                         DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
+                         DACOMP.TEST.NAME.TWO_PART_WILCOXON,
+                         DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST)
 
 #Tests that require test statistics to be squared:
-TEST.DEF.SCORES.TO.BE.SQUARED = c(WCOMP.TEST.NAME.WILCOXON,
-                                  WCOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
-                                  WCOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
-                                  WCOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST)
+TEST.DEF.SCORES.TO.BE.SQUARED = c(DACOMP.TEST.NAME.WILCOXON,
+                                  DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
+                                  DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
+                                  DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST)
 
 # Tests the are on pairs of observations:
-TEST.DEF.TESTS.ON.PAIRS = c(WCOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST)
+TEST.DEF.TESTS.ON.PAIRS = c(DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST)
 
 # Tests over groups of observations (2 or more, but not 1)
-TEST.DEF.TESTS.OVER.GROUPS  = WCOMP.TEST.NAME.KRUSKAL_WALLIS
+TEST.DEF.TESTS.OVER.GROUPS  = DACOMP.TEST.NAME.KRUSKAL_WALLIS
 
 # Tests for which the reference validation procedure is doable:
-TEST.DEF.TEST.THAT.ALLOW.RVP = c(WCOMP.TEST.NAME.WILCOXON,
-                                 WCOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
-                                 WCOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
-                                 WCOMP.TEST.NAME.TWO_PART_WILCOXON,
-                                 #WCOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST, # I need a version of the RVP for paired data.
-                                 WCOMP.TEST.NAME.KRUSKAL_WALLIS)
+TEST.DEF.TEST.THAT.ALLOW.RVP = c(DACOMP.TEST.NAME.WILCOXON,
+                                 DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
+                                 DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
+                                 DACOMP.TEST.NAME.TWO_PART_WILCOXON,
+                                 #DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST, # I need a version of the RVP for paired data.
+                                 DACOMP.TEST.NAME.KRUSKAL_WALLIS)
 
 #A list of all possible test names, also accessible to the user
-WCOMP.POSSIBLE.TEST.NAMES = c(WCOMP.TEST.NAME.WILCOXON,
-                              WCOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
-                              WCOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
-                              WCOMP.TEST.NAME.TWO_PART_WILCOXON,
-                              WCOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
-                              WCOMP.TEST.NAME.KRUSKAL_WALLIS)
+DACOMP.POSSIBLE.TEST.NAMES = c(DACOMP.TEST.NAME.WILCOXON,
+                              DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
+                              DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
+                              DACOMP.TEST.NAME.TWO_PART_WILCOXON,
+                              DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
+                              DACOMP.TEST.NAME.KRUSKAL_WALLIS)
 
 
 
@@ -50,7 +50,7 @@ WCOMP.POSSIBLE.TEST.NAMES = c(WCOMP.TEST.NAME.WILCOXON,
 # coloumns of Y_matrix are different permutations of the group labels
 # rows are samples
 # the returned statistics are a sum of individual test statistics across columns of X (test the joint null hypothesis)
-Compute.resample.test = function(X_matrix,Y_matrix,statistic = WCOMP.TEST.NAME.WILCOXON){
+Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.WILCOXON){
   
   if(ncol(X_matrix) != 1)
     stop('Error in Compute.resample.test: Function requires X_matrix with a single column')
@@ -67,7 +67,7 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = WCOMP.TEST.NAME.W
   ranked_X = rank(X_matrix[,1], ties.method = 'average') #break ties by average rank
   
   #the wilcoxon rank sum test
-  if(statistic == WCOMP.TEST.NAME.WILCOXON){
+  if(statistic == DACOMP.TEST.NAME.WILCOXON){
     
     current_stats = (subzero::rcpp_Wilcoxon_PermTest_Given_Permutations(ranked_X,Y_matrix)[[1]]) #compute statistic and a sample of test statistic given from the null hypothesis
     current_stats = current_stats - sum(Y_matrix[,1])/nrow(Y_matrix) * sum(ranked_X)
@@ -90,26 +90,26 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = WCOMP.TEST.NAME.W
     V_H0 = NR_Y0 * NR_Y1 * (N+1) / 12 - NR_Y0 * NR_Y1 * unique_value_counts_only_ties_correction / (12 * N * (N - 1))
     current_stats = current_stats/sqrt(V_H0) #convert to Z score
   }
-  if(statistic == WCOMP.TEST.NAME.DIFFERENCE_IN_MEANS){ #test statistic is the difference in mean counts across two sample groups
+  if(statistic == DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS){ #test statistic is the difference in mean counts across two sample groups
     current_stats = rep(0,nr_bootstraps)
     for(b in 1:ncol(Y_matrix)){
       current_stats[b] = mean(X_matrix[Y_matrix[,b]==0,s]) - mean(X_matrix[Y_matrix[,b]==1,s])
     }
   } 
-  if(statistic == WCOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS){ #test statistic is the log fold change across two sample groups
+  if(statistic == DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS){ #test statistic is the log fold change across two sample groups
     current_stats = rep(0,nr_bootstraps)
     for(b in 1:ncol(Y_matrix)){
       current_stats[b] = mean(log10(X_matrix[Y_matrix[,b]==0,s]+1)) - mean(log10(X_matrix[Y_matrix[,b]==1,s]+1))
     }
   }   
-  if(statistic == WCOMP.TEST.NAME.TWO_PART_WILCOXON){#chi square score of a wilcoxon test and a two-sample test for equality of proportions (for zeroes in the data)
+  if(statistic == DACOMP.TEST.NAME.TWO_PART_WILCOXON){#chi square score of a wilcoxon test and a two-sample test for equality of proportions (for zeroes in the data)
     X_ranked_without_zeroes = X_matrix[,1]
     X_ranked_without_zeroes[X_ranked_without_zeroes>0] = rank(X_ranked_without_zeroes[X_ranked_without_zeroes>0],ties.method = 'average')
     current_stats = (subzero::rcpp_TwoPartTest_Given_Permutations(X_ranked_without_zeroes,Y_matrix)[[1]])
   } 
     
   
-  if(statistic == WCOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST){ # signed wilcoxon
+  if(statistic == DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST){ # signed wilcoxon
     
     for(j in 1:nr_bootstraps){
       g1 = X_matrix[Y_matrix[1:(n/2),j],s]
@@ -118,7 +118,7 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = WCOMP.TEST.NAME.W
     }
     
   }
-  if(statistic == WCOMP.TEST.NAME.KRUSKAL_WALLIS){ #Kruskal Wallis
+  if(statistic == DACOMP.TEST.NAME.KRUSKAL_WALLIS){ #Kruskal Wallis
     for(j in 1:nr_bootstraps){
       add_stat = (kruskal.test(X_matrix[,s], as.factor(Y_matrix[,j]))$statistic)
       if(is.nan(add_stat))

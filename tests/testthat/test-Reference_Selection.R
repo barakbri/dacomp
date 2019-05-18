@@ -13,36 +13,36 @@ test_that("multiplication works", {
   
   set.seed(1)
   
-  data = wcomp.generate_example_dataset(m1 = 100,
+  data = dacomp.generate_example_dataset(m1 = 100,
                                         n_X = 50,
                                         n_Y = 50,
                                         signal_strength_as_change_in_microbial_load = 0.1)
   
-  expect_error(wcomp.select_references(X = data$counts,
+  expect_error(dacomp.select_references(X = data$counts,
                                        median_SD_threshold = -1, 
                                        verbose = F),info = "negative median SD threshold")
   
-  expect_warning(wcomp.select_references(X = data$counts,
+  expect_warning(dacomp.select_references(X = data$counts,
                                        median_SD_threshold = 0.4, 
                                        verbose = F),info = "medianSD under 0.5 should produce warning")
   
-  expect_warning(wcomp.select_references(X = data$counts,
+  expect_warning(dacomp.select_references(X = data$counts,
                                          median_SD_threshold = 1.6, 
                                          verbose = F),info = "medianSD above 1.5 should produce warning")
   
-  expect_error(wcomp.select_references(X = data$counts,
+  expect_error(dacomp.select_references(X = data$counts,
                                        median_SD_threshold = 1.0, minimal_TA = -1,
                                        verbose = F),info = "minimal_TA cannot be negative")
   
-  expect_error(wcomp.select_references(X = data$counts,
+  expect_error(dacomp.select_references(X = data$counts,
                                        median_SD_threshold = 1.0, minimal_TA = 50,maximal_TA = 10,
                                        verbose = F),info = "minimal_TA must be smaller than maximal TA")
   
-  expect_error(wcomp.select_references(X = data$counts,
+  expect_error(dacomp.select_references(X = data$counts,
                                        median_SD_threshold = 1.0, minimal_TA = 10,maximal_TA = 50,Pseudo_Count_used = 0,
                                        verbose = F),info = "Pseudo_Count_used must be strictly greater than zero")
   
-  expect_error(wcomp.select_references(X = data$counts,
+  expect_error(dacomp.select_references(X = data$counts,
                                        median_SD_threshold = 1.0, minimal_TA = 10,maximal_TA = 50,Pseudo_Count_used = 1,select_from = (1:(ncol(data$counts)+1)),
                                        verbose = F),info = "select_from must be a subset of 1:ncol(X)")
   
@@ -52,16 +52,16 @@ test_that("multiplication works", {
   ###************************************************
   set.seed(1)
   
-  data = wcomp.generate_example_dataset(m1 = 100,
+  data = dacomp.generate_example_dataset(m1 = 100,
                                         n_X = 50,
                                         n_Y = 50,
                                         signal_strength_as_change_in_microbial_load = 0.1)
   
-  result.selected.references = wcomp.select_references(X = data$counts,
+  result.selected.references = dacomp.select_references(X = data$counts,
                                                        median_SD_threshold = 0.6, 
                                                        verbose = F)
   
-  result.selected.references.different.threshold = wcomp.select_references(X = data$counts,
+  result.selected.references.different.threshold = dacomp.select_references(X = data$counts,
                                                        median_SD_threshold = 0.5, 
                                                        verbose = F,Previous_Reference_Selection_Object = result.selected.references)
   
@@ -71,7 +71,7 @@ test_that("multiplication works", {
   ###************************************************
   
   
-  expect_is(result.selected.references,class = wcomp:::CLASS.LABEL.REFERENCE_SELECTION_OBJECT)
+  expect_is(result.selected.references,class = dacomp:::CLASS.LABEL.REFERENCE_SELECTION_OBJECT)
   
   
   expect_equal(names(result.selected.references),c("selected_references","mean_prevalence_over_the_sorted", "min_abundance_over_the_sorted", "ratio_matrix",                 
@@ -81,7 +81,7 @@ test_that("multiplication works", {
   
   expect(!any(!(result.selected.references.different.threshold$selected_references %in% result.selected.references$selected_references)) ,failure_message = 'as medianSD threshold increases, taxa should only join the refernece set, not leave it.')
   
-  result.selected.references.same.threshold = wcomp.select_references(X = data$counts,
+  result.selected.references.same.threshold = dacomp.select_references(X = data$counts,
                                                                            median_SD_threshold = 0.6, 
                                                                            verbose = F,Previous_Reference_Selection_Object = result.selected.references)
   expect_equal(
@@ -96,7 +96,7 @@ test_that("multiplication works", {
   library(digest)
   hash_computation_result = digest::digest(result.selected.references, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "61ed2ab005ef9c1735b7c722fa2feb41"
+  hash_gold_standard = "4a4d94536995c27c42f5c2fb5e234290"
   expect_equal(hash_computation_result,hash_gold_standard)
   
 })

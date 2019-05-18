@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // rcpp_Wilcoxon_PermTest_Given_Permutations
 List rcpp_Wilcoxon_PermTest_Given_Permutations(NumericVector X, IntegerMatrix Y);
-RcppExport SEXP _wcomp_rcpp_Wilcoxon_PermTest_Given_Permutations(SEXP XSEXP, SEXP YSEXP) {
+RcppExport SEXP _dacomp_rcpp_Wilcoxon_PermTest_Given_Permutations(SEXP XSEXP, SEXP YSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // rcpp_TwoPartTest_Given_Permutations
 List rcpp_TwoPartTest_Given_Permutations(NumericVector X, IntegerMatrix Y);
-RcppExport SEXP _wcomp_rcpp_TwoPartTest_Given_Permutations(SEXP XSEXP, SEXP YSEXP) {
+RcppExport SEXP _dacomp_rcpp_TwoPartTest_Given_Permutations(SEXP XSEXP, SEXP YSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -31,7 +31,7 @@ END_RCPP
 }
 // rcpp_Compute_Wilcoxon_Signed_Rank_Stat
 NumericVector rcpp_Compute_Wilcoxon_Signed_Rank_Stat(NumericVector RankedDifferences, IntegerVector SecondGroupBigger);
-RcppExport SEXP _wcomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat(SEXP RankedDifferencesSEXP, SEXP SecondGroupBiggerSEXP) {
+RcppExport SEXP _dacomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat(SEXP RankedDifferencesSEXP, SEXP SecondGroupBiggerSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -43,13 +43,13 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_wcomp_rcpp_Wilcoxon_PermTest_Given_Permutations", (DL_FUNC) &_wcomp_rcpp_Wilcoxon_PermTest_Given_Permutations, 2},
-    {"_wcomp_rcpp_TwoPartTest_Given_Permutations", (DL_FUNC) &_wcomp_rcpp_TwoPartTest_Given_Permutations, 2},
-    {"_wcomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat", (DL_FUNC) &_wcomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat, 2},
+    {"_dacomp_rcpp_Wilcoxon_PermTest_Given_Permutations", (DL_FUNC) &_dacomp_rcpp_Wilcoxon_PermTest_Given_Permutations, 2},
+    {"_dacomp_rcpp_TwoPartTest_Given_Permutations", (DL_FUNC) &_dacomp_rcpp_TwoPartTest_Given_Permutations, 2},
+    {"_dacomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat", (DL_FUNC) &_dacomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat, 2},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_wcomp(DllInfo *dll) {
+RcppExport void R_init_dacomp(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }
