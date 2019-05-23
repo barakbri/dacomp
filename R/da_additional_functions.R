@@ -58,7 +58,7 @@ DACOMP.POSSIBLE.TEST.NAMES = c(DACOMP.TEST.NAME.WILCOXON,
 # coloumns of Y_matrix are different permutations of the group labels
 # rows are samples
 # the returned statistics are a sum of individual test statistics across columns of X (test the joint null hypothesis)
-Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.WILCOXON){
+Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.WILCOXON,user_defined_test_function = NULL){
   
   if(ncol(X_matrix) != 1)
     stop('Error in Compute.resample.test: Function requires X_matrix with a single column')
@@ -137,6 +137,9 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.
   if(statistic == DACOMP.TEST.NAME.SPEARMAN){
     ranked_X = ranked_X - mean(ranked_X)
     current_stats = (rcpp_Spearman_PermTest_Given_Permutations(ranked_X,Y_matrix)[[1]]) #compute statistic and a sample of test statistic given from the null hypothesis
+  }
+  if(statistic == DACOMP.TEST.NAME.USER_DEFINED){
+    current_stats = user_defined_test_function(X_matrix[,1])
   }
   stats = (current_stats)
   

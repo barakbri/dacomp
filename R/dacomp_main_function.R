@@ -77,7 +77,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.reference.selection.object"
 #' rejected_DSFDR = result.test$dsfdr_rejected
  
 #' }
-dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,verbose = F){
+dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, verbose = F ){
   
   #Preprocess inputs, before check:
   
@@ -95,7 +95,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, 
   }
      
   #Check input validity
-  input_check_result = check.input.dacomp.main(X,y,ind_reference_taxa,test, q, nr_perm, disable_DSFDR,verbose)
+  input_check_result = check.input.dacomp.main(X,y,ind_reference_taxa,test, q, nr_perm, disable_DSFDR,user_defined_test_function,verbose)
   if(!input_check_result)
     stop('Input check failed on dacomp.test')
       
@@ -143,6 +143,8 @@ dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, 
       Y_matrix[,i] = sample(Y_matrix[,1])
     }
     
+  }else if (test == DACOMP.TEST.NAME.USER_DEFINED){
+     #user must plan and perform permutation independently.
   }else{
     Y_matrix[,1] = y
     for( i in 2:ncol(Y_matrix)){
@@ -175,7 +177,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, 
     
     temp_subsampled =  rhyper(n, nom, dnom,min_value)  
     rarefaction_matrix[,1] = temp_subsampled 
-    stats_matrix[,i] = Compute.resample.test(rarefaction_matrix,Y_matrix,statistic = test)
+    stats_matrix[,i] = Compute.resample.test(rarefaction_matrix,Y_matrix,statistic = test, user_defined_test_function = user_defined_test_function)
     
   }
   
@@ -208,7 +210,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, 
 }
 
 #internal function for validating inputs on dacomp.test
-check.input.dacomp.main = function(X, y, ind_reference_taxa, test, q, nr_perm, disable_DSFDR, verbose){
+check.input.dacomp.main = function(X, y, ind_reference_taxa, test, q, nr_perm, disable_DSFDR,user_defined_test_function, verbose){
   
   ##  dacomp.test: test X is numeric matrix of counts, 
   MSG_X = 'X must be a valid counts matrix'
@@ -224,7 +226,7 @@ check.input.dacomp.main = function(X, y, ind_reference_taxa, test, q, nr_perm, d
   }
   
   ##test y is valid - 0 or 1 for the relevant tests, has two groups are more for KW, disregarded in signed rank test
-  if(!(test %in% TEST.DEF.TESTS.ON.PAIRS)){
+  if(!(test %in% c(TEST.DEF.TESTS.ON.PAIRS,DACOMP.TEST.NAME.USER_DEFINED))){
     if(length(y)!= nrow(X))
       stop('length of y must be same as number of rows in X_ref')
     if(any(is.na(y))|any(is.nan(y)))
@@ -283,6 +285,11 @@ check.input.dacomp.main = function(X, y, ind_reference_taxa, test, q, nr_perm, d
   
   if(any(!(ind_reference_taxa %in% 1:ncol(X))))
     stop('ind_reference_taxa must be subset of 1:ncol(X)')
+  
+  if(test == DACOMP.TEST.NAME.USER_DEFINED){
+    if(typeof(user_defined_test_function) !=  "closure")
+      stop('For user defined test, argument user_defined_test_function must be function returning P.value')
+  }
   
   return(TRUE)
 }
