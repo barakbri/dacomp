@@ -10,7 +10,7 @@ test_that("Test dacomp test function", {
   set.seed(1)
   
   ###************************************************
-  #generate data:
+  # generate data:
   ###************************************************
   
   data = dacomp.generate_example_dataset(m1 = 100,
@@ -28,7 +28,7 @@ test_that("Test dacomp test function", {
   
   
   ###************************************************
-  #check inputs
+  # check inputs
   ###************************************************
   expect_error(dacomp.test(X = data$counts+0.5,
                           y = data$group_labels,
@@ -96,7 +96,7 @@ test_that("Test dacomp test function", {
   
   
   ###************************************************
-  #check returned class
+  # check returned class
   ###************************************************
   set.seed(1)
   result.test.with.class = dacomp.test(X = data$counts,
@@ -110,21 +110,56 @@ test_that("Test dacomp test function", {
   #check results identical
   expect_identical(result.test.with.class,result.test,info = "dacomp.test results with reference object and vector of indices for references not identical")
   ###************************************************
-  #check returned fields
+  # check returned fields
   ###************************************************
   
-  expect_identical(names(result.test.with.class),c("test.reference.set.validity", "lambda","stats_matrix","p.values.test","rejected","dsfdr_threshold" ))
+  expect_identical(names(result.test.with.class),c("lambda","stats_matrix","p.values.test","dsfdr_rejected","dsfdr_threshold" ))
   
   expect_identical(sort(which(is.na(result.test.with.class$lambda))),sort(result.selected.references$selected_references),info = "check missing lambda are only the given references")
   
   expect_identical(sort(which(is.na(result.test.with.class$p.values.test))),sort(result.selected.references$selected_references),info = "check missing p.values are only the given references")
   
   ###************************************************
-  #regression test
+  # regression test
   ###************************************************
   library(digest)
   hash_computation_result = digest::digest(result.test, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "7a3b82dc462a1ac7139475c75644100b"
+  hash_gold_standard = "6e77041be923f250b1a50a818e45f6b2"
   expect_equal(hash_computation_result,hash_gold_standard)
+  
+  ###************************************************
+  # test continuous convariate
+  ###************************************************
+  set.seed(1)
+  
+  data = dacomp.generate_example_dataset_continuous(n = 100,m1 = 30,signal_strength_as_change_in_microbial_load = 0.1)
+  
+  
+  result.selected.references = dacomp.select_references(X = data$counts,
+                                                        median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                                                        verbose = T)
+  
+  #multiplicity correction levels for the BH and DS-FDR methods
+  q_BH = q_DSFDR = 0.1
+  
+  #Perform testing:
+  result.test = dacomp.test(X = data$counts,
+                            y = data$covariate,test = DACOMP.TEST.NAME.SPEARMAN,
+                            ind_reference_taxa = result.selected.references,
+                            verbose = T,q = q_DSFDR)
+  
+  rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
+  rejected_DSFDR = result.test$dsfdr_rejected
+  
+  #sum(rejected_BH %in% data$select_diff_abundant)
+  #length(rejected_BH)
+  
+  library(digest)
+  hash_computation_result = digest::digest(result.test, algo="md5")
+  cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
+  hash_gold_standard_continous = "4f10dd3b13a1f4375973809007ba5cc2"
+  expect_equal(hash_computation_result,hash_gold_standard_continous)
+  
+  
 })

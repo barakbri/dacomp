@@ -25,6 +25,28 @@ List rcpp_Wilcoxon_PermTest_Given_Permutations(NumericVector X, IntegerMatrix Y)
   return z ;
 }
 
+
+//compute a wilcoxon sum rank test, over the ranks given by X. summing all ranks where Y=1
+double Compute_Spearman_Stat(NumericVector X, NumericVector Y){
+  double stat=0.0;
+  for(int i=0;i<X.length();i++){
+      stat += X(i) * Y(i);
+  }
+  return stat;
+}
+
+//function for computing the wilcoxon rank sum test, over a matrix of given permutations. Each column in Y is a different permutation of the data
+// [[Rcpp::export]]
+List rcpp_Spearman_PermTest_Given_Permutations(NumericVector X, NumericMatrix Y) {
+  NumericVector stats(Y.ncol());
+  for(int i=0;i<Y.ncol();i++){
+    stats(i) = Compute_Spearman_Stat(X,Y(_,i));
+  }
+  List z  = List::create( stats);
+  return z ;
+}
+
+
 // two part test for counts data
 double Compute_TwoPartTest(NumericVector X, IntegerVector Y, NumericVector additional_return_values){
   double total_counts_0 = 0.0;

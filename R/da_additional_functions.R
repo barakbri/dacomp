@@ -4,6 +4,8 @@ DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS = 'Log.Avg.Diff'
 DACOMP.TEST.NAME.TWO_PART_WILCOXON = 'TwoPartWilcoxon'
 DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST = 'SignedWilcoxon'
 DACOMP.TEST.NAME.KRUSKAL_WALLIS = 'KW'
+DACOMP.TEST.NAME.SPEARMAN = 'SPEARMAN'
+DACOMP.TEST.NAME.USER_DEFINED = 'USER_DEFINED'
 
 #define test properties:
 #Tests that require Y to be 0 or 1 strictly:
@@ -17,10 +19,14 @@ TEST.DEF.Y.IS.0.OR.1 = c(DACOMP.TEST.NAME.WILCOXON,
 TEST.DEF.SCORES.TO.BE.SQUARED = c(DACOMP.TEST.NAME.WILCOXON,
                                   DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
                                   DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
-                                  DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST)
+                                  DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
+                                  DACOMP.TEST.NAME.SPEARMAN)
 
 # Tests the are on pairs of observations:
 TEST.DEF.TESTS.ON.PAIRS = c(DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST)
+
+# Test with continous Y, univariate
+TEST.DEF.TESTS.ON.UNIVARIATE_CONTINOUS = c(DACOMP.TEST.NAME.SPEARMAN)
 
 # Tests over groups of observations (2 or more, but not 1)
 TEST.DEF.TESTS.OVER.GROUPS  = DACOMP.TEST.NAME.KRUSKAL_WALLIS
@@ -39,7 +45,9 @@ DACOMP.POSSIBLE.TEST.NAMES = c(DACOMP.TEST.NAME.WILCOXON,
                               DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
                               DACOMP.TEST.NAME.TWO_PART_WILCOXON,
                               DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
-                              DACOMP.TEST.NAME.KRUSKAL_WALLIS)
+                              DACOMP.TEST.NAME.KRUSKAL_WALLIS,
+                              DACOMP.TEST.NAME.SPEARMAN,
+                              DACOMP.TEST.NAME.USER_DEFINED)
 
 
 
@@ -69,7 +77,7 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.
   #the wilcoxon rank sum test
   if(statistic == DACOMP.TEST.NAME.WILCOXON){
     
-    current_stats = (subzero::rcpp_Wilcoxon_PermTest_Given_Permutations(ranked_X,Y_matrix)[[1]]) #compute statistic and a sample of test statistic given from the null hypothesis
+    current_stats = (rcpp_Wilcoxon_PermTest_Given_Permutations(ranked_X,Y_matrix)[[1]]) #compute statistic and a sample of test statistic given from the null hypothesis
     current_stats = current_stats - sum(Y_matrix[,1])/nrow(Y_matrix) * sum(ranked_X)
     
     #compute test statistic with correction for ties:
@@ -105,7 +113,7 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.
   if(statistic == DACOMP.TEST.NAME.TWO_PART_WILCOXON){#chi square score of a wilcoxon test and a two-sample test for equality of proportions (for zeroes in the data)
     X_ranked_without_zeroes = X_matrix[,1]
     X_ranked_without_zeroes[X_ranked_without_zeroes>0] = rank(X_ranked_without_zeroes[X_ranked_without_zeroes>0],ties.method = 'average')
-    current_stats = (subzero::rcpp_TwoPartTest_Given_Permutations(X_ranked_without_zeroes,Y_matrix)[[1]])
+    current_stats = (rcpp_TwoPartTest_Given_Permutations(X_ranked_without_zeroes,Y_matrix)[[1]])
   } 
     
   
@@ -125,6 +133,10 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.
         add_stat = 0
       current_stats[j] = add_stat
     }
+  }
+  if(statistic == DACOMP.TEST.NAME.SPEARMAN){
+    ranked_X = ranked_X - mean(ranked_X)
+    current_stats = (rcpp_Spearman_PermTest_Given_Permutations(ranked_X,Y_matrix)[[1]]) #compute statistic and a sample of test statistic given from the null hypothesis
   }
   stats = (current_stats)
   

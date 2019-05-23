@@ -8,10 +8,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.reference.selection.object"
 #' @param ind_reference_taxa 
 #' @param test 
 #' @param q 
-#' @param return_results_also_on_reference_validation_fail 
 #' @param nr_perm 
-#' @param nr_perms_reference_validation 
-#' @param T1E_reference_validation 
 #' @param disable_DSFDR 
 #' @param verbose 
 #'
@@ -49,27 +46,48 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.reference.selection.object"
 #'                       verbose = T,q = q_DSFDR)
 #' 
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
-#' rejected_DSFDR = result.test$rejected
+#' rejected_DSFDR = result.test$dsfdr_rejected
 #' 
+#' # example with continous covariate
+#' set.seed(1)
+#'
+#' data = dacomp.generate_example_dataset_continuous(n = 100,m1 = 30,
+#' signal_strength_as_change_in_microbial_load = 0.1)
+#'
+#'
+#' result.selected.references = dacomp.select_references(X = data$counts,
+#'                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+#'                                                      verbose = T)
+#' #number of selected references
+#' length(result.selected.references$selected_references)
+#'
+#' #plot the reference selection scores (can also be used to better set the median SD threshold)
+#' dacomp.plot_reference_scores(result.selected.references)
+#'
+#' #multiplicity correction levels for the BH and DS-FDR methods
+#' q_BH = q_DSFDR = 0.1
 #' 
-#' TP = sum((rejected_BH %in% data$select_diff_abundant))
-#' FDR = ifelse(length(rejected_BH)>0,
-#'              sum(!(rejected_BH %in% data$select_diff_abundant))/length(rejected_BH),0)
-#' cat(paste0('True positives: ',TP,', FDR: ',round(FDR,2),', while using BH multiplicity correction\n\r'))
-#' 
-#' TP_DSFDR = sum((rejected_DSFDR %in% data$select_diff_abundant))
-#' FDR_DSFDR = ifelse(length(rejected_DSFDR)>0,
-#'              sum(!(rejected_DSFDR %in% data$select_diff_abundant))/length(rejected_DSFDR),0)
-#' 
-#' cat(paste0('True positives: ',TP_DSFDR,', FDR: ',round(FDR_DSFDR,2),', while using DS-FDR multiplicity correction\n\r'))
-#' 
-#' } 
-dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, q=0.05,return_results_also_on_reference_validation_fail = F, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))),nr_perms_reference_validation = 10^4,T1E_reference_validation = 0.01, disable_DSFDR = F,verbose = F){
+#' #Perform testing:
+#' result.test = dacomp.test(X = data$counts,
+#'                          y = data$covariate,test = DACOMP.TEST.NAME.SPEARMAN,
+#'                          ind_reference_taxa = result.selected.references,
+#'                          verbose = T,q = q_DSFDR)
+#'
+#' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
+#' rejected_DSFDR = result.test$dsfdr_rejected
+ 
+#' }
+dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,verbose = F){
+  
+  #Preprocess inputs, before check:
   
   #in case a user inserted a reference selection object, with take the indices from the object
   if(class(ind_reference_taxa) == CLASS.LABEL.REFERENCE_SELECTION_OBJECT){
     ind_reference_taxa = ind_reference_taxa$selected_references
   }
+  
+  if(is.numeric(nr_perm))
+    nr_perm = ceiling(nr_perm)
   
   #if test is in TEST.DEF.Y.IS.0.OR.1, convert Y to 0 and 1
   if(test %in% TEST.DEF.Y.IS.0.OR.1){
@@ -77,7 +95,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, 
   }
      
   #Check input validity
-  input_check_result = check.input.dacomp.main(X,y,ind_reference_taxa,test, q,return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation,T1E_reference_validation, disable_DSFDR,verbose)
+  input_check_result = check.input.dacomp.main(X,y,ind_reference_taxa,test, q, nr_perm, disable_DSFDR,verbose)
   if(!input_check_result)
     stop('Input check failed on dacomp.test')
       
@@ -118,6 +136,13 @@ dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, 
       }
       Y_matrix[,i] = ind
     }
+  }else if (test %in% TEST.DEF.TESTS.ON.UNIVARIATE_CONTINOUS){
+    Y_matrix[,1] = rank(y,ties.method = 'average')
+    Y_matrix[,1] = Y_matrix[,1] - mean(Y_matrix[,1])
+    for( i in 2:ncol(Y_matrix)){
+      Y_matrix[,i] = sample(Y_matrix[,1])
+    }
+    
   }else{
     Y_matrix[,1] = y
     for( i in 2:ncol(Y_matrix)){
@@ -168,51 +193,22 @@ dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, 
   
   p.values.test = p.values; p.values.test[ind_reference_taxa] = NA
   
-  #test reference validity:
-  if(verbose)
-    cat(paste0('Running test to validate reference set\n\r'))
-  test.reference.set.validity = "NOT TESTED,see run time warnings for additional details"
-  if(test %in% TEST.DEF.TEST.THAT.ALLOW.RVP){
-    test.reference.set.validity = dacomp.check_reference_set_is_valid.k_groups(X_ref = X[,ind_reference_taxa],
-                                                                     Y = y, nr.perm = nr_perms_reference_validation,
-                                                                     verbose = verbose)
-    # handle a case of signal detected in the reference set:
-    possible_problem_in_reference_set_detected = F
-    if(any(unlist(test.reference.set.validity)<=T1E_reference_validation)){
-      possible_problem_in_reference_set_detected = T
-      warning_msg = paste0('Warning: One are more tests for validating that no differentially abundant taxa have entered the reference set has rejected it\'s null hypothesis at T1E level = ',T1E_reference_validation,'. A different reference set of taxa or reference selection method may need to be considered. To return p.values and rejections together with this warning, set parameter \'return_results_also_on_reference_validation_fail\' to TRUE\n\r')
-      warning(warning_msg)
-    }
-  }else{
-    warning('WARNING: The reference validation procedure does not support the current reference set. This does not mean that the reference set is invalid, just that it wasn\'t tested')
-  }
-  
- 
-  
   #return results:
   
   ret = list()
-  ret$test.reference.set.validity = test.reference.set.validity
-  if(possible_problem_in_reference_set_detected){ #put warning if needed:
-    ret$warning_msg = warning_msg
-  }
-  
-  if(return_results_also_on_reference_validation_fail | !possible_problem_in_reference_set_detected){ #if reference validation procedure failed, dont put result. Only if the user specifically asked
-    ret$lambda = min_value_array
-    ret$stats_matrix = stats_matrix
-    ret$p.values.test = p.values.test
-    
-    if(!disable_DSFDR){
-      ret$rejected = which(p.values.test<=dsfdr_threshold)
-      ret$dsfdr_threshold = dsfdr_threshold  
-    }
+  ret$lambda = min_value_array
+  ret$stats_matrix = stats_matrix
+  ret$p.values.test = p.values.test
+  if(!disable_DSFDR){
+    ret$dsfdr_rejected = which(p.values.test<=dsfdr_threshold)
+    ret$dsfdr_threshold = dsfdr_threshold  
   }
   class(ret) = CLASS.LABEL.DACOMP_RESULT_OBJECT
   return(ret)
 }
 
 #internal function for validating inputs on dacomp.test
-check.input.dacomp.main = function(X, y, ind_reference_taxa, test, q, return_results_also_on_reference_validation_fail, nr_perm,nr_perms_reference_validation, T1E_reference_validation, disable_DSFDR, verbose){
+check.input.dacomp.main = function(X, y, ind_reference_taxa, test, q, nr_perm, disable_DSFDR, verbose){
   
   ##  dacomp.test: test X is numeric matrix of counts, 
   MSG_X = 'X must be a valid counts matrix'
@@ -233,8 +229,9 @@ check.input.dacomp.main = function(X, y, ind_reference_taxa, test, q, return_res
       stop('length of y must be same as number of rows in X_ref')
     if(any(is.na(y))|any(is.nan(y)))
       stop('y has NA or NaNs - invalid observations')
-    if(min(table(y))<5)
-      warning('Note: at least one sample group with less than 5 observations\n\r')
+    if(!(test %in% TEST.DEF.TESTS.ON.UNIVARIATE_CONTINOUS))
+      if(min(table(y))<5)
+        warning('Note: at least one sample group with less than 5 observations\n\r')
   }
   
   if(test %in% TEST.DEF.Y.IS.0.OR.1){
@@ -269,35 +266,12 @@ check.input.dacomp.main = function(X, y, ind_reference_taxa, test, q, return_res
   if(q > 0.1)
     warning('Note: you have set q for DS-FDR to be greater than 0.1, irregular parameter setting.\n\r')
   
-  
-  ##return_results_also_on_reference_validation_fail is valid 
-  if(!is.logical(return_results_also_on_reference_validation_fail))
-    stop('Verbose must be logical')
-  
   ##nr_perm is valid,
   MSG_NR_PERM = 'nr.perm must be at integer, at least 1000'
   if(nr_perm != as.integer(nr_perm))
     stop(MSG_NR_PERM)
   if(nr_perm<1000)
     stop(MSG_NR_PERM)
-  
-  ##nr_perms_reference_validation is valid, 
-  MSG_NR_PERM_VALIDATION = 'nr_perms_reference_validation must be at integer, at least 1000'
-  if(nr_perms_reference_validation != as.integer(nr_perms_reference_validation))
-    stop(MSG_NR_PERM_VALIDATION)
-  if(nr_perms_reference_validation<1000)
-    stop(MSG_NR_PERM_VALIDATION)
-  
-  ##T1E_reference_validation is valid, 
-  MSG_T1E_reference_validation = "T1E_reference_validation must be a number, >0"
-  if(!is.numeric(T1E_reference_validation))
-    stop(MSG_T1E_reference_validation)
-  if(T1E_reference_validation <= 0)
-    stop(MSG_T1E_reference_validation)
-  
-  if(T1E_reference_validation > 0.05)
-    warning('Note: you have set T1E_reference_validation to be greater than 0.05, irregular parameter setting.\n\r')
-  
   
   ##disable_DSFDR is valid 
   if(!is.logical(disable_DSFDR))

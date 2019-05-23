@@ -5,6 +5,10 @@ rcpp_Wilcoxon_PermTest_Given_Permutations <- function(X, Y) {
     .Call(`_dacomp_rcpp_Wilcoxon_PermTest_Given_Permutations`, X, Y)
 }
 
+rcpp_Spearman_PermTest_Given_Permutations <- function(X, Y) {
+    .Call(`_dacomp_rcpp_Spearman_PermTest_Given_Permutations`, X, Y)
+}
+
 rcpp_TwoPartTest_Given_Permutations <- function(X, Y) {
     .Call(`_dacomp_rcpp_TwoPartTest_Given_Permutations`, X, Y)
 }
