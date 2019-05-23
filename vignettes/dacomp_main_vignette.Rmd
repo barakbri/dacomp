@@ -1,0 +1,212 @@
+---
+title: Nonparametric Differential Abundance Testing for Microbiome Counts Data
+shorttitle: "DACOMP"
+author:
+- name: Barak Brill
+  affiliation: Department of Statistics and OR, Tel Aviv University
+  email: barakbri@mail.tau.ac.il
+bibliography: dacomp_bib.bib
+output:
+  BiocStyle::html_document:
+    toc_float: true
+  BiocStyle::pdf_document: default
+package: DACOMP
+vignette: |
+    %\VignetteIndexEntry{Nonparametric differential abundance testing for microbiome counts data}
+    %\VignetteEncoding{UTF-8}
+    %\VignetteEngine{knitr::rmarkdown}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+foo
+
+# Model 
+
+$$ \vec{X}_{i} | \vec{P}_{i}, N_i^X \sim multinom\left( N^{X}_i , \vec{P}_{i} \right) ,\quad\quad \vec{P}_{i}\sim\mathcal{P}\quad ,0\leq P_{i,j}, \sum_{j=1}^{m}P_{i,j} = 1 , $$
+
+
+$$ \vec{Y}_{l} | \vec{Q}_{l}, N_l^Y \sim multinom\left( N^{Y}_l , \vec{Q}_{l} \right) ,\quad\quad \vec{Q}_{l}\sim\mathcal{Q}\quad ,0\leq Q_{l,j}, \sum_{j=1}^{m}Q_{l,j} = 1 .$$
+
+$$\frac{\left(P_{v_1},P_{v_2},...,P_{v_{k}}\right)}{\sum_{k'=1}^{k} P_{v_{k'}}}\stackrel{d}{=}\frac{\left(Q_{v_1},Q_{v_2},...,Q_{v_{k}}\right)}{\sum_{k'=1}^{k} Q_{v_{k'}}} $$
+
+$$ H_0^{(j)}:\quad \frac{\left(P_j,P_{b_1},P_{b_2},...,P_{b_{r}}\right)}{P_j + \sum_{k=1}^{r} P_{b_k}}\stackrel{d}{=}\frac{\left(Q_j,Q_{b_1},Q_{b_2},...,Q_{b_{r}}\right)}{Q_j + \sum_{k=1}^{r} Q_{b_k}}.$$
+
+
+$$\tilde{H}_0^{(j)}: \tilde{X}_{i,j} \stackrel{d}{=} \tilde{Y}_{l,j} $$
+
+## Choosing reference taxa
+
+$$ SD_{j,k} = \mathop{\large{\mathrm{sd}}}^{n_X+n_Y}_{i=1}\left(log_{10}\left(\frac{Z_{i,j}+1}{Z_{i,k}+1}\right)\right), $$
+
+foo
+
+$$ S_j = \mathop{\large{\mathrm{median}}}^{m}_{k=1, k\ne j}\left(SD_{j,k}\right).$$
+
+$$ Select\, B: \quad B = \{j|S_j \leq S_{crit}\}. $$
+
+
+# Workflow
+```{r,eval = F}
+library(dacomp)
+
+set.seed(1)
+
+data = dacomp.generate_example_dataset(m1 = 100,
+        n_X = 50,
+        n_Y = 50,
+        signal_strength_as_change_in_microbial_load = 0.1)
+```
+
+## Selecting reference taxa
+```{r, eval = F}
+#select references: (may take a minute)
+result.selected.references = dacomp.select_references(X = data$counts,
+                                                    median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                                                    verbose = T)
+
+length(result.selected.references$selected_references)
+
+#plot the reference selection scores (can also be used to better set the median SD threshold)
+dacomp.plot_reference_scores(result.selected.references)
+```
+
+## Testing for differential abundance
+```{r, eval = F}
+#multiplicity correction levels for the BH and DS-FDR methods
+q_BH = q_DSFDR = 0.1
+
+#Perform testing:
+result.test = dacomp.test(X = data$counts,
+                     y = data$group_labels,
+                     ind_reference_taxa = result.selected.references,
+                     verbose = T,q = q_DSFDR)
+
+rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
+rejected_DSFDR = result.test$dsfdr_rejected
+```
+
+## Using different non parametric tests
+
+$\verb|DACOMP.TEST.NAME.WILCOXON|$
+
+$\verb|DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS|$
+
+$\verb|DACOMP.TEST.NAME.TWO_PART_WILCOXON|$
+
+
+```{r, eval = F}
+result.test = dacomp.test(X = data$counts,
+                     y = data$group_labels,
+                     ind_reference_taxa = result.selected.references,
+                     test = DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
+                     verbose = T,q = q_DSFDR)
+```
+
+
+
+
+
+# Testing with $K$ sample groups
+$\verb|DACOMP.TEST.NAME.KRUSKAL_WALLIS|$
+
+# Testing with paired study design
+$\verb|DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST|$
+
+# Testing with a continous covariate
+$\verb|DACOMP.TEST.NAME.SPEARMAN|$
+
+```{r,eval = F}
+set.seed(1)
+data = dacomp.generate_example_dataset_continuous(n = 100,m1 = 30,
+signal_strength_as_change_in_microbial_load = 0.1)
+
+
+result.selected.references = dacomp.select_references(X = data$counts,
+                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                                                      verbose = T)
+#number of selected references
+length(result.selected.references$selected_references)
+#plot the reference selection scores (can also be used to better set the median SD threshold)
+dacomp.plot_reference_scores(result.selected.references)
+
+#multiplicity correction levels for the BH and DS-FDR methods
+q_BH = q_DSFDR = 0.1
+
+#Perform testing:
+result.test = dacomp.test(X = data$counts,
+                          y = data$covariate,test = DACOMP.TEST.NAME.SPEARMAN,
+                          ind_reference_taxa = result.selected.references,
+                          verbose = T,q = q_DSFDR)
+
+rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
+rejected_DSFDR = result.test$dsfdr_rejected
+ 
+```
+
+
+# Development
+
+## Other reference selection methods
+  
+## User defined tests
+
+```{r,eval = F}
+set.seed(1)
+
+data = dacomp.generate_example_dataset_multivariate_example(n = 100,m1 = 30,signal_strength_as_change_in_microbial_load = 0.1)
+
+#two covariates for each subject
+head(data$covariate)
+#            u1         u2
+#[1,] 0.4820801 0.57487220
+#[2,] 0.5995658 0.07706438
+#[3,] 0.4935413 0.03554058
+#[4,] 0.1862176 0.64279549
+#[5,] 0.8273733 0.92861520
+#[6,] 0.6684667 0.59809242
+
+result.selected.references = dacomp.select_references(X = data$counts,
+                                                      median_SD_threshold = 0.5,
+                                                      verbose = T)
+
+
+
+#multiplicity correction levels for the BH and DS-FDR methods
+q_BH = q_DSFDR = 0.1
+
+
+nr_perm_to_perform = 1000
+
+library(energy)
+custom_test_function = function(X){
+  res = dcov.test(X, data$covariate, R=nr_perm_to_perform)
+  return(
+          c(
+            res$statistic ,
+            res$replicates
+            )
+    )
+}
+
+#Perform testing:
+result.test = dacomp.test(X = data$counts,
+                          y = NULL,
+                          test = DACOMP.TEST.NAME.USER_DEFINED,
+                          ind_reference_taxa = result.selected.references,
+                          verbose = T,q = q_DSFDR,
+                          nr_perm = nr_perm_to_perform, # should be exactly the same as the 
+                          user_defined_test_function = custom_test_function)
+
+rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
+rejected_DSFDR = result.test$dsfdr_rejected
+
+
+```
+
+  
