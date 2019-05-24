@@ -125,7 +125,7 @@ test_that("Test dacomp test function", {
   library(digest)
   hash_computation_result = digest::digest(result.test, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "6e77041be923f250b1a50a818e45f6b2"
+  hash_gold_standard = "945199b3b004cf2953d394c8e9b507eb"
   expect_equal(hash_computation_result,hash_gold_standard)
   
   ###************************************************
@@ -138,7 +138,7 @@ test_that("Test dacomp test function", {
   
   result.selected.references = dacomp.select_references(X = data$counts,
                                                         median_SD_threshold = 0.6, #APPLICATION SPECIFIC
-                                                        verbose = T)
+                                                        verbose = F)
   
   #multiplicity correction levels for the BH and DS-FDR methods
   q_BH = q_DSFDR = 0.1
@@ -147,7 +147,7 @@ test_that("Test dacomp test function", {
   result.test = dacomp.test(X = data$counts,
                             y = data$covariate,test = DACOMP.TEST.NAME.SPEARMAN,
                             ind_reference_taxa = result.selected.references,
-                            verbose = T,q = q_DSFDR)
+                            verbose = F,q = q_DSFDR)
   
   rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
   rejected_DSFDR = result.test$dsfdr_rejected
@@ -158,7 +158,7 @@ test_that("Test dacomp test function", {
   library(digest)
   hash_computation_result = digest::digest(result.test, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard_continous = "4f10dd3b13a1f4375973809007ba5cc2"
+  hash_gold_standard_continous = "ae703e6acef7d2a8242edfb62a593f05"
   expect_equal(hash_computation_result,hash_gold_standard_continous)
   
   

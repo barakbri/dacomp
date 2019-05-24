@@ -1,5 +1,5 @@
 #class label for results of the dacomp test function
-CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.reference.selection.object"
+CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 
 #' Title
 #'

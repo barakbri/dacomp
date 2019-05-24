@@ -1,0 +1,24 @@
+print.dacomp.result.object = function(obj){
+  cat('DACOMP results object \n\r')
+  cat(paste0('Nr. taxa tested: ',sum(!is.na(obj$lambda)),'\n\r'))
+  cat(paste0('Nr. reference taxa : ',sum(is.na(obj$lambda)),'\n\r'))
+  cat(paste0('Mean lambda : ',round(mean((obj$lambda),2),na.rm = T),'\n\r'))
+  cat(paste0('Median lambda : ',median((obj$lambda),na.rm = T),'\n\r'))
+  cat(paste0('Nr taxa identified by DS-FDR as differentially abundant: ',length(obj$dsfdr_rejected),'\n\r'))
+}
+
+print.dacomp.reference.selection.object = function(obj){
+  cat('DACOMP reference selection object \n\r')
+  cat(paste0('Thereshold for median SD statistic: ',obj$median_SD_threshold,'\n\r'))
+  cat(paste0('Nr. Selected references: ',length(obj$selected_references),'\n\r'))
+  cat(paste0('Minimal number of counts observed in reference taxa (across subjects): ',(obj$selected_MinAbundance),'\n\r'))
+}
+
+print.dacomp.reference.validation.result.object = function(obj){
+  cat('DACOMP reference validation object \n\r')
+  cat('Printing P-values by reference validation test: \n\r')
+  cat('############################################### \n\r')
+  for(i in 1:length(names(obj))){
+    cat(paste0(names(obj)[i],' = ',round(obj[[i]],5),'\n\r'))
+  }
+}

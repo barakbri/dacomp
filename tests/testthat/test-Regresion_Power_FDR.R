@@ -38,11 +38,10 @@ test_that("Regression tests to paper, power and FDR", {
       result.test = dacomp.test(X = data$X,
                                y = data$Y,
                                ind_reference_taxa = result.selected.references$selected_references,
-                               verbose = F,q = q_DSFDR,nr_perm = 10000,
-                               return_results_also_on_reference_validation_fail = F)
+                               verbose = F,q = q_DSFDR,nr_perm = 10000)
       
       rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
-      rejected_DSFDR = result.test$rejected
+      rejected_DSFDR = result.test$dsfdr_rejected
       
       
       TP = sum((rejected_BH %in% data$select_diff_abundant))
@@ -89,6 +88,6 @@ test_that("Regression tests to paper, power and FDR", {
   library(digest)
   hash_computation_result = digest::digest(result_table, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "cba9aab1bab68d5a33180ce2f178279e"
+  hash_gold_standard = "bc538dc93f245407ae4c3edc33739386"
   expect_equal(hash_computation_result,hash_gold_standard)
 })
