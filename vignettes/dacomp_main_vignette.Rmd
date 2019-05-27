@@ -106,6 +106,18 @@ result.test = dacomp.test(X = data$counts,
                      ind_reference_taxa = result.selected.references,
                      test = DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
                      verbose = T,q = q_DSFDR)
+
+result.test = dacomp.test(X = data$counts,
+                     y = data$group_labels,
+                     ind_reference_taxa = result.selected.references,
+                     test = DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
+                     verbose = T,q = q_DSFDR)
+
+result.test = dacomp.test(X = data$counts,
+                     y = data$group_labels,
+                     ind_reference_taxa = result.selected.references,
+                     test = DACOMP.TEST.NAME.TWO_PART_WILCOXON,
+                     verbose = T,q = q_DSFDR)
 ```
 
 # Testing with $K$ sample groups
