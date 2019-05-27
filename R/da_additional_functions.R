@@ -12,8 +12,7 @@ DACOMP.TEST.NAME.USER_DEFINED = 'USER_DEFINED'
 TEST.DEF.Y.IS.0.OR.1 = c(DACOMP.TEST.NAME.WILCOXON,
                          DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
                          DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
-                         DACOMP.TEST.NAME.TWO_PART_WILCOXON,
-                         DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST)
+                         DACOMP.TEST.NAME.TWO_PART_WILCOXON)
 
 #Tests that require test statistics to be squared:
 TEST.DEF.SCORES.TO.BE.SQUARED = c(DACOMP.TEST.NAME.WILCOXON,
@@ -101,13 +100,13 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.
   if(statistic == DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS){ #test statistic is the difference in mean counts across two sample groups
     current_stats = rep(0,nr_bootstraps)
     for(b in 1:ncol(Y_matrix)){
-      current_stats[b] = mean(X_matrix[Y_matrix[,b]==0,s]) - mean(X_matrix[Y_matrix[,b]==1,s])
+      current_stats[b] = mean(X_matrix[Y_matrix[,b]==0,1]) - mean(X_matrix[Y_matrix[,b]==1,1])
     }
   } 
   if(statistic == DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS){ #test statistic is the log fold change across two sample groups
     current_stats = rep(0,nr_bootstraps)
     for(b in 1:ncol(Y_matrix)){
-      current_stats[b] = mean(log10(X_matrix[Y_matrix[,b]==0,s]+1)) - mean(log10(X_matrix[Y_matrix[,b]==1,s]+1))
+      current_stats[b] = mean(log10(X_matrix[Y_matrix[,b]==0,1]+1)) - mean(log10(X_matrix[Y_matrix[,b]==1,1]+1))
     }
   }   
   if(statistic == DACOMP.TEST.NAME.TWO_PART_WILCOXON){#chi square score of a wilcoxon test and a two-sample test for equality of proportions (for zeroes in the data)
@@ -120,15 +119,15 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.
   if(statistic == DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST){ # signed wilcoxon
     
     for(j in 1:nr_bootstraps){
-      g1 = X_matrix[Y_matrix[1:(n/2),j],s]
-      g2 = X_matrix[Y_matrix[(n/2 +1):(n),j],s]
+      g1 = X_matrix[Y_matrix[1:(n/2),j],1]
+      g2 = X_matrix[Y_matrix[(n/2 +1):(n),j],1]
       current_stats[j] = SignedRankWilcoxon.statistic(g1,g2)  
     }
     
   }
   if(statistic == DACOMP.TEST.NAME.KRUSKAL_WALLIS){ #Kruskal Wallis
     for(j in 1:nr_bootstraps){
-      add_stat = (kruskal.test(X_matrix[,s], as.factor(Y_matrix[,j]))$statistic)
+      add_stat = (kruskal.test(X_matrix[,1], as.factor(Y_matrix[,j]))$statistic)
       if(is.nan(add_stat))
         add_stat = 0
       current_stats[j] = add_stat

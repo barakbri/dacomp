@@ -31,20 +31,9 @@ dacomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_str
     stop('Input check failed on dacomp.generate_example_dataset')
   #load phyloseq and prepare data
   
-  library(phyloseq)
-  filepath = system.file("extdata", "study_1457_split_library_seqs_and_mapping.zip", package="phyloseq")
-  sink(tempfile())
-  kostic = (suppressWarnings(microbio_me_qiime(filepath)))
-  sink()
-  kostic = subset_samples(kostic, DIAGNOSIS == "Healthy") 
-  kostic = prune_samples(sample_sums(kostic) > 500, kostic) #prune samples with a low number of counts
-  kostic_counts = as.matrix(t(otu_table(kostic)))
-  kostic_sample_data = sample_data(kostic)
-  kostic_counts_data_healthy = kostic_counts
-  #keep taxa that appear in  at least 2 subjects:
-  kostic_counts_data_healthy= kostic_counts_data_healthy[ , apply(kostic_counts_data_healthy>0,2,sum) >= 2 ]
-  kostic_N_reads = median(apply(kostic_counts_data_healthy,1,sum))
-  
+  kostic = get_kostic_data()
+  kostic_counts_data_healthy = kostic$kostic_counts_data_healthy
+  kostic_N_reads = kostic$kostic_N_reads  
   
   p= ncol(kostic_counts_data_healthy)
   select_diff_abundant = sample(1:p,size = m1,replace = F)

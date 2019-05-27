@@ -1,4 +1,4 @@
 library(testthat)
-library(wcomp)
+library(dacomp)
 
-test_check("wcomp")
+test_check("dacomp")

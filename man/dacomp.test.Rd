@@ -5,10 +5,8 @@
 \title{Title}
 \usage{
 dacomp.test(X, y, ind_reference_taxa, test = DACOMP.TEST.NAME.WILCOXON,
-  q = 0.05, return_results_also_on_reference_validation_fail = F,
-  nr_perm = 1/(q/(ncol(X) - length(ind_reference_taxa))),
-  nr_perms_reference_validation = 10^4,
-  T1E_reference_validation = 0.01, disable_DSFDR = F, verbose = F)
+  q = 0.05, nr_perm = 1/(q/(ncol(X) - length(ind_reference_taxa))),
+  disable_DSFDR = F, user_defined_test_function = NULL, verbose = F)
 }
 \arguments{
 \item{X}{}
@@ -21,13 +19,7 @@ dacomp.test(X, y, ind_reference_taxa, test = DACOMP.TEST.NAME.WILCOXON,
 
 \item{q}{}
 
-\item{return_results_also_on_reference_validation_fail}{}
-
 \item{nr_perm}{}
-
-\item{nr_perms_reference_validation}{}
-
-\item{T1E_reference_validation}{}
 
 \item{disable_DSFDR}{}
 
@@ -67,19 +59,34 @@ result.test = dacomp.test(X = data$counts,
                       verbose = T,q = q_DSFDR)
 
 rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
-rejected_DSFDR = result.test$rejected
+rejected_DSFDR = result.test$dsfdr_rejected
+
+# example with continous covariate
+set.seed(1)
+
+data = dacomp.generate_example_dataset_continuous(n = 100,m1 = 30,
+signal_strength_as_change_in_microbial_load = 0.1)
 
 
-TP = sum((rejected_BH \%in\% data$select_diff_abundant))
-FDR = ifelse(length(rejected_BH)>0,
-             sum(!(rejected_BH \%in\% data$select_diff_abundant))/length(rejected_BH),0)
-cat(paste0('True positives: ',TP,', FDR: ',round(FDR,2),', while using BH multiplicity correction\\n\\r'))
+result.selected.references = dacomp.select_references(X = data$counts,
+                                                     median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                                                     verbose = T)
+#number of selected references
+length(result.selected.references$selected_references)
 
-TP_DSFDR = sum((rejected_DSFDR \%in\% data$select_diff_abundant))
-FDR_DSFDR = ifelse(length(rejected_DSFDR)>0,
-             sum(!(rejected_DSFDR \%in\% data$select_diff_abundant))/length(rejected_DSFDR),0)
+#plot the reference selection scores (can also be used to better set the median SD threshold)
+dacomp.plot_reference_scores(result.selected.references)
 
-cat(paste0('True positives: ',TP_DSFDR,', FDR: ',round(FDR_DSFDR,2),', while using DS-FDR multiplicity correction\\n\\r'))
+#multiplicity correction levels for the BH and DS-FDR methods
+q_BH = q_DSFDR = 0.1
 
-} 
+#Perform testing:
+result.test = dacomp.test(X = data$counts,
+                         y = data$covariate,test = DACOMP.TEST.NAME.SPEARMAN,
+                         ind_reference_taxa = result.selected.references,
+                         verbose = T,q = q_DSFDR)
+
+rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
+rejected_DSFDR = result.test$dsfdr_rejected
+}
 }

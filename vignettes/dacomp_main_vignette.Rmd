@@ -108,15 +108,52 @@ result.test = dacomp.test(X = data$counts,
                      verbose = T,q = q_DSFDR)
 ```
 
-
-
-
-
 # Testing with $K$ sample groups
 $\verb|DACOMP.TEST.NAME.KRUSKAL_WALLIS|$
 
 # Testing with paired study design
 $\verb|DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST|$
+
+```{r, eval = F}
+set.seed(1)
+data = dacomp.generate_example_dataset_paired(30)
+
+#image(t(log10(data$counts+1)),xlab = 'taxa',ylab = 'subject')
+#abline(h = 0.5,col = 'black')
+
+
+data$counts
+
+result.selected.references = dacomp.select_references(X = data$counts,
+                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                                                      verbose = T)
+
+
+length(result.selected.references$selected_references)
+
+#plot the reference selection scores (can also be used to better set the median SD threshold)
+dacomp.plot_reference_scores(result.selected.references)
+
+
+#multiplicity correction levels for the BH and DS-FDR methods
+q_BH = q_DSFDR = 0.1
+
+#Perform testing:
+result.test = dacomp.test(X = data$counts,
+                          y = NULL,
+                          ind_reference_taxa = result.selected.references, test = DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
+                          verbose = T,q = q_DSFDR)
+
+rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
+rejected_DSFDR = result.test$dsfdr_rejected
+
+sum(rejected_DSFDR %in% data$select_diff_abundant) 
+length(rejected_DSFDR)
+
+sum(rejected_BH %in% data$select_diff_abundant) 
+length(rejected_BH)
+```
+
 
 # Testing with a continous covariate
 $\verb|DACOMP.TEST.NAME.SPEARMAN|$
