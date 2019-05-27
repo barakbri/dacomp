@@ -30,7 +30,7 @@
 dacomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_strength_as_change_in_microbial_load = 0.1){
   
   #check inputs
-  input_check_result = check.input.dacomp.generate_example_dataset(n_X,n_Y,m1, signal_strength_as_change_in_microbial_load)
+  input_check_result = check.input.generate_example_dataset(n_X,n_Y,m1, signal_strength_as_change_in_microbial_load)
   if(!input_check_result)
     stop('Input check failed on dacomp.generate_example_dataset')
   #load phyloseq and prepare data
@@ -70,7 +70,7 @@ dacomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_str
 }
 
 #internal function for checking inputs:
-check.input.dacomp.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_change_in_microbial_load){
+check.input.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_change_in_microbial_load){
   # n_X,n_Y - sample sizes
   if(n_X!= as.integer(n_X) | n_Y!= as.integer(n_Y))
     stop('n_X and n_Y must be integers')
@@ -121,7 +121,7 @@ check.input.dacomp.generate_example_dataset = function(n_X,n_Y,m1, signal_streng
 dacomp.generate_example_dataset_continuous = function(n, m1 = 30, signal_strength_as_change_in_microbial_load = 0.1){
   
   #check inputs
-  input_check_result = check.input.dacomp.generate_example_dataset_continuous(n = n,m1 = m1, signal_strength_as_change_in_microbial_load)
+  input_check_result = check.input.generate_example_dataset_continuous(n = n,m1 = m1, signal_strength_as_change_in_microbial_load)
   if(!input_check_result)
     stop('Input check failed on dacomp.generate_example_dataset')
   
@@ -155,7 +155,7 @@ dacomp.generate_example_dataset_continuous = function(n, m1 = 30, signal_strengt
 }
 
 #internal function for checking inputs:
-check.input.dacomp.generate_example_dataset_continuous = function(n,m1, signal_strength_as_change_in_microbial_load){
+check.input.generate_example_dataset_continuous = function(n,m1, signal_strength_as_change_in_microbial_load){
   
   # n - sample sizes
   if(n!= as.integer(n))
@@ -196,7 +196,7 @@ check.input.dacomp.generate_example_dataset_continuous = function(n,m1, signal_s
 dacomp.generate_example_dataset_multivariate_example = function(n, m1 = 30, signal_strength_as_change_in_microbial_load = 0.1){
   
   #check inputs
-  input_check_result = check.input.dacomp.generate_example_dataset_continuous(n = n,m1 = m1, signal_strength_as_change_in_microbial_load)
+  input_check_result = check.input.generate_example_dataset_continuous(n = n,m1 = m1, signal_strength_as_change_in_microbial_load)
   if(!input_check_result)
     stop('Input check failed on dacomp.generate_example_dataset')
   
@@ -268,7 +268,7 @@ get_kostic_data = function(){
 dacomp.generate_example_dataset_paired = function(n, m1 = 30, signal_strength_as_change_in_microbial_load = 0.1){
   
   #check inputs
-  input_check_result = check.input.dacomp.generate_example_dataset_continuous(n = n,m1 = m1, signal_strength_as_change_in_microbial_load)
+  input_check_result = check.input.generate_example_dataset_continuous(n = n,m1 = m1, signal_strength_as_change_in_microbial_load)
   if(!input_check_result)
     stop('Input check failed on dacomp.generate_example_dataset')
   #load phyloseq and prepare data

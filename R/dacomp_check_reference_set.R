@@ -59,7 +59,7 @@ library(energy)
 #' } 
 dacomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,verbose = F){
   # check inputs
-  input_check_result = check.input.dacomp.check_reference_set_is_valid(X_ref,Y,nr.perm,verbose)
+  input_check_result = check.input.check_reference_set_is_valid(X_ref,Y,nr.perm,verbose)
   if(!input_check_result)
     stop('Input check failed on dacomp.check_reference_set_is_valid')
   
@@ -140,7 +140,7 @@ dacomp.check_reference_set_is_valid.k_groups = function(X_ref,Y,nr.perm=10^4,ver
   return(ret)
 }
 
-check.input.dacomp.check_reference_set_is_valid = function(X_ref,Y,nr.perm,verbose){
+check.input.check_reference_set_is_valid = function(X_ref,Y,nr.perm,verbose){
   
   # X_ref, - check is numeric matrix
   MSG_X_REF = 'X_ref must be a valid counts matrix'

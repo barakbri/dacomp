@@ -63,7 +63,7 @@ dacomp.select_references = function(X, median_SD_threshold,
                                                            select_from = NULL,
                                                            Previous_Reference_Selection_Object = NULL){
   #check inputs
-  input_check_result = check.input.dacomp.select_references(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from, Previous_Reference_Selection_Object)
+  input_check_result = check.input.select_references(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from, Previous_Reference_Selection_Object)
   if(!input_check_result)
     stop('Input check failed on dacomp.select_references')
   if(is.null(Previous_Reference_Selection_Object)){
@@ -172,7 +172,7 @@ dacomp.select_references = function(X, median_SD_threshold,
   return(ret)
 }
 
-check.input.dacomp.select_references = function(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from, Previous_Reference_Selection_Object){
+check.input.select_references = function(X, median_SD_threshold, minimal_TA,maximal_TA, Pseudo_Count_used, verbose, select_from, Previous_Reference_Selection_Object){
   
   # X - matrix of counts
   MSG_X = 'X must be a valid counts matrix'

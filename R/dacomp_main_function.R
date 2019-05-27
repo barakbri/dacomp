@@ -100,7 +100,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, 
   }
      
   #Check input validity
-  input_check_result = check.input.dacomp.main(X,y,ind_reference_taxa,test, q, nr_perm, disable_DSFDR,user_defined_test_function,verbose)
+  input_check_result = check.input.main(X,y,ind_reference_taxa,test, q, nr_perm, disable_DSFDR,user_defined_test_function,verbose)
   if(!input_check_result)
     stop('Input check failed on dacomp.test')
       
@@ -215,7 +215,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, 
 }
 
 #internal function for validating inputs on dacomp.test
-check.input.dacomp.main = function(X, y, ind_reference_taxa, test, q, nr_perm, disable_DSFDR,user_defined_test_function, verbose){
+check.input.main = function(X, y, ind_reference_taxa, test, q, nr_perm, disable_DSFDR,user_defined_test_function, verbose){
   
   ##  dacomp.test: test X is numeric matrix of counts, 
   MSG_X = 'X must be a valid counts matrix'
