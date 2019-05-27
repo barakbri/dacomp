@@ -13,10 +13,16 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' @param verbose 
 #'
 #' @return
+#' * lambda
+#' * stats_matrix
+#' * p.values.test
+#' * dsfdr_rejected
+#' * dsfdr_threshold
+#' 
 #' @export
 #'
 #' @examples
-#' #' \dontrun{
+#' \dontrun{
 #' library(dacomp)
 #' 
 #' set.seed(1)
@@ -75,7 +81,6 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #'
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 #' rejected_DSFDR = result.test$dsfdr_rejected
- 
 #' }
 dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, verbose = F ){
   

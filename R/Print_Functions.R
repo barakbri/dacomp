@@ -1,3 +1,11 @@
+#' Title
+#'
+#' @param obj 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 print.dacomp.result.object = function(obj){
   cat('DACOMP results object \n\r')
   cat(paste0('Nr. taxa tested: ',sum(!is.na(obj$lambda)),'\n\r'))
@@ -7,6 +15,14 @@ print.dacomp.result.object = function(obj){
   cat(paste0('Nr taxa identified by DS-FDR as differentially abundant: ',length(obj$dsfdr_rejected),'\n\r'))
 }
 
+#' Title
+#'
+#' @param obj 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 print.dacomp.reference.selection.object = function(obj){
   cat('DACOMP reference selection object \n\r')
   cat(paste0('Thereshold for median SD statistic: ',obj$median_SD_threshold,'\n\r'))
@@ -14,6 +30,14 @@ print.dacomp.reference.selection.object = function(obj){
   cat(paste0('Minimal number of counts observed in reference taxa (across subjects): ',(obj$selected_MinAbundance),'\n\r'))
 }
 
+#' Title
+#'
+#' @param obj 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 print.dacomp.reference.validation.result.object = function(obj){
   cat('DACOMP reference validation object \n\r')
   cat('Printing P-values by reference validation test: \n\r')

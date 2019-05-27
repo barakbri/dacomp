@@ -12,6 +12,16 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "dacomp.reference.selection.object"
 #' @param select_from 
 #' @param Previous_Reference_Selection_Object
 #' @return
+#' * selected_references
+#' * mean_prevalence_over_the_sorted
+#' * min_abundance_over_the_sorted
+#' * ratio_matrix
+#' * scores
+#' * selected_MinAbundance
+#' * median_SD_threshold
+#' * minimal_TA
+#' * maximal_TA
+#' 
 #' @export
 #'
 #' @examples

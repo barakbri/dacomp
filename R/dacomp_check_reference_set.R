@@ -14,6 +14,16 @@ library(energy)
 #' @param verbose 
 #'
 #' @return
+#' * p.value.HHG.L2
+#' * p.value.HHG.L1
+#' * p.value.HHG.BC
+#' * p.value.energy.L2
+#' * p.value.energy.L1
+#' * p.value.energy.BC
+#' * p.value.permanova_L2
+#' * p.value.permanova_L1
+#' * p.value.permanova_BC
+#' 
 #' @export
 #'
 #' @examples

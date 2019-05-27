@@ -8,6 +8,10 @@
 #' @param signal_strength_as_change_in_microbial_load 
 #'
 #' @return
+#' * counts
+#' * group_labels
+#' * select_diff_abundant
+#' 
 #' @export
 #'
 #' @examples
@@ -67,7 +71,6 @@ dacomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_str
 
 #internal function for checking inputs:
 check.input.dacomp.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_change_in_microbial_load){
-   
   # n_X,n_Y - sample sizes
   if(n_X!= as.integer(n_X) | n_Y!= as.integer(n_Y))
     stop('n_X and n_Y must be integers')
@@ -98,6 +101,10 @@ check.input.dacomp.generate_example_dataset = function(n_X,n_Y,m1, signal_streng
 #' @param signal_strength_as_change_in_microbial_load 
 #'
 #' @return
+#' * counts
+#' * covariate
+#' * select_diff_abundant
+#' 
 #' @export
 #'
 #' @examples
@@ -179,6 +186,10 @@ check.input.dacomp.generate_example_dataset_continuous = function(n,m1, signal_s
 #' @param signal_strength_as_change_in_microbial_load 
 #'
 #' @return
+#' * counts
+#' * covariate
+#' * select_diff_abundant
+#' 
 #' @export
 #'
 #' @examples
@@ -218,7 +229,7 @@ dacomp.generate_example_dataset_multivariate_example = function(n, m1 = 30, sign
   return(ret)
 }
 
-# internal function for accessing data from the kostic package
+# internal function for accessing the kostic dataset from the phyloseq package
 get_kostic_data = function(){
   library(phyloseq)
   filepath = system.file("extdata", "study_1457_split_library_seqs_and_mapping.zip", package="phyloseq")
@@ -248,6 +259,9 @@ get_kostic_data = function(){
 #' @param signal_strength_as_change_in_microbial_load 
 #'
 #' @return
+#' * counts
+#' * covariate
+#' * select_diff_abundant
 #' @export
 #'
 #' @examples
