@@ -129,6 +129,50 @@ test_that("Test dacomp test function", {
   expect_equal(hash_computation_result,hash_gold_standard)
   
   ###************************************************
+  # check other variants work, need to expand this section...
+  ###************************************************
+  cat('sanity check variants: \n\r')
+  cat('log difference in means: \n\r')
+  result.test = dacomp.test(X = data$counts,
+                            y = data$group_labels,
+                            ind_reference_taxa = result.selected.references,
+                            test = DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
+                            verbose = T,q = q_DSFDR)
+  cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
+  
+  cat(' difference in means: \n\r')
+  result.test = dacomp.test(X = data$counts,
+                            y = data$group_labels,
+                            ind_reference_taxa = result.selected.references,
+                            test = DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
+                            verbose = T,q = q_DSFDR)
+  cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
+  
+  cat(' two part wilcoxon: \n\r')
+  result.test = dacomp.test(X = data$counts,
+                            y = data$group_labels,
+                            ind_reference_taxa = result.selected.references,
+                            test = DACOMP.TEST.NAME.TWO_PART_WILCOXON,
+                            verbose = T,q = q_DSFDR)
+  cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
+  
+  cat(' KW-two groups: \n\r')
+  result.test = dacomp.test(X = data$counts,
+                            y = data$group_labels,
+                            ind_reference_taxa = result.selected.references,
+                            test = DACOMP.TEST.NAME.KRUSKAL_WALLIS,
+                            verbose = T,q = q_DSFDR)
+  cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
+  
+  cat(' KW-three groups: \n\r')
+  result.test = dacomp.test(X = data$counts,
+                            y = c(rep(0,33),rep(1,34),rep(2,33)),
+                            ind_reference_taxa = result.selected.references,
+                            test = DACOMP.TEST.NAME.KRUSKAL_WALLIS,
+                            verbose = T,q = q_DSFDR)
+  cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
+  
+  ###************************************************
   # test continuous convariate
   ###************************************************
   set.seed(1)
@@ -160,6 +204,7 @@ test_that("Test dacomp test function", {
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
   hash_gold_standard_continous = "ae703e6acef7d2a8242edfb62a593f05"
   expect_equal(hash_computation_result,hash_gold_standard_continous)
+  
   
   
 })
