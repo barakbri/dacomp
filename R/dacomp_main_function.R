@@ -12,12 +12,15 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' @param disable_DSFDR 
 #' @param verbose 
 #'
-#' @return
-#' * lambda
-#' * stats_matrix
-#' * p.values.test
-#' * dsfdr_rejected
-#' * dsfdr_threshold
+#' 
+#' @return a list
+#' \itemize{
+#' \item{lambda}{}
+#' \item{stats_matrix}{}
+#' \item{p.values.test}{}
+#' \item{dsfdr_rejected}{}
+#' \item{dsfdr_threshold}{}
+#' }
 #' 
 #' @export
 #'

@@ -25,11 +25,21 @@ dacomp.test(X, y, ind_reference_taxa, test = DACOMP.TEST.NAME.WILCOXON,
 
 \item{verbose}{}
 }
+\value{
+a list
+\itemize{
+\item{lambda}{}
+\item{stats_matrix}{}
+\item{p.values.test}{}
+\item{dsfdr_rejected}{}
+\item{dsfdr_threshold}{}
+}
+}
 \description{
 Title
 }
 \examples{
-#' \dontrun{
+\dontrun{
 library(dacomp)
 
 set.seed(1)

@@ -16,6 +16,14 @@ dacomp.generate_example_dataset(n_X = 30, n_Y = 30, m1 = 30,
 
 \item{signal_strength_as_change_in_microbial_load}{}
 }
+\value{
+a list
+\itemize{
+\item{counts}{}
+\item{group_labels}{}
+\item{select_diff_abundant}{}
+}
+}
 \description{
 Title
 }

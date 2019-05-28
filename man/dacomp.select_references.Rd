@@ -23,6 +23,20 @@ dacomp.select_references(X, median_SD_threshold, minimal_TA = 10,
 
 \item{select_from}{}
 }
+\value{
+a list
+\itemize{
+\item{selected_references}{}
+\item{mean_prevalence_over_the_sorted}{}
+\item{min_abundance_over_the_sorted}{}
+\item{ratio_matrix}{}
+\item{scores}{}
+\item{selected_MinAbundance}{}
+\item{median_SD_threshold}{}
+\item{minimal_TA}{}
+\item{maximal_TA}{}
+}
+}
 \description{
 Title
 }

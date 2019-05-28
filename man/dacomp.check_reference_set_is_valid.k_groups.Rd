@@ -16,6 +16,20 @@ dacomp.check_reference_set_is_valid.k_groups(X_ref, Y, nr.perm = 10^4,
 
 \item{verbose}{}
 }
+\value{
+a list
+\itemize{
+\item{p.value.HHG.L2}{}
+\item{p.value.HHG.L1}{}
+\item{p.value.HHG.BC}{}
+\item{p.value.energy.L2}{}
+\item{p.value.energy.L1}{}
+\item{p.value.energy.BC}{}
+\item{p.value.permanova_L2}{}
+\item{p.value.permanova_L1}{}
+\item{p.value.permanova_BC}{}
+}
+}
 \description{
 Title
 }

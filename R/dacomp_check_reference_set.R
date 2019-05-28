@@ -12,17 +12,19 @@ library(energy)
 #' @param Y 
 #' @param nr.perm 
 #' @param verbose 
-#'
-#' @return
-#' * p.value.HHG.L2
-#' * p.value.HHG.L1
-#' * p.value.HHG.BC
-#' * p.value.energy.L2
-#' * p.value.energy.L1
-#' * p.value.energy.BC
-#' * p.value.permanova_L2
-#' * p.value.permanova_L1
-#' * p.value.permanova_BC
+#' 
+#' @return a list
+#' \itemize{
+#' \item{p.value.HHG.L2}{}
+#' \item{p.value.HHG.L1}{}
+#' \item{p.value.HHG.BC}{}
+#' \item{p.value.energy.L2}{}
+#' \item{p.value.energy.L1}{}
+#' \item{p.value.energy.BC}{}
+#' \item{p.value.permanova_L2}{}
+#' \item{p.value.permanova_L1}{}
+#' \item{p.value.permanova_BC}{}
+#' }
 #' 
 #' @export
 #'
@@ -53,7 +55,6 @@ library(energy)
 #'                         Y = data$group_labels,
 #'                         nr.perm = 10000,
 #'                         verbose = T)
-
 #' result.ref.validity
 #'
 #' } 

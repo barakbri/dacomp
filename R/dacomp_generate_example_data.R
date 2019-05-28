@@ -7,10 +7,12 @@
 #' @param m1 
 #' @param signal_strength_as_change_in_microbial_load 
 #'
-#' @return
-#' * counts
-#' * group_labels
-#' * select_diff_abundant
+#' @return a list
+#' \itemize{
+#' \item{counts}{}
+#' \item{group_labels}{}
+#' \item{select_diff_abundant}{}
+#' }
 #' 
 #' @export
 #'
@@ -100,10 +102,12 @@ check.input.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_c
 #' @param m1 
 #' @param signal_strength_as_change_in_microbial_load 
 #'
-#' @return
-#' * counts
-#' * covariate
-#' * select_diff_abundant
+#' @return a list
+#' \itemize{
+#' \item{counts}{}
+#' \item{covariate}{}
+#' \item{select_diff_abundant}{}
+#' }
 #' 
 #' @export
 #'
@@ -185,10 +189,12 @@ check.input.generate_example_dataset_continuous = function(n,m1, signal_strength
 #' @param m1 
 #' @param signal_strength_as_change_in_microbial_load 
 #'
-#' @return
-#' * counts
-#' * covariate
-#' * select_diff_abundant
+#' @return a list
+#' \itemize{
+#' \item{counts}{}
+#' \item{covariate}{}
+#' \item{select_diff_abundant}{}
+#' }
 #' 
 #' @export
 #'
@@ -258,10 +264,11 @@ get_kostic_data = function(){
 #' @param m1 
 #' @param signal_strength_as_change_in_microbial_load 
 #'
-#' @return
-#' * counts
-#' * covariate
-#' * select_diff_abundant
+#' @return a list
+#' \itemize{
+#' \item{counts}{}
+#' \item{select_diff_abundant}{}
+#' }
 #' @export
 #'
 #' @examples
