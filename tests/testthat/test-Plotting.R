@@ -14,7 +14,7 @@ test_that("Test Plot function", {
   #generate data:
   ###************************************************
   
-  data = dacomp.generate_example_dataset(m1 = 100,
+  data = dacomp.generate_example_dataset.two_sample(m1 = 100,
                                         n_X = 20,
                                         n_Y = 20,
                                         signal_strength_as_change_in_microbial_load = 0.5)

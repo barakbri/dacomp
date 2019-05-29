@@ -12,49 +12,49 @@ test_that("Data generation", {
   ###************************************************
   
   #expect error if m1, n_X,n_Y,signal_strength illegal
-  expect_error({dacomp.generate_example_dataset(m1 = -1,
+  expect_error({dacomp.generate_example_dataset.two_sample(m1 = -1,
                                                n_X = 50,
                                                n_Y = 50,
                                                signal_strength_as_change_in_microbial_load = 0.1)},info = "m1 = -1")
-  expect_error({dacomp.generate_example_dataset(m1 = NA,
+  expect_error({dacomp.generate_example_dataset.two_sample(m1 = NA,
                                                n_X = 50,
                                                n_Y = 50,
                                                signal_strength_as_change_in_microbial_load = 0.1)},info = "m1 = NA")
-  expect_error({dacomp.generate_example_dataset(m1 = NULL,
+  expect_error({dacomp.generate_example_dataset.two_sample(m1 = NULL,
                                                n_X = 50,
                                                n_Y = 50,
                                                signal_strength_as_change_in_microbial_load = 0.1)},info = "m1 = NULL")
-  expect_error({dacomp.generate_example_dataset(m1 = 0,
+  expect_error({dacomp.generate_example_dataset.two_sample(m1 = 0,
                                                n_X = 0,
                                                n_Y = 50,
                                                signal_strength_as_change_in_microbial_load = 0.1)},info = "m1 = 0")
   
-  expect_error({dacomp.generate_example_dataset(m1 = 100,
+  expect_error({dacomp.generate_example_dataset.two_sample(m1 = 100,
                                                n_X = 0,
                                                n_Y = 50,
                                                signal_strength_as_change_in_microbial_load = 0.1)},info = "n_X = 0")
   
-  expect_error({dacomp.generate_example_dataset(m1 = 100,
+  expect_error({dacomp.generate_example_dataset.two_sample(m1 = 100,
                                                n_X = 4,
                                                n_Y = 50,
                                                signal_strength_as_change_in_microbial_load = 0.1)},info = "n_X = 4,small n_X")
   
-  expect_error({dacomp.generate_example_dataset(m1 = 100,
+  expect_error({dacomp.generate_example_dataset.two_sample(m1 = 100,
                                                n_X = 50,
                                                n_Y = 0,
                                                signal_strength_as_change_in_microbial_load = 0.1)},info = "n_Y = 0")
   
-  expect_error({dacomp.generate_example_dataset(m1 = 100,
+  expect_error({dacomp.generate_example_dataset.two_sample(m1 = 100,
                                                n_X = 50,
                                                n_Y = 4,
                                                signal_strength_as_change_in_microbial_load = 0.1)},info = "n_Y = 4,small n_X")
   
-  expect_error({dacomp.generate_example_dataset(m1 = 100,
+  expect_error({dacomp.generate_example_dataset.two_sample(m1 = 100,
                                                n_X = 50,
                                                n_Y = 50,
                                                signal_strength_as_change_in_microbial_load = -0.01)},info = "signal_strength_as_change_in_microbial_load < 0")
   
-  expect_error({dacomp.generate_example_dataset(m1 = 100,
+  expect_error({dacomp.generate_example_dataset.two_sample(m1 = 100,
                                                n_X = 50,
                                                n_Y = 50,
                                                signal_strength_as_change_in_microbial_load = 0.51)},info = "signal_strength_as_change_in_microbial_load > 0.5")
@@ -95,7 +95,7 @@ test_that("Data generation", {
   #check returned class
   ###************************************************
   
-  data = dacomp.generate_example_dataset(m1 = 100,
+  data = dacomp.generate_example_dataset.two_sample(m1 = 100,
                                         n_X = 50,
                                         n_Y = 50,
                                         signal_strength_as_change_in_microbial_load = 0.1);

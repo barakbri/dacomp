@@ -21,7 +21,7 @@
 #' library(dacomp)
 #'
 #' set.seed(1)
-#' data = dacomp.generate_example_dataset(m1 = 100,
+#' data = dacomp.generate_example_dataset.two_sample(m1 = 100,
 #'        n_X = 50,
 #'        n_Y = 50,
 #'        signal_strength_as_change_in_microbial_load = 0.1)
@@ -29,7 +29,7 @@
 #'
 #'
 #' } 
-dacomp.generate_example_dataset = function(n_X = 30,n_Y = 30,m1 = 30, signal_strength_as_change_in_microbial_load = 0.1){
+dacomp.generate_example_dataset.two_sample = function(n_X = 30,n_Y = 30,m1 = 30, signal_strength_as_change_in_microbial_load = 0.1){
   
   #check inputs
   input_check_result = check.input.generate_example_dataset(n_X,n_Y,m1, signal_strength_as_change_in_microbial_load)

@@ -30,7 +30,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' 
 #' set.seed(1)
 #' 
-#' data = dacomp.generate_example_dataset(m1 = 100,
+#' data = dacomp.generate_example_dataset.two_sample(m1 = 100,
 #'        n_X = 50,
 #'        n_Y = 50,
 #'        signal_strength_as_change_in_microbial_load = 0.1)
@@ -58,7 +58,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 #' rejected_DSFDR = result.test$dsfdr_rejected
 #' 
-#' # example with continous covariate
+#' # example with continous outcome
 #' set.seed(1)
 #'
 #' data = dacomp.generate_example_dataset_continuous(n = 100,m1 = 30,
