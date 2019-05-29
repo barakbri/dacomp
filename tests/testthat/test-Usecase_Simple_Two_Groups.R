@@ -43,6 +43,7 @@ test_that("Simple Use Case", {
   ###************************************************
   result.test = dacomp.test(X = data$counts,
                            y = data$group_labels,
+                           test = DACOMP.TEST.NAME.WILCOXON,
                            ind_reference_taxa = result.selected.references$selected_references,verbose = T,q = q_DSFDR) # can also use for example , test = 'TwoPartWilcoxon', show example
   
   rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)

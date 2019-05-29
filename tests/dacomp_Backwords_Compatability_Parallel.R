@@ -39,6 +39,7 @@ if(RUN_REGRESSION_TEST_PAPER){
       result.test = dacomp.test(X = data$X,
                                 y = data$Y,
                                 ind_reference_taxa = result.selected.references$selected_references,
+                                test = DACOMP.TEST.NAME.WILCOXON,
                                 verbose = F,q = q_DSFDR,nr_perm = 10000)
       
       rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)

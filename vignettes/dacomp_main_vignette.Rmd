@@ -85,6 +85,7 @@ q_BH = q_DSFDR = 0.1
 result.test = dacomp.test(X = data$counts,
                      y = data$group_labels,
                      ind_reference_taxa = result.selected.references,
+                     test = DACOMP.TEST.NAME.WILCOXON,
                      verbose = T,q = q_DSFDR)
 
 rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
@@ -153,7 +154,8 @@ q_BH = q_DSFDR = 0.1
 #Perform testing:
 result.test = dacomp.test(X = data$counts,
                           y = NULL,
-                          ind_reference_taxa = result.selected.references, test = DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
+                          ind_reference_taxa = result.selected.references,
+                          test = DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
                           verbose = T,q = q_DSFDR)
 
 rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)

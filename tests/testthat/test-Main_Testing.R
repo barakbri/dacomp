@@ -32,66 +32,82 @@ test_that("Test dacomp test function", {
   ###************************************************
   expect_error(dacomp.test(X = data$counts+0.5,
                           y = data$group_labels,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,q = q_DSFDR),info = "counts are not integers")
   
   expect_error(dacomp.test(X = NA,
                           y = data$group_labels,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,q = q_DSFDR),info = "counts are not matrix")
   
   expect_error(dacomp.test(X = data$counts,
                           y = data$group_labels[-1],
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,q = q_DSFDR),info = "labels not same length as counts")
   
   expect_error(dacomp.test(X = data$counts,
                           y = data$group_labels,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = -1,verbose = F,q = q_DSFDR),info = "reference taxa must be subset of 1:ncol(X)")
   
   expect_error(dacomp.test(X = data$counts,
                           y = data$group_labels,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = NA,q = q_DSFDR),info = "verbose must be logical")
   
   expect_error(dacomp.test(X = data$counts,
                           y = data$group_labels,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,q = -1),info = "q must be between 0 and 1")
   
   expect_warning(dacomp.test(X = data$counts,
                           y = data$group_labels,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,q = 0.5),info = "abnormal value of q not detected")
   
   expect_error(dacomp.test(X = data$counts,
                             y = data$group_labels,
+                           test = DACOMP.TEST.NAME.WILCOXON,
                             ind_reference_taxa = result.selected.references$selected_references,verbose = F,nr_perm = 50,q = q_DSFDR),info = "low number of permutations - nr_perm")
   
   expect_error(dacomp.test(X = data$counts,
                           y = data$group_labels,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,nr_perms_reference_validation = 50,q = q_DSFDR),info = "low number of permutations - nr_perms_reference_validation")
   
   expect_error(dacomp.test(X = data$counts,
                           y = data$group_labels,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,test =  'FOO_TEST',q = q_DSFDR),info = "invalid test")
   
   expect_error(dacomp.test(X = data$counts[-1,],
                           y = NULL,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,test =  'SignedWilcoxon',q = q_DSFDR),info = "odd number of rows for paired test")
   
   expect_error(dacomp.test(X = data$counts,
                           y = data$group_labels,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,test =  'SignedWilcoxon',q = q_DSFDR),info = "Y not null for paired test")
   
   expect_error(dacomp.test(X = data$counts,
                           y = c(data$group_labels[-1],3),
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,q = q_DSFDR),info = "More than two groups for two group test")
   
   expect_error(dacomp.test(X = data$counts,
                           y = c(data$group_labels[-1],NA),
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,q = q_DSFDR),info = "Missing labels in y (NA)")
   
   expect_error(dacomp.test(X = data$counts,
                           y = c(data$group_labels[-1],NaN),
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,q = q_DSFDR),info = "Missing labels in y (NaN)")
   
   expect_error(dacomp.test(X = data$counts,
                           y = data$group_labels,
+                          test = DACOMP.TEST.NAME.WILCOXON,
                           ind_reference_taxa = result.selected.references$selected_references,verbose = F,disable_DSFDR = 1,q = q_DSFDR),info = "disable_DSFDR is not valid logical")
   
   
@@ -101,10 +117,12 @@ test_that("Test dacomp test function", {
   set.seed(1)
   result.test.with.class = dacomp.test(X = data$counts,
                            y = data$group_labels,
+                           test = DACOMP.TEST.NAME.WILCOXON,
                            ind_reference_taxa = result.selected.references,verbose = F,q = q_DSFDR)
   set.seed(1)
   result.test = dacomp.test(X = data$counts,
                            y = data$group_labels,
+                           test = DACOMP.TEST.NAME.WILCOXON,
                            ind_reference_taxa = result.selected.references$selected_references,verbose = F,q = q_DSFDR) # can also use for example , test = 'TwoPartWilcoxon', show example
   
   #check results identical
@@ -156,21 +174,25 @@ test_that("Test dacomp test function", {
                             verbose = T,q = q_DSFDR)
   cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
   
-  cat(' KW-two groups: \n\r')
-  result.test = dacomp.test(X = data$counts,
-                            y = data$group_labels,
-                            ind_reference_taxa = result.selected.references,
-                            test = DACOMP.TEST.NAME.KRUSKAL_WALLIS,
-                            verbose = T,q = q_DSFDR)
-  cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
+  #KW is slow - disabled for now
+  if(F){
+    cat(' KW-two groups: \n\r')
+    result.test = dacomp.test(X = data$counts,
+                              y = data$group_labels,
+                              ind_reference_taxa = result.selected.references,
+                              test = DACOMP.TEST.NAME.KRUSKAL_WALLIS,
+                              verbose = T,q = q_DSFDR)
+    cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
+    
+    cat(' KW-three groups: \n\r')
+    result.test = dacomp.test(X = data$counts,
+                              y = c(rep(0,33),rep(1,34),rep(2,33)),
+                              ind_reference_taxa = result.selected.references,
+                              test = DACOMP.TEST.NAME.KRUSKAL_WALLIS,
+                              verbose = T,q = q_DSFDR)
+    cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))  
+  }
   
-  cat(' KW-three groups: \n\r')
-  result.test = dacomp.test(X = data$counts,
-                            y = c(rep(0,33),rep(1,34),rep(2,33)),
-                            ind_reference_taxa = result.selected.references,
-                            test = DACOMP.TEST.NAME.KRUSKAL_WALLIS,
-                            verbose = T,q = q_DSFDR)
-  cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
   
   ###************************************************
   # test continuous convariate

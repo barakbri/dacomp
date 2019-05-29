@@ -37,6 +37,7 @@ test_that("Regression tests to paper, power and FDR", {
       
       result.test = dacomp.test(X = data$X,
                                y = data$Y,
+                               test = DACOMP.TEST.NAME.WILCOXON,
                                ind_reference_taxa = result.selected.references$selected_references,
                                verbose = F,q = q_DSFDR,nr_perm = 10000)
       

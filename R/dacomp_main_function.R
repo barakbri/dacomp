@@ -52,6 +52,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' result.test = dacomp.test(X = data$counts,
 #'                       y = data$group_labels,
 #'                       ind_reference_taxa = result.selected.references,
+#'                       test = DACOMP.TEST.NAME.WILCOXON,
 #'                       verbose = T,q = q_DSFDR)
 #' 
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
@@ -85,7 +86,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 #' rejected_DSFDR = result.test$dsfdr_rejected
 #' }
-dacomp.test = function(X,y,ind_reference_taxa,test = DACOMP.TEST.NAME.WILCOXON, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, verbose = F ){
+dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, verbose = F ){
   
   #Preprocess inputs, before check:
   
