@@ -54,6 +54,8 @@ Let $\lambda_j$ be the minimal number of reads available in the taxa indexed by 
 
 $$\tilde{H}_0^{(j)}: \tilde{X}_{j} \perp \!\!\! \perp \vec{Y}$$
 
+The `DACOMP` package provides $P$-values for hypothesis testing. Also, the packge makes use of the $DS-FDR$ method for controlling the False Discvory Rate (FDR) when multiple hypotheses are tested. The DS-FDR method (Jiang et al. ) is a multiple testing procedure aimed at providing control of the FDR when the null distribution of $P$-values is discrete, and thus stochastically greater then uniform distribution. In this settings, the $DS-FDR$ procedure is known to provide higher power compared to classical multple hypothesis testing procedure, see Jiang et al () for further details.
+
 ## Choosing reference taxa
 In order to obtain a set of reference taxa, we compute the $S_j$ statistic for each taxon $j$.
 Let $X_{i,j}$ denote the numeber of counts obtained for taxon $j$ in the $i$th sample. We begin by compuing $SD_{j,k}$, for every pair
@@ -75,7 +77,9 @@ The key assumption for reference selection, is that a small fraction of all taxa
 The value of $S_{crit}$ is data specific. In this vignette, we use data from the kostic dataset in the phyloseq package, with $S_{crit} = 0.6$ selected. Other datasets may require different values.
 
 # Workflow
-```{r,eval = F}
+This section demonstrate the workflow for statistical analysis. We begin by generating a sample dataset. The dataset will consist of two study groups (labeled 0 and 1), 50 samples in each study groups. The data will contain 1384 OTUs with `m1=100` OTUs selected (at random) as differentially abundant. The parameter `signal_strength_as_change_in_microbial_load = 0.1` indicates OTUs associated with the phenotype cause a change of 10% in the microbial load, compared to study group 0. Note that this parameter effects the ratios of different columns in the data, but not the total number of counts in a row (sample): the total number of counts in a sample is not indicative of the microbial load.
+
+```{r,eval = F,cache=TRUE}
 library(dacomp)
 
 set.seed(1)
@@ -86,12 +90,19 @@ data = dacomp.generate_example_dataset.two_sample(m1 = 100,
         signal_strength_as_change_in_microbial_load = 0.1)
 ```
 
+The object `data` consists of `data$counts` - a matrix with 100 rows and 1384 columns (per OTU), and `data$group_labels` - a vector of length 100 with values of 0's and 1's, denoting the group labeling of each observation.
+
 ## Selecting reference taxa
-```{r, eval = F}
+
+We begin our analysis by selecting a set of reference taxa. This requires a threshold, $S_{crit}=0.6$
+We  also plot the histogram of $S_j$ scores, with vertical lines for the $0.5,0.7,$ and $0.9$ percentiles of $S_j$'s. This allows us to assess how high is $S_{crit}$ compated to the values of $S_j$ in our data.
+
+```{r,eval = F,cache=TRUE}
 #select references: (may take a minute)
-result.selected.references = dacomp.select_references(X = data$counts,
-                                                    median_SD_threshold = 0.6, #APPLICATION SPECIFIC
-                                                    verbose = T)
+result.selected.references = dacomp.select_references(
+                              X = data$counts,
+                              median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                              verbose = F)
 
 length(result.selected.references$selected_references)
 
@@ -100,28 +111,35 @@ dacomp.plot_reference_scores(result.selected.references)
 ```
 
 ## Testing for differential abundance
+We test taxa not in the reference set for differential abundance by using the function `dacomp.test`. We show tro possible corrections for multiplicity, based on the BH procedure, and the DS_FDR procedure:
+
 ```{r, eval = F}
 #multiplicity correction levels for the BH and DS-FDR methods
 q_BH = q_DSFDR = 0.1
 
 #Perform testing:
-result.test = dacomp.test(X = data$counts,
-                     y = data$group_labels,
-                     ind_reference_taxa = result.selected.references,
-                     test = DACOMP.TEST.NAME.WILCOXON,
-                     verbose = T,q = q_DSFDR)
+result.test = dacomp.test(X = data$counts, #counts data
+                     y = data$group_labels, #phenotype in y argument
+                     # obtained from dacomp.select_references(...):
+                     ind_reference_taxa = result.selected.references, 
+                     test = DACOMP.TEST.NAME.WILCOXON, #constant, name of test
+                     verbose = F,q = q_DSFDR) #multiplicity adjustment level
 
-rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
-rejected_DSFDR = result.test$dsfdr_rejected
+#These are the indices of taxa discoverted as differentially abundant:
+# by applying a BH multiplicity adjustment on the P-values:
+rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH) 
+#by applying a DS-FDR multiplicity adjustment on the P-values:
+rejected_DSFDR = result.test$dsfdr_rejected 
 ```
 
 ## Using different non parametric tests
+The function `dacomp.test(...)` supports several other tests for two study groups:
 
-$\verb|DACOMP.TEST.NAME.WILCOXON|$
+* `DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS` - Permutation based test for a difference in means
 
-$\verb|DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS|$
+* `DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS` - Permutation based test for a difference in means, after a log transformation. A pseudocount is added to address zeros, before taking the logarithm of the number of subsampled counts.
 
-$\verb|DACOMP.TEST.NAME.TWO_PART_WILCOXON|$
+* `DACOMP.TEST.NAME.TWO_PART_WILCOXON` - A two part test that includes a two-sample test for a change in the proportion of zeros, toghehther with a Wilcoxon rank sum test for detecting a difference in the distribution of the non zero components of $\tilde{X}_{j}$. See CITATION for additional details.
 
 
 ```{r, eval = F}
@@ -145,29 +163,40 @@ result.test = dacomp.test(X = data$counts,
 ```
 
 # Testing with $K$ sample groups
-$\verb|DACOMP.TEST.NAME.KRUSKAL_WALLIS|$
+The function `dacomp.test` supports the Kruskal Wallis test for equality of distributions between K sample groups. The analyze results from a study with a categorical phenotype with $K$ levels, supply as an argument a vector with the group-labeling as a `y` argument, and select `test = DACOMP.TEST.NAME.KRUSKAL_WALLIS`
 
 # Testing with paired study design
-$\verb|DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST|$
+
+To analyze results from a paired study design, with $n$ different samples, each sampled twice, format the data as follows:
+
+ * Generate a matrix of counts, with the first $n$ rows corresponding to samples $1,2,...,n$ under the first condition, and rows $n+1,n+2,...,2n$ corresponding to samples $1,2,...,n$ under the second condition. This matrix is supplied as an argument `X` in `dacomp.test`
+ * Use argument `test = DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST` to select the Wilcoxon sign rank test.
+ * The phenotype argument `y` in `dacomp.test` is set to `NULL`.
+
+An example on how to analyze paired data;
 
 ```{r, eval = F}
 set.seed(1)
-data = dacomp.generate_example_dataset_paired(30)
+# Sample data:
+# 30 is the number of samples, so we will have 60 rows.
+# By default, 30 OTUs are differentially abundant
+data = dacomp.generate_example_dataset_paired(30) 
 
-#image(t(log10(data$counts+1)),xlab = 'taxa',ylab = 'subject')
-#abline(h = 0.5,col = 'black')
+# data$counts is matrix of counts:
+# first 30 rows correspond to samples 1:30 under condition 1
+# rows 31:60 correspond to samples 1:30 under condition 2
 
-
-data$counts
-
-result.selected.references = dacomp.select_references(X = data$counts,
-                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
-                                                      verbose = T)
+#select references:
+result.selected.references = dacomp.select_references(
+                                X = data$counts,
+                                median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                                verbose = T)
 
 
 length(result.selected.references$selected_references)
 
-#plot the reference selection scores (can also be used to better set the median SD threshold)
+#plot the reference selection scores:
+#(can also be used to better set the median SD threshold)
 dacomp.plot_reference_scores(result.selected.references)
 
 
@@ -175,37 +204,44 @@ dacomp.plot_reference_scores(result.selected.references)
 q_BH = q_DSFDR = 0.1
 
 #Perform testing:
-result.test = dacomp.test(X = data$counts,
-                          y = NULL,
-                          ind_reference_taxa = result.selected.references,
-                          test = DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
-                          verbose = T,q = q_DSFDR)
+result.test = dacomp.test(
+                    X = data$counts, #counts matrix formated as required
+                    y = NULL, #supply a null phenotype
+                    ind_reference_taxa = result.selected.references,
+                    test = DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
+                    verbose = T,q = q_DSFDR)
 
+#discoveries:
 rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 rejected_DSFDR = result.test$dsfdr_rejected
-
-sum(rejected_DSFDR %in% data$select_diff_abundant) 
-length(rejected_DSFDR)
-
-sum(rejected_BH %in% data$select_diff_abundant) 
-length(rejected_BH)
 ```
 
 
 # Testing with a continuous covariate
-$\verb|DACOMP.TEST.NAME.SPEARMAN|$
+The function `dacomp.test` allows testing with a continuous phenotype:
+* The argument `y` is set to a vector of phenotype measurements by observation.
+* The argument `test` is set to `DACOMP.TEST.NAME.SPEARMAN`, the test conducted is a permutation test based on the Spearman correlation coefficient between $\tilde{X}_j$ and $Y$.
+
+See a detailed example below.
 
 ```{r,eval = F}
 set.seed(1)
 data = dacomp.generate_example_dataset_continuous(n = 100,m1 = 30,
 signal_strength_as_change_in_microbial_load = 0.1)
 
+#data$counts - matrix of counts
+#data$covariate - a vector of 100 phenotype measurements,
+#corresponding to the rows of X.
 
-result.selected.references = dacomp.select_references(X = data$counts,
-                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
-                                                      verbose = T)
+
+result.selected.references = dacomp.select_references(
+                                  X = data$counts,
+                                  median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                                  verbose = T)
+
 #number of selected references
 length(result.selected.references$selected_references)
+
 #plot the reference selection scores (can also be used to better set the median SD threshold)
 dacomp.plot_reference_scores(result.selected.references)
 
@@ -214,9 +250,9 @@ q_BH = q_DSFDR = 0.1
 
 #Perform testing:
 result.test = dacomp.test(X = data$counts,
-                          y = data$covariate,test = DACOMP.TEST.NAME.SPEARMAN,
-                          ind_reference_taxa = result.selected.references,
-                          verbose = T,q = q_DSFDR)
+                      y = data$covariate,test = DACOMP.TEST.NAME.SPEARMAN,
+                      ind_reference_taxa = result.selected.references,
+                      verbose = T,q = q_DSFDR)
 
 rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 rejected_DSFDR = result.test$dsfdr_rejected
@@ -224,16 +260,31 @@ rejected_DSFDR = result.test$dsfdr_rejected
 ```
 
 
-# Extending the procedures provided
-
+# Extending the `dacomp` package
+  
 ## Other reference selection methods
+  The argument `ind_reference_taxa` in the function `dacomp.test(...)` can receive one of two possible arguments:
+  * Object received from `dacomp.select_references(...)` 
+  * A set of integers defining the indices of reference taxa (by columns of the counts matrix).
+  
+  You can use a general method for selecting a set of reference taxa, and then supply the vector of taxa indices using the argument `ind_reference_taxa`.
+  Note that you cannot use phenotypes for reference selection, only for testing.
   
 ## User defined tests
+You can use a general test, to test for association between the rarefied reads, $\tilde{X}_j$ and the phenotype vector $\vec{Y}$. To use a general test, supply the following arguments:
+
+*  `DACOMP.TEST.NAME.USER_DEFINED`
+* `data$covariate`
+* `custom_test_function`
+* set the argument `nr_perm`
 
 ```{r,eval = F}
 set.seed(1)
 
-data = dacomp.generate_example_dataset_multivariate_example(n = 100,m1 = 30,signal_strength_as_change_in_microbial_load = 0.1)
+data = dacomp.generate_example_dataset_multivariate_example(
+  n = 100,
+  m1 = 30,
+  signal_strength_as_change_in_microbial_load = 0.1)
 
 #two covariates for each subject
 head(data$covariate)
@@ -245,9 +296,10 @@ head(data$covariate)
 #[5,] 0.8273733 0.92861520
 #[6,] 0.6684667 0.59809242
 
-result.selected.references = dacomp.select_references(X = data$counts,
-                                                      median_SD_threshold = 0.5,
-                                                      verbose = T)
+result.selected.references = dacomp.select_references(
+                              X = data$counts,
+                              median_SD_threshold = 0.5,
+                              verbose = T)
 
 
 
@@ -255,7 +307,7 @@ result.selected.references = dacomp.select_references(X = data$counts,
 q_BH = q_DSFDR = 0.1
 
 
-nr_perm_to_perform = 1000
+nr_perm_to_perform = 1000 # should be exactly the same as the 
 
 library(energy)
 custom_test_function = function(X){
@@ -274,7 +326,7 @@ result.test = dacomp.test(X = data$counts,
                           test = DACOMP.TEST.NAME.USER_DEFINED,
                           ind_reference_taxa = result.selected.references,
                           verbose = T,q = q_DSFDR,
-                          nr_perm = nr_perm_to_perform, # should be exactly the same as the 
+                          nr_perm = nr_perm_to_perform, 
                           user_defined_test_function = custom_test_function)
 
 rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
