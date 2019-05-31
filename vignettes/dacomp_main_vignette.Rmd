@@ -24,32 +24,55 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-foo
+The DACOMP package implements the methods for detecting differentially abundant taxa in 16S microbiome data across different phenotype levels, as described in Brill et. al. (). microbiome 16S counts data has several unique characteristics, and therefore requires specific methods for statistical inference. More specificly, a sample of 16S counts is a sparse, high dimensional, vector of counts. The sampled counts represent the relative freuqncies of taxa in the sampled ecosystem. However, the total number of counts in a sample is not indicative of the total abundance of taxa in the ecosystem. 
+
+The DACOMP package is aimed at providing valid statistical inference while addressing the above challengs. The key idea is to to first obtain a set of taxa which are non-differentially abundant. These taxa serve as a reference set. In the second step, a fixed number of reads is sampled from each sample from the reads available for the set of reference taxa and the taxon being test. We test whether the number of subsampled counts is indendent from the measured phenotype. If the number of subsampled counts depends on the measured phenotype, the tested taxon alone is responsible for the depndence discovered. For further details, see Brill et al.()
+
+The structure of the vignette is as follows. In section 2 we breifly describe the DACOMP model and underlting assumptions. In section 3 we present the package workflow on example data, containing a set with two study groups. In Sections 4-6 we discuss how to detect differentially abundant taxa in studies with K study groups, paired study design and studies with continoues phenotyes. Section 7 discusses possible extensions and modifications. In Subsection 7.1, we discuss how different methods for selecting reference taxa can be used. In Subsection 7.2, we show how to utilize the DACOMP workflow with other tests of association, supplied by the user. Our example will involve associating differentially abundant taxa with a pair of continous covariates. The user supplied test will be the DCOV test from package ENERGY.
 
 # Model 
+Let $\vec{X}$ be a $m$-dimensional vector of counts obtained from a 16S sample. The DACOMP generative model assumes $\vec{X}$ is realized from a multinomial distribution, whose probability vector $\vec{P}$ is a random vector on the unit simplex:
 
-$$ \vec{X} | \vec{P}, N \sim multinom\left( N , \vec{P} \right) ,\quad\quad \vec{P}\sim\mathcal{P}\quad ,0\leq P_{j}, \sum_{j=1}^{m}P_{i,j} = 1 , $$
+$$ \vec{X} | \vec{P}, N \sim multinom\left( N , \vec{P} \right) ,\quad\quad \vec{P}\sim\mathcal{P}\quad ,0\leq P_{j}, \sum_{j=1}^{m}P_{j} = 1 , $$
 
+where $N$ is the number of counts observed in the sample.
 
+Let $\vec{Y}$ represent the measured vector of phenotypes in a sample. We assume there exists a subset of the taxa, indexed by $\mathcal{B}\subset\{1,2,...,m\}$, that are not differentially abundant. DACOMP assumes ratios between non differentialy abundant taxa are independent of the measured phenotype. For every subset $\{v_1,v_2,...,v_s\} \subset \mathcal{B}$, where $P\left(.. >0\right)=1$, we assume that:
 
 
 $$\frac{\left(P_{v_1},P_{v_2},...,P_{v_{s}}\right)}{\sum_{k=1}^{s} P_{v_{k}}}\perp \!\!\! \perp \vec{Y}$$
+Furthermore, we assume that $P\left(..\right)=1$. Our task is to find all differentially abundant taxa, the complement of the set $\mathcal{B}$.
+
+We show how the $j$th taxon can be tested for differential abundance given a set of reference taxa, $\{b_1,b_2,...,b_r\}\in\mathcal{B}$. The hypothesis of no differential abundance is given by:
+
 
 $$ H_0^{(j)}:\quad \frac{\left(P_j,P_{b_1},P_{b_2},...,P_{b_{r}}\right)}{P_j + \sum_{k=1}^{r} P_{b_k}}\perp \!\!\! \perp \vec{Y}$$
+This hypothesis cannot be tested directly, since \vec{P} is not observed. Brill et al. discuss how this hypothesis can be tested using the observed counts.
+
+Let $\lambda_j$ be the minimal number of reads available in the taxa indexed by $\{j\}\cup\mathcal{B}$ across the different samples. From each sample, select exactly $\lambda_j$ reads, from the reads available under indices $\{j\}\cup\mathcal{B}$. Let $\tilde{X}_j$ denote the number of reads selected from taxon $j$ by rarefaction. Taxon $j$ is tested for differential abundance by testing:
 
 
 $$\tilde{H}_0^{(j)}: \tilde{X}_{j} \perp \!\!\! \perp \vec{Y}$$
 
 ## Choosing reference taxa
+In order to obtain a set of reference taxa, we compute the $S_j$ statistic for each taxon $j$.
+Let $X_{i,j}$ denote the numeber of counts obtained for taxon $j$ in the $i$th sample. We begin by compuing $SD_{j,k}$, for every pair
+$\left(j,k\right) \in \{1,2,...,m\}\otimes\{1,2,...,m\}$:
 
 $$ SD_{j,k} = \mathop{\large{\mathrm{sd}}}^{n}_{i=1}\left(log_{10}\left(\frac{X_{i,j}+1}{X_{i,k}+1}\right)\right)$$
 
-foo
+where $n$ is the number of samples, and $sd$ is the sample standard deviation, taken over $n$ samples.
+
+Next, we compute $S_j$ by taking the median over value of $SD_{j,k}$, for fixed $j$:
 
 $$ S_j = \mathop{\large{\mathrm{median}}}^{m}_{k=1, k\ne j}\left({SD}_{j,k}\right)$$
 
-$$ Select\, B: \quad B = \{j|S_j \leq S_{crit}\}$$
+The selected set of reference taxa, $B$, is the set of taxa with $S_j \le S_{crit}$ , with $S_{crit}$ being a predefined threshold:
 
+$$ Select\, B: \quad B = \{j|S_j \leq S_{crit}\}$$
+The key assumption for reference selection, is that a small fraction of all taxa are differentially abundant. Hence, a subset of taxa, containing no differentially abundant taxa, can be obtained by selecting a fixed value of $S_{crit}$ as a threshold.
+
+The value of $S_{crit}$ is data specific. In this vignette, we use data from the kostic dataset in the phyloseq package, with $S_{crit} = 0.6$ selected. Other datasets may require different values.
 
 # Workflow
 ```{r,eval = F}
