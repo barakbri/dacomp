@@ -8,16 +8,17 @@ library(energy)
 
 #' Test reference set of taxa for validity, by multivariate K-Sample testing
 #' 
-#' The function carries out the Reference Validation Procedure (RVP), described in Brill et. al. (2019), appendix A. The input to the function includes a count matrix of taxa selected as a reference set (rows represent samples), and a vector Y of groups labeling. The function first rarefies all samples to constant depth, then tests for multivariate equality of distributions across the differet study groups.
+#' The function carries out the Reference Validation Procedure (RVP), described in Brill et. al. (2019), appendix A. The test verifies no differentially abundant taxa have entered the reference set. The input to the function includes a counts matrix of taxa selected as a reference set (rows represent samples), and a vector Y of groups labels. The function first rarefies all samples to constant depth, then tests for multivariate equality of distributions across the differet study groups.
 #' 
 #' @details 
-#' Rarefying samples to equal depth is mandatory, see Brill et. al. (2019) Appendix A for a complete discussion of the test and assumption. The multivariate K-sample tests performed include the \code{hhg.test.k.sample} (Heller et. al. 2019) from package \code{HHG}, The \code{disco} test (Székely et. al. 2007 ) from package \code{energy} and the Permanova test (Anderson et, al. 2001), available through the function \code{adonis} in the \code{vegan} package.
-#' All three tests require a distance (or dissimilarity) metric between samples. All three tests are evaluated with both the L1,L2 and Bray-Curtis dissimilartiy metrics.
-#' This function supports categorical phenotypes. For continous and multivariate phenotypes, a different procedure is required, making use of multivariate tests of independencesuch as \code{hhg.test} (from packge \code{HHG}), and \code{dcov.test} (from package \code{energy}) are better suited.
+#' Rarefying samples to equal depth is mandatory for testing, see Brill et. al. (2019) Appendix A for a complete discussion of the test and assumptions. The multivariate K-sample tests performed include the \code{hhg.test.k.sample} (Heller et. al. 2019) from package \code{HHG}, The \code{disco} test (Székely et. al. 2007 ) from package \code{energy} and the Permanova test (Anderson et, al. 2001), available through the function \code{adonis} in the \code{vegan} package.
+#' All three tests require a distance (or dissimilarity) metric between samples. All three tests are evaluated with the L1,L2 and Bray-Curtis dissimilarity metrics.
+#' This function supports categorical phenotypes. For continous and multivariate phenotypes, a different procedure is required, making use of multivariate tests of independence such as \code{hhg.test} (from packge \code{HHG}), and \code{dcov.test} (from package \code{energy}).
+#' 
 #' @param X_ref Matrix of counts, containing the reference taxa alone. Rows represent samples, columns represent taxa.
 #' @param Y Categorical variable of the measure phenotype, the group labeling
 #' @param nr.perm Number of permutations for computing P-values 
-#' @param verbose Should messages be printed to console, for each test computed.
+#' @param verbose Should messages be printed to console, indicating which test is being computed.
 #' 
 #' @return An object of type "dacomp.reference.validation.result.object", is a list with the follows fields:
 #' \itemize{
@@ -28,8 +29,8 @@ library(energy)
 #' \item{p.value.energy.L1}{ - P-value for the disco test, with the L1 distance metric}
 #' \item{p.value.energy.BC}{ - P-value for the disco test, with the Bray-Curtis dissimilarity metric}
 #' \item{p.value.permanova_L2}{ - P-value for the permanova test, with the L2 distance metric}
-#' \item{p.value.permanova_L1}{ - P-value for the permanova K sample test, with the L1 distance metric}
-#' \item{p.value.permanova_BC}{ - P-value for the permanova K sample test, with the Bray-Curtis dissimilarity metric}
+#' \item{p.value.permanova_L1}{ - P-value for the permanova test, with the L1 distance metric}
+#' \item{p.value.permanova_BC}{ - P-value for the permanova test, with the Bray-Curtis dissimilarity metric}
 #' }
 #' 
 #' @export
