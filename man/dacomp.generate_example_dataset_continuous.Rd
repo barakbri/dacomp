@@ -2,26 +2,36 @@
 % Please edit documentation in R/dacomp_generate_example_data.R
 \name{dacomp.generate_example_dataset_continuous}
 \alias{dacomp.generate_example_dataset_continuous}
-\title{Title}
+\title{Generate a simulated dataset with a continuous phenotype, based on data from the Phyloseq package
+This function generates a dataset with a continuous Phenotype, based on the \code{kostic} dataset (Kostic et. al. 2012) from the \code{phyloseq} package (McMurdie et. al. 2012). Simulated data is generated in a procedure similar to the one presented in Brill et. al. 2019, Subsection 4.1. See additionals details below.}
 \usage{
 dacomp.generate_example_dataset_continuous(n, m1 = 30,
   signal_strength_as_change_in_microbial_load = 0.1)
 }
 \arguments{
-\item{m1}{}
+\item{n}{Number of samples}
 
-\item{signal_strength_as_change_in_microbial_load}{}
+\item{m1}{Number of differentially abundant taxa}
+
+\item{signal_strength_as_change_in_microbial_load}{A number in the range 0-0.75, indicating the fraction of the microbial load that is added to the measured ecosystem, if the phenotype for the sample is equal to 1. For phenotypes with lower values, the change in the microbial load is proportional to the value of the measured phenotype.}
 }
 \value{
 a list
 \itemize{
-\item{counts}{}
-\item{covariate}{}
-\item{select_diff_abundant}{}
+\item{counts}{A counts matrix with \code{n} rows, and 1384 columns, rows represent samples,columns represent taxa.}
+\item{covariate}{The measured phenotype}
+\item{select_diff_abundant}{A vector containing the indices of taxa that are differentially abundant.}
 }
 }
 \description{
-Title
+Generate a simulated dataset with a continuous phenotype, based on data from the Phyloseq package
+This function generates a dataset with a continuous Phenotype, based on the \code{kostic} dataset (Kostic et. al. 2012) from the \code{phyloseq} package (McMurdie et. al. 2012). Simulated data is generated in a procedure similar to the one presented in Brill et. al. 2019, Subsection 4.1. See additionals details below.
+}
+\details{
+Data is generated as follows.
+In the first step, we generate a list of frequency vectors to sample from: only healthy subjects from the kostic colorectal dataset are selected. Samples with less than 500 reads are dropped. Only OTUs that appear in 2 or more subjects are retained.
+In the seccond step, a random phenotype is sampled for each sample, from a uniform(0,1) distribution.
+In the third step, samples are generated. For each sample, a vector of frequencies is chosen at random, The differentially abundant taxa are increased, with the additions realized from a poisson random variable. The signal inserted is such that a phenotype with a value of 1 is equivlant to an increase in the microbial load, \code{signal_strength_as_change_in_microbial_load} in fraction of the original microbial load.
 }
 \examples{
 \dontrun{
@@ -34,4 +44,9 @@ m1 = 30,signal_strength_as_change_in_microbial_load = 0.1)
 
 
 } 
+}
+\references{
+Brill, Barak, Amnon Amir, and Ruth Heller. 2019. “Testing for Differential Abundance in Compositional Counts Data, with Application to Microbiome Studies.” arXiv Preprint arXiv:1904.08937.
+Kostic, Aleksandar D, Dirk Gevers, Chandra Sekhar Pedamallu, Monia Michaud, Fujiko Duke, Ashlee M Earl, Akinyemi I Ojesina, et al. 2012. “Genomic Analysis Identifies Association of Fusobacterium with Colorectal Carcinoma.” Genome Research 22 (2). Cold Spring Harbor Lab: 292–98.
+McMurdie, Paul J, and Susan Holmes. 2013. “Phyloseq: An R Package for Reproducible Interactive Analysis and Graphics of Microbiome Census Data.” PloS One 8 (4). Public Library of Science: e61217.
 }

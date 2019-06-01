@@ -9,47 +9,47 @@ dacomp.select_references(X, median_SD_threshold, minimal_TA = 10,
   select_from = NULL, Previous_Reference_Selection_Object = NULL)
 }
 \arguments{
-\item{X}{counts matrix, with rows representing samples, columns representing different taxa.}
+\item{X}{Counts matrix, with rows representing samples, columns representing different taxa.}
 
-\item{median_SD_threshold}{Critical value for the `median SD` statistic. Taxa with a `median SD` statistic will be taken}
+\item{median_SD_threshold}{Critical value for the `median SD` statistic. Taxa with a `median SD` statistic will be taken.}
 
 \item{minimal_TA}{The minimal number of counts required in each sample, in the taxa selected as reference. If the set of reference taxa has a sample with less than `minimal_TA` reads in the set of reference taxa selected, the function will increase the `median SD` value until all samples have at least \core{minimal_TA} reads in the selected set of reference taxa.}
 
-\item{maximal_TA}{If all samples have more than \code{maximal_TA} reads available under the selected set of reference taxa, the `median SD` threshold value for classifying taxa as reference will be lowered, until the condition is met.}
+\item{maximal_TA}{If all samples have more than \code{maximal_TA} reads available under the selected set of reference taxa, the `median SD` threshold value for classifying taxa as references will be lowered, until the condition is met.}
 
 \item{Pseudo_Count_used}{Pseudo count added to all count values, to avoid dividing by zero.}
 
 \item{verbose}{If set to \code{TRUE}, messages will be displayed, as computation progresses.}
 
-\item{select_from}{The default value of \code{NULL} indicates that all taxa are valid candidates for selection. The user may limit the set of possible candidates for the reference set, by supplying a list of candidates using this argument.}
+\item{select_from}{The default value of \code{NULL} indicates that all taxa are valid candidates for selection. The user may limit the set of possible candidates for the reference set, by supplying a list of candidates (by indices) using this argument.}
 
-\item{Previous_Reference_Selection_Object}{If the user previously selected a set of reference taxa for the data with one threshold, and would like to select a new set of reference taxa with a different threshold, the output of a previous run of \code{dacomp.select.references} can be supplied as an argument to speed up computations. See usage example in code snippet below.}
+\item{Previous_Reference_Selection_Object}{If the user previously selected a set of reference taxa for the data with one threshold, and would like to select a new set of reference taxa with another threshold, the output of a previous run of \code{dacomp.select.references} can be supplied as an argument to speed up computations. See usage example in code snippet below.}
 }
 \value{
 The function returns an object of type "dacomp.reference.selection.object", which is a list with the following fields:
 \itemize{
-\item{selected_references}{ - the list of selected reference taxa}
-\item{mean_prevalence_over_the_sorted}{ - A vector, containing probability of zero counts in the reference set of taxa if: the lowest median SD are taken as reference, two lowest median SD are taken as reference, three lowest...}
-\item{min_abundance_over_the_sorted}{ - A vector, containing the minimal number of counts observed in the reference set of taxa, across subjects, if: the lowest median SD are taken as reference, two lowest median SD are taken as reference, three lowest...}
-\item{ratio_matrix}{ - The matrix of SD_{j,k} as defined in the paper and the package vignette}
-\item{scores}{ - the median SD scores, S_j as defined in the package vignette and paper}
-\item{selected_MinAbundance}{ - The minimal number of counts, available under the reference set of taxa, across subjects}
-\item{median_SD_threshold}{ - The input supplied under the function argument with the same name, without modification by the Target Abundance feature (see 'details')}
-\item{minimal_TA}{ - The input supplied under the function argument with the same name}
-\item{maximal_TA}{ - The input supplied under the function argument with the same name}
+\item{selected_references}{ - A vector with the indices of selected reference taxa.}
+\item{mean_prevalence_over_the_sorted}{ - A vector, containing fraction of zero counts in the reference set of taxa, across samples, if: the lowest median SD are taken as reference, two lowest median SD are taken as reference, three lowest...}
+\item{min_abundance_over_the_sorted}{ - A vector, containing the minimal number of counts observed in the reference set of taxa, across samples, if: the lowest median SD are taken as reference, two lowest median SD are taken as reference, three lowest...}
+\item{ratio_matrix}{ - The matrix of SD_{j,k} as defined in the paper and the package vignette.}
+\item{scores}{ - the median SD scores, S_j as defined in the package vignette and paper.}
+\item{selected_MinAbundance}{ - The minimal number of counts, available under the reference set of taxa, across subjects.}
+\item{median_SD_threshold}{ - The input supplied under the function argument with the same name, without modification by the Target Abundance feature (see 'details').}
+\item{minimal_TA}{ - The input supplied under the function argument with the same name.}
+\item{maximal_TA}{ - The input supplied under the function argument with the same name.}
 }
 }
 \description{
-The function receives a table of microbiome counts, and classifies a set of taxa as non differentially abundant. The set of taxa classified as non differentially abundant will be later used by tests of differential abundance, by \code{\link{dacomp.test}}.
-The counts matrix must have OTUs (or higher taxa) as columns, samples as rows. No rarefaction or perliminary normalization is required.
-The first step of the computation consists of computing the standard deviation of the ratio of each pair of taxa, across subjects. Each taxon was involved in the computation of \eqn{m-1} pairwise standard deviations, with \eqn{m} being the number of taxa. The second step consists of finding the median pairwise standard deviation of each taxon, across all pairwise standard deviation computed.
-This value, computed for each taxon, is named the `median SD` statistic. Taxa with values of the `median SD` statistic below the threshold given by \code{median_SD_threshold} are selected as the reference set of taxa for testing.
+The function receives a table of microbiome counts, and selects a set of taxa used for normalization in  \code{\link{dacomp.test}}.
+The counts matrix should be formated with taxa as columns, samples as rows. No rarefaction or perliminary normalization is required.
+The first step of the computation consists of computing the standard deviation of the ratio of each pair of taxa, across subjects. Each taxon is involved in the computation of \eqn{m-1} pairwise standard deviations, with \eqn{m} being the number of taxa. The second step consists of finding the median pairwise standard deviation of each taxon, across all pairwise standard deviation computed.
+This value, computed for each taxon, is named the `median SD` statistic. Taxa with values of the `median SD` statistic below \code{median_SD_threshold} are selected as the reference set of taxa.
 See \code{vignette('dacomp_main_vignette')} for additional details and formulas.
 The full algorithm and additional details are found in Subsection 3.1 in Brill et. al. (2019).
 }
 \details{
-Target Abundance (TA) limits: The function will attempt to use the argument \code{median_SD_threshold} as a threshold for classification. The function will raise and reduce the actual threshold used, so that each sample has at least \code{minimal_TA} counts under taxa selected as reference. The function will lower the classification threshold if all samples have more than \code{maximal_Ta} reads under the selected set of reference taxa.
-Computation may take up to a minute or two, for large datasets are older computers.
+Target Abundance (TA) limits: The function will attempt to use the argument \code{median_SD_threshold} as a threshold for classification. If needed, the function will increase the actual threshold used so that each sample has at least \code{minimal_TA} counts under taxa selected as reference. The function will lower the classification threshold if all samples have more than \code{maximal_Ta} reads under the selected set of reference taxa.
+Computation may take up to a minute or two, for large datasets.
 }
 \examples{
 #' \dontrun{

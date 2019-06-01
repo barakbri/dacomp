@@ -2,23 +2,23 @@
 % Please edit documentation in R/ReferenceScore_Plot.R
 \name{dacomp.plot_reference_scores}
 \alias{dacomp.plot_reference_scores}
-\title{Title}
+\title{Plot histogram of median SD statistics from reference selection object}
 \usage{
 dacomp.plot_reference_scores(ref_select,
   label = "Histogram of medianSD statistic, across taxa",
   quantiles_to_plot = c(0.5, 0.7, 0.9), breaks_param = 30)
 }
 \arguments{
-\item{ref_select}{}
+\item{ref_select}{Computation result of \code{dacomp.select_references}}
 
-\item{label}{}
+\item{label}{Histogram label.}
 
-\item{quantiles_to_plot}{}
+\item{quantiles_to_plot}{Percentiles marked by vertical lines. Default value is \code{c(0.5,0.7,0.9)}.}
 
-\item{breaks_param}{}
+\item{breaks_param}{Passed as argument with the same name to the \code{hist} function.}
 }
 \description{
-Title
+Plot histogram of median SD statistics from reference selection object
 }
 \examples{
 \dontrun{

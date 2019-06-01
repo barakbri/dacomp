@@ -2,25 +2,38 @@
 % Please edit documentation in R/dacomp_generate_example_data.R
 \name{dacomp.generate_example_dataset_paired}
 \alias{dacomp.generate_example_dataset_paired}
-\title{Title}
+\title{Generate a simulated dataset for a paired study design.}
 \usage{
 dacomp.generate_example_dataset_paired(n, m1 = 30,
   signal_strength_as_change_in_microbial_load = 0.1)
 }
 \arguments{
-\item{n}{}
+\item{n}{Number of ecosystems to sample. Actual number of samples will be twice this number.}
 
-\item{m1}{}
+\item{m1}{Number of differentially abundant taxa}
 
-\item{signal_strength_as_change_in_microbial_load}{}
+\item{signal_strength_as_change_in_microbial_load}{A number in the range 0-0.75, indicating the fractional increase in the microbial load of a sample, when changing from condition 1 to condition 2.}
 }
 \value{
 a list
 \itemize{
-\item{counts}{}
-\item{select_diff_abundant}{}
+\item{counts}{A counts matrix with \code{(2 * n)} rows, and 1384 columns, rows represent samples,columns represent taxa.}
+\item{select_diff_abundant}{A vector containing the indices of taxa that are differentially abundant.}
 }
 }
 \description{
-Title
+The function generates a simulated data set for a paired study design. The first \code{n} rows correspond to ecosystems sampled, measured under condition 1. The next \code{n} rows correspond to the same ecosystems, measured under condition 2.
+}
+\details{
+Data generation is similar to \code{\link{dacomp.generate_example_dataset.two_sample}} with the following difference: In the first step, samples for condition 1 are generated as in the two-sample function.
+In the second step, the frequencies of taxa (used for sampling in the previous step) are increased to simulate the changing condition. Samples under condition 2 are multinomial samples, generated using the modified frequency vectors.
+}
+\examples{
+data = dacomp.generate_example_dataset_paired(30)
+
+}
+\references{
+Brill, Barak, Amnon Amir, and Ruth Heller. 2019. “Testing for Differential Abundance in Compositional Counts Data, with Application to Microbiome Studies.” arXiv Preprint arXiv:1904.08937.
+Kostic, Aleksandar D, Dirk Gevers, Chandra Sekhar Pedamallu, Monia Michaud, Fujiko Duke, Ashlee M Earl, Akinyemi I Ojesina, et al. 2012. “Genomic Analysis Identifies Association of Fusobacterium with Colorectal Carcinoma.” Genome Research 22 (2). Cold Spring Harbor Lab: 292–98.
+McMurdie, Paul J, and Susan Holmes. 2013. “Phyloseq: An R Package for Reproducible Interactive Analysis and Graphics of Microbiome Census Data.” PloS One 8 (4). Public Library of Science: e61217.
 }
