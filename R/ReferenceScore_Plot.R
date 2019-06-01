@@ -1,12 +1,9 @@
-
-
-
-#' Title
+#' Plot histogram of median SD statistics from reference selection object
 #'
-#' @param ref_select 
-#' @param label 
-#' @param quantiles_to_plot 
-#' @param breaks_param 
+#' @param ref_select  Computation result of \code{dacomp.select_references}
+#' @param label Histogram label.
+#' @param quantiles_to_plot Percentiles marked by vertical lines. Default value is \code{c(0.5,0.7,0.9)}.
+#' @param breaks_param Passed as argument with the same name to the \code{hist} function.
 #'
 #' @return
 #' @export
