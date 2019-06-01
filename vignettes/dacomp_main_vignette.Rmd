@@ -1,5 +1,5 @@
 ---
-title: Nonparametric Differential Abundance Testing for Microbiome Counts Data
+title: Nonparametric Differential Abundance Testing for Compositional Microbiome Counts Data
 shorttitle: "DACOMP"
 author:
 - name: Barak Brill
@@ -16,7 +16,7 @@ output:
   BiocStyle::pdf_document: default
 package: DACOMP
 vignette: |
-    %\VignetteIndexEntry{Nonparametric differential abundance testing for microbiome counts data}
+    %\VignetteIndexEntry{dacomp}
     %\VignetteEncoding{UTF-8}
     %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -375,7 +375,9 @@ rejected_DSFDR = result.test$dsfdr_rejected
 
 ```
 
-  
+<script type="text/x-mathjax-config">
+   MathJax.Hub.Config({  "HTML-CSS": { minScaleAdjust: 125, availableFonts: [] }  });
+</script>
   
   
   

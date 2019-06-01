@@ -1,6 +1,6 @@
-#' Title
+#' Print the results contained in an object from type dacomp.result.object
 #'
-#' @param obj 
+#' @param obj Object returned from dacomp.test(...)
 #'
 #' @return
 #' @export
@@ -15,9 +15,9 @@ print.dacomp.result.object = function(obj){
   cat(paste0('Nr taxa identified by DS-FDR as differentially abundant: ',length(obj$dsfdr_rejected),'\n\r'))
 }
 
-#' Title
+#' Print information on the selected reference set, given an object from type reference.selection.object
 #'
-#' @param obj 
+#' @param obj Object returned by dacomp.select.references(...)
 #'
 #' @return
 #' @export
@@ -30,9 +30,9 @@ print.dacomp.reference.selection.object = function(obj){
   cat(paste0('Minimal number of counts observed in reference taxa (across subjects): ',(obj$selected_MinAbundance),'\n\r'))
 }
 
-#' Title
+#' Print the results of an object from type reference.validation.result.object
 #'
-#' @param obj 
+#' @param obj Object returned by dacomp.check_reference_set_is_valid.k_groups
 #'
 #' @return
 #' @export

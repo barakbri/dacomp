@@ -2,13 +2,13 @@
 % Please edit documentation in R/Print_Functions.R
 \name{print.dacomp.reference.validation.result.object}
 \alias{print.dacomp.reference.validation.result.object}
-\title{Title}
+\title{Print the results of an object from type reference.validation.result.object}
 \usage{
 \method{print}{dacomp.reference.validation.result.object}(obj)
 }
 \arguments{
-\item{obj}{}
+\item{obj}{Object returned by dacomp.check_reference_set_is_valid.k_groups}
 }
 \description{
-Title
+Print the results of an object from type reference.validation.result.object
 }

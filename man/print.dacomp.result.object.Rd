@@ -2,13 +2,13 @@
 % Please edit documentation in R/Print_Functions.R
 \name{print.dacomp.result.object}
 \alias{print.dacomp.result.object}
-\title{Title}
+\title{Print the results contained in an object from type dacomp.result.object}
 \usage{
 \method{print}{dacomp.result.object}(obj)
 }
 \arguments{
-\item{obj}{}
+\item{obj}{Object returned from dacomp.test(...)}
 }
 \description{
-Title
+Print the results contained in an object from type dacomp.result.object
 }

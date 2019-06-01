@@ -2,41 +2,58 @@
 % Please edit documentation in R/dacomp_main_function.R
 \name{dacomp.test}
 \alias{dacomp.test}
-\title{Title}
+\title{Test taxa for differential abundance, using a given set of reference taxa used for normalization.}
 \usage{
 dacomp.test(X, y, ind_reference_taxa, test, q = 0.05,
   nr_perm = 1/(q/(ncol(X) - length(ind_reference_taxa))),
   disable_DSFDR = F, user_defined_test_function = NULL, verbose = F)
 }
 \arguments{
-\item{X}{}
+\item{X}{Matrix of counts, with rows representing samples, columns representing taxa. See `details` for additional information on how to format this matrix for paired study designs.}
 
-\item{y}{}
+\item{y}{Vector of phenotype values by sample. See details on different formats used by different tests.}
 
-\item{ind_reference_taxa}{}
+\item{ind_reference_taxa}{One of two options: Object of type 'dacomp.reference.selection.object' returned from \code{\link{dacomp.select.references}}, or a vector of indices of taxa selected as a reference set for normalization. See package vignette for additional details.}
 
-\item{test}{}
+\item{test}{One of the values under \code{DACOMP.POSSIBLE.TEST.NAMES}, or one of the constants available as \code{DACOMP.TEST.NAME.*} with asterisk representing the name of the test. See 'details' for number of details on running different tests.}
 
-\item{q}{}
+\item{q}{The required FDR level for the DS-FDR algorithm, see Jiang et. al. (2017) for details.}
 
-\item{nr_perm}{}
+\item{nr_perm}{Number of permuations used for testing and computing P-values. The default number of permutations is set high enough to provide powerful inference after adjusting for multiplicity. Change the number of permutations only if you know how it effects power after correcting for multiplicity.}
 
-\item{disable_DSFDR}{}
+\item{disable_DSFDR}{Can be used to disable the DS-FDR computation (which may take up to a minute on large datasets). The default value is \code{FALSE}.}
 
-\item{verbose}{}
+\item{user_defined_test_function}{Argument for inputting a function for a custom test of association supplied by the user, see `details` below.}
+
+\item{verbose}{Should messages be printed to console, indicating computation progress. The default value is \code{FALSE}}
 }
 \value{
-a list
+An object of type "dacomp.result.object", which is a list with the follow fields:
 \itemize{
-\item{lambda}{}
-\item{stats_matrix}{}
-\item{p.values.test}{}
-\item{dsfdr_rejected}{}
-\item{dsfdr_threshold}{}
+\item{lambda}{ - The number of reads taken as }
+\item{stats_matrix}{ - A matrix of size \code{(nr_perm+1) X ncol(X)}  containing the tests statistics for the data (first row) and test statistics computed for permuted valued of \code{y} (other rows).}
+\item{p.values.test}{ - A vector with P-values for the different tests of association, by taxa, obtained by permutations. Reference taxa will appear as \code{NA}}
+\item{dsfdr_rejected}{ - A vector of taxa indices declated differentially abundant after using the DS-FDR method for multiplicity adjustment. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}}
+\item{dsfdr_threshold}{ - The selected threshold, in terms of P-values, for declaring taxa as differentialy abundant. Taxa with P-values under this threshold will be declared diffentially abundant. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}}
 }
 }
 \description{
-Title
+The function tests taxa for differential abundance, given a set of reference taxa used for normalization, as described in Brill et. al. (2019). The function supports several tests, for different outcomes: two sample tests, K-sample tests, tests for association with a continous outcome and user defined tests. See `details` below on how the input argument \code{y} shold be formatted for different tests.
+}
+\details{
+The function performs tests each taxon not in the reference set for differential abundance as follows. First, an identical number of reads is taken from each sample, from the reads available under the reference set of taxa, and the taxon in question. Next, a test of association is performed between the rarefied reads and the phenotype given by the argument \code{y}. P-values are computed by permutations. Finally, after all P-values are computed, the DS-FDR threshold for rejection is computed. P-values are compared to this threshold, and discoveries are announced accordingly. Reference taxa are not tested for differential abundance. See \code{vignette('dacomp_main_vignette')} for additional details and additional examples.
+
+The function supports several tests. Different tests require different formats for the arguments \code{X} and \code{y}:
+\itemize{
+\item{DACOMP.TEST.NAME.WILCOXON}{ - a Wilcoxon rank sum test between the rarefied reads from the two sample groups. \code{y} is either a vector of zeros and ones or any vector with two levels.}
+\item{DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS}{ - a two sample test for difference in means, based on permutation. \code{y} formated as for the Wilcoxon rank sum test.}
+\item{DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS}{ - a two sample test for difference in means of the logatihm of counts, based on permutation. A pseudocount of 1 is added to the rarefied reads, so that the lograithm can be computed. \code{y} formated as for the Wilcoxon rank sum test.}
+\item{DACOMP.TEST.NAME.TWO_PART_WILCOXON}{ - The two part test of Wagner et. al. (2011), for equality of distributions between two sample groups. \code{y} formated as for the Wilcoxon rank sum test.}
+\item{DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST}{ - The Wilcoxon sign rank test for paired designs. For this test, \code{X} is formatted with the first \eqn{n/2} rows corresponding to the samples measured at condition 1, and the latter \eqn{n/2} rows measured at condition 2, i.e. rows \eqn{1} and \eqn{n/2 + 1} correspond to the same physical sample, under two conditions. For this test, \code{y} is set to \code{NULL}}
+\item{DACOMP.TEST.NAME.SPEARMAN}{ - Test of association with a continuous, univariate phenotype. \code{y} is the measured phenotype across samples. The test performed is a permutation based test for the Spearman correlation coefficient with a two sided alternative.}
+\item{DACOMP.TEST.NAME.KRUSKAL_WALLIS}{ - Test for equality of distributions between \eqn{K} sample groups. \code{y} should be contian the group labeling of different observations.}
+\item{DACOMP.TEST.NAME.USER_DEFINED}{ - Indicates that a custum test is supplied via \code{user_defined_test_function}. The supplied function will receive a single argument, the vector of rarefied counts and will return an array of length \code{nr_perm +1}, containing the test statistic computed for the original data, along with test statistics computed for permuted phenotypes. Test statistics must have a right sided alternative. A complete example with code snippets is found in \code{vignette('dacomp_main_vignette')} }
+}
 }
 \examples{
 \dontrun{
@@ -100,4 +117,9 @@ result.test = dacomp.test(X = data$counts,
 rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 rejected_DSFDR = result.test$dsfdr_rejected
 }
+}
+\references{
+Brill, Barak, Amnon Amir, and Ruth Heller. 2019. “Testing for Differential Abundance in Compositional Counts Data, with Application to Microbiome Studies.” arXiv Preprint arXiv:1904.08937.
+Jiang, L, A Amir, JT Morton, R Heller, E Arias-Castro, and R Knight. 2017. “Discrete False-Discovery Rate Improves Identification of Differentially Abundant Microbes. mSystems 2: E00092-17.” Am Soc Microbiol.
+Wagner, Brandie D, Charles E Robertson, and J Kirk Harris. 2011. “Application of Two-Part Statistics for Comparison of Sequence Variant Counts.” PloS One 6 (5). Public Library of Science: e20296.
 }
