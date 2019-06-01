@@ -15,7 +15,7 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "dacomp.reference.selection.object"
 #' Computation may take up to a minute or two, for large datasets.
 #' 
 #' @param X Counts matrix, with rows representing samples, columns representing different taxa.
-#' @param median_SD_threshold Critical value for the `median SD` statistic. Taxa with a `median SD` statistic will be taken 
+#' @param median_SD_threshold Critical value for the `median SD` statistic. Taxa with a `median SD` statistic will be taken.
 #' @param minimal_TA The minimal number of counts required in each sample, in the taxa selected as reference. If the set of reference taxa has a sample with less than `minimal_TA` reads in the set of reference taxa selected, the function will increase the `median SD` value until all samples have at least \core{minimal_TA} reads in the selected set of reference taxa.
 #' @param maximal_TA If all samples have more than \code{maximal_TA} reads available under the selected set of reference taxa, the `median SD` threshold value for classifying taxa as references will be lowered, until the condition is met. 
 #' @param Pseudo_Count_used Pseudo count added to all count values, to avoid dividing by zero.
@@ -25,15 +25,15 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "dacomp.reference.selection.object"
 #' 
 #' @return The function returns an object of type "dacomp.reference.selection.object", which is a list with the following fields:
 #' \itemize{
-#' \item{selected_references}{ - a vector with the indices of selected reference taxa}
+#' \item{selected_references}{ - A vector with the indices of selected reference taxa.}
 #' \item{mean_prevalence_over_the_sorted}{ - A vector, containing fraction of zero counts in the reference set of taxa, across samples, if: the lowest median SD are taken as reference, two lowest median SD are taken as reference, three lowest...}
 #' \item{min_abundance_over_the_sorted}{ - A vector, containing the minimal number of counts observed in the reference set of taxa, across samples, if: the lowest median SD are taken as reference, two lowest median SD are taken as reference, three lowest...}
-#' \item{ratio_matrix}{ - The matrix of SD_{j,k} as defined in the paper and the package vignette}
-#' \item{scores}{ - the median SD scores, S_j as defined in the package vignette and paper}
-#' \item{selected_MinAbundance}{ - The minimal number of counts, available under the reference set of taxa, across subjects}
-#' \item{median_SD_threshold}{ - The input supplied under the function argument with the same name, without modification by the Target Abundance feature (see 'details')}
-#' \item{minimal_TA}{ - The input supplied under the function argument with the same name}
-#' \item{maximal_TA}{ - The input supplied under the function argument with the same name}
+#' \item{ratio_matrix}{ - The matrix of SD_{j,k} as defined in the paper and the package vignette.}
+#' \item{scores}{ - the median SD scores, S_j as defined in the package vignette and paper.}
+#' \item{selected_MinAbundance}{ - The minimal number of counts, available under the reference set of taxa, across subjects.}
+#' \item{median_SD_threshold}{ - The input supplied under the function argument with the same name, without modification by the Target Abundance feature (see 'details').}
+#' \item{minimal_TA}{ - The input supplied under the function argument with the same name.}
+#' \item{maximal_TA}{ - The input supplied under the function argument with the same name.}
 #' }
 #' 
 #' @references 

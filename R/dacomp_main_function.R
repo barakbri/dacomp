@@ -10,25 +10,25 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' 
 #' The function supports several tests. Different tests require different formats for the arguments \code{X} and \code{y}:
 #' \itemize{
-#' \item{DACOMP.TEST.NAME.WILCOXON}{ - a Wilcoxon rank sum test between the rarefied reads from the two sample groups. \code{y} is either a vector of zeros and ones or any vector with two levels.}
-#' \item{DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS}{ - a two sample test for difference in means, based on permutation. \code{y} formated as for the Wilcoxon rank sum test.}
-#' \item{DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS}{ - a two sample test for difference in means of the logatihm of counts, based on permutation. A pseudocount of 1 is added to the rarefied reads, so that the lograithm can be computed. \code{y} formated as for the Wilcoxon rank sum test.}
+#' \item{DACOMP.TEST.NAME.WILCOXON}{ - A Wilcoxon rank sum test between the rarefied reads from the two sample groups. \code{y} is either a vector of zeros and ones or any vector with two levels.}
+#' \item{DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS}{ - A two sample test for difference in means, based on permutation. \code{y} formated as for the Wilcoxon rank sum test.}
+#' \item{DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS}{ - A two sample test for difference in means of the logatihm of counts, based on permutation. A pseudocount of 1 is added to the rarefied reads, so that the lograithm can be computed. \code{y} formated as for the Wilcoxon rank sum test.}
 #' \item{DACOMP.TEST.NAME.TWO_PART_WILCOXON}{ - The two part test of Wagner et. al. (2011), for equality of distributions between two sample groups. \code{y} formated as for the Wilcoxon rank sum test.}
-#' \item{DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST}{ - The Wilcoxon sign rank test for paired designs. For this test, \code{X} is formatted with the first \eqn{n/2} rows corresponding to the samples measured at condition 1, and the latter \eqn{n/2} rows measured at condition 2, i.e. rows \eqn{1} and \eqn{n/2 + 1} correspond to the same physical sample, under two conditions. For this test, \code{y} is set to \code{NULL}}
+#' \item{DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST}{ - The Wilcoxon sign rank test for paired designs. For this test, \code{X} is formatted with the first \eqn{n/2} rows corresponding to the samples measured at condition 1, and the latter \eqn{n/2} rows measured at condition 2, i.e. rows \eqn{1} and \eqn{n/2 + 1} correspond to the same physical sample, under two conditions. For this test, \code{y} is set to \code{NULL}.}
 #' \item{DACOMP.TEST.NAME.SPEARMAN}{ - Test of association with a continuous, univariate phenotype. \code{y} is the measured phenotype across samples. The test performed is a permutation based test for the Spearman correlation coefficient with a two sided alternative.}
 #' \item{DACOMP.TEST.NAME.KRUSKAL_WALLIS}{ - Test for equality of distributions between \eqn{K} sample groups. \code{y} should be contian the group labeling of different observations.}
-#' \item{DACOMP.TEST.NAME.USER_DEFINED}{ - Indicates that a custom test is supplied using the argument \code{user_defined_test_function}. The supplied function will receive a single argument, the vector of rarefied counts and will return an array of length \code{nr_perm +1}, containing the test statistic computed for the original data, along with test statistics computed for permuted phenotypes. Test statistics must have a right sided alternative. A complete example with code snippets is found in \code{vignette('dacomp_main_vignette')} }
+#' \item{DACOMP.TEST.NAME.USER_DEFINED}{ - Indicates that a custom test is supplied using the argument \code{user_defined_test_function}. The supplied function will receive a single argument, the vector of rarefied counts and will return an array of length \code{nr_perm +1}, containing the test statistic computed for the original data, along with test statistics computed for permuted phenotypes. Test statistics must have a right sided alternative. A complete example with code snippets is found in \code{vignette('dacomp_main_vignette')}.}
 #' }
 #' 
 #' @param X Matrix of counts, with rows representing samples, columns representing taxa. See `details` for additional information on how to format this matrix for paired study designs.
 #' @param y Vector of phenotype values by sample. See details on different formats used by different tests.
 #' @param ind_reference_taxa One of two options: Object of type 'dacomp.reference.selection.object' returned from \code{\link{dacomp.select.references}}, or a vector of indices of taxa selected as a reference set for normalization. See package vignette for additional details.
-#' @param test One of the values under \code{DACOMP.POSSIBLE.TEST.NAMES}, or one of the constants available as \code{DACOMP.TEST.NAME.*} with asterisk representing the name of the test. See 'details' for number of details on running different tests.
+#' @param test One of the values in the vector \code{DACOMP.POSSIBLE.TEST.NAMES}, or one of the constants available as \code{DACOMP.TEST.NAME.*} with asterisk representing the name of the test. See 'details' for additional details and inputs required, by test.
 #' @param q The required FDR level for the DS-FDR algorithm, see Jiang et. al. (2017) for details.
 #' @param nr_perm Number of permuations used for testing and computing P-values. The default number of permutations is set high enough to provide powerful inference after adjusting for multiplicity. Change the number of permutations only if you know how it effects power after correcting for multiplicity. 
 #' @param disable_DSFDR Can be used to disable the DS-FDR computation (which may take up to a minute on large datasets). The default value is \code{FALSE}.
 #' @param user_defined_test_function Argument for inputting a function for a custom test of association supplied by the user, see `details` below.
-#' @param verbose Should messages be printed to console, indicating computation progress. The default value is \code{FALSE}
+#' @param verbose Should messages be printed to console, indicating computation progress. The default value is \code{FALSE}.
 #'
 #' 
 #' @return An object of type "dacomp.result.object", which is a list with the follow fields:
