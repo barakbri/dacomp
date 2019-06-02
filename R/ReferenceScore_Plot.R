@@ -1,4 +1,4 @@
-#' Plot histogram of median SD statistics from reference selection object
+#' Plot histogram of median SD statistics from a reference selection result object
 #'
 #' @param ref_select  Computation result of \code{dacomp.select_references}
 #' @param label Histogram label.

@@ -42,7 +42,7 @@ The function returns an object of type "dacomp.reference.selection.object", whic
 \description{
 The function receives a table of microbiome counts, and selects a set of taxa used for normalization in  \code{\link{dacomp.test}}.
 The counts matrix should be formated with taxa as columns, samples as rows. No rarefaction or perliminary normalization is required.
-The first step of the computation consists of computing the standard deviation of the ratio of each pair of taxa, across subjects. Each taxon is involved in the computation of \eqn{m-1} pairwise standard deviations, with \eqn{m} being the number of taxa. The second step consists of finding the median pairwise standard deviation of each taxon, across all pairwise standard deviation computed.
+The first step of the computation consists of computing the standard deviation of the ratio of each pair of taxa, across subjects. Each taxon is involved in the computation of \eqn{m-1} pairwise standard deviations, with \eqn{m} being the number of taxa. The second step consists of finding the median pairwise standard deviation of each taxon, across all pairwise standard deviations computed.
 This value, computed for each taxon, is named the `median SD` statistic. Taxa with values of the `median SD` statistic below \code{median_SD_threshold} are selected as the reference set of taxa.
 See \code{vignette('dacomp_main_vignette')} for additional details and formulas.
 The full algorithm and additional details are found in Subsection 3.1 in Brill et. al. (2019).
@@ -84,5 +84,5 @@ result.selected.references.different.threshold = dacomp.select_references(X = da
 } 
 }
 \references{
-Brill, Barak, Amnon Amir, and Ruth Heller. 2019. “Testing for Differential Abundance in Compositional Counts Data, with Application to Microbiome Studies.” arXiv Preprint arXiv:1904.08937.
+Brill, Barak, Amnon Amir, and Ruth Heller. 2019. Testing for Differential Abundance in Compositional Counts Data, with Application to Microbiome Studies. arXiv Preprint arXiv:1904.08937.
 }

@@ -1,5 +1,5 @@
 ---
-title: Nonparametric Differential Abundance Testing for Compositional Microbiome Counts Data
+title: Non Parametric Tests for Differential Abundance in Microbiome Counts Data.
 shorttitle: "DACOMP"
 author:
 - name: Barak Brill
@@ -28,11 +28,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-The DACOMP package implements the methods for detecting differentially abundant taxa in 16S microbiome data, across different phenotype levels, as described in Brill et. al. (2019) ^[@brill2019testing]. microbiome 16S counts data has several unique characteristics, and requires specific methods for statistical inference. More specificly, a sample of 16S counts is a sparse, high dimensional, vector of counts. The sampled counts represent the relative frequencies of taxa in the sampled ecosystem. However, the total number of counts in a sample is not associated withthe total abundance of taxa in the ecosystem. This effect is known as compositionality^[@mandal2015analysis;@gloor2017microbiome;@kumar2018analysis]. As a result of compositionality, a change in the absolute abundnace of several taxa, in the measured ecosystem, results in the change of all relative frequencies of taxa. Disregarding this effect results in an inflated rate of false positive discoveries, when associating taxa to phenotype levels.
+The `dacomp` package implements methods for detecting differentially abundant taxa in 16S microbiome data, across different phenotype levels^[@brill2019testing]. Microbiome 16S counts data has several unique characteristics, and requires specific methods for statistical inference. More specificly, a sample of 16S counts is a sparse, high dimensional, vector of counts. The sampled counts represent the relative frequencies of taxa in the sampled ecosystem. However, the total number of counts in a sample is not associated with the total abundance of taxa in the ecosystem. This effect is known as compositionality^[@gloor2017microbiome]. As a result of compositionality, a change in the absolute abundnace of several taxa in the measured ecosystem results in the change of all relative frequencies of taxa. Disregarding this effect when associating taxa to phenotype levels leads to an inflated rate of false positive discoveries^[@mandal2015analysis;@kumar2018analysis].
 
-The DACOMP package is aimed at providing valid statistical inference while addressing the above challenges (sparsity, compositionality). The key idea is to to first obtain a set of taxa which are non-differentially abundant. These taxa serve as a reference set for the null behaviour of taxa. In the second step, for taxon tested for differential abundance, a fixed number of reads is selected from each sample from the reads available under the reference setof taxa and the tested taxon. The `dacomp` method tests for association between the number of subsampled reads that belong to the tested taxon and the measured phenotype. If the number of subsampled counts that belong to the taxon begin tested depend on the measured phenotype, the tested taxon alone is responsible for the association discovered (as all other taxa involved in the computation are null). 
+The DACOMP package is aimed at providing valid statistical inference while addressing the above challenges (sparsity, compositionality). The key idea is to first obtain a set of taxa which are non-differentially abundant. These taxa serve as a reference set for the null behaviour of taxa. In the second step, for each taxon tested for differential abundance, a fixed number of reads is selected from each sample from the reads available under the reference set of taxa and the tested taxon. The `dacomp` method tests for association between the number of subsampled reads that belong to the tested taxon and the measured phenotype. If the number of subsampled counts that belong to the tested taxon depends on the measured phenotype, the tested taxon alone is responsible for the association discovered (as all other taxa involved in the computation are non differentially abundant). 
 
-The structure of the vignette is as follows. In section 2 we breifly describe the DACOMP model and underlying assumptions. In section 3 we present the package workflow on data with two study groups. In Sections 4-6 we demonstrate how to detect differentially abundant taxa in studies with K study groups, paired study design and studies with continuous phenotypes. Section 7 discusses possible extensions and modifications to the `dacomp` method. In Subsection 7.1, we discuss how alternative methods for selecting reference taxa can be used. In Subsection 7.2, we demonstrate how to utilize the `dacomp` workflow with other tests of association, supplied by the user. Our example will involve associating differentially abundant taxa with a pair of continuous phenotypes. The user supplied test will be the `dcov.test` test^[@szekely2007measuring] from `R` package `ENERGY`.
+The structure of the vignette is as follows. In section 2 we breifly describe the DACOMP method and underlying assumptions. In section 3 we present the package workflow on data with two study groups. In Sections 4-6 we demonstrate how to detect differentially abundant taxa in studies with K study groups, paired study design and studies with continuous phenotypes. In section 7 we demonstrate how to utilize the `dacomp` workflow with other tests of association, supplied by the user. Our example will involve associating differentially abundant taxa with a pair of continuous phenotypes. The user supplied test will be the `dcov.test` test^[@szekely2007measuring] from `R` package `ENERGY`.
 
 You can install the package using the devtools package:
 ```{r, eval=FALSE}
@@ -41,36 +41,34 @@ devtools::install_github("barakbri/dacomp")
 ```
 
 
-# Model 
-Let $\vec{X}$ be a $m$-dimensional vector of counts obtained from a 16S sample. The `dacomp` generative model assumes $\vec{X}$ is realized from a multinomial distribution, whose probability vector $\vec{P}$ is a random vector on the unit simplex:
+# Method 
+Let $\vec{X}$ be a $m$-dimensional vector of counts obtained from a 16S sample. The `dacomp` generative model assumes $\vec{X}$ is realized from a multinomial distribution, whose probability vector $\vec{P}$ is a random vector on the unit simplex (an infinite mixture of multinomials):
 
 $$ \vec{X} | \vec{P}, N \sim multinom\left( N , \vec{P} \right) ,\quad\quad \vec{P}\sim\mathcal{P}\quad ,0\leq P_{j}, \sum_{j=1}^{m}P_{j} = 1 , $$
 
-where $N$ is the number of counts observed in the sample.
+where $N$ is the number of counts observed in the sample, $P_j$ is the $j$th entry of $\vec{P}$ and $\mathcal{P}$ is a distribution over the $m$-dimensional unit simplex.
 
-Let $\vec{Y}$ represent the measured vector of phenotypes for a sample. We assume there exists a subset of the taxa, indexed by $\mathcal{B}\subset\{1,2,...,m\}$, that are not differentially abundant. The `dacomp` method assumes taht ratios between non differentialy abundant taxa are independent of the measured phenotype. Specifically, for every subset $\{v_1,v_2,...,v_s\} \subset \mathcal{B}$, where $P\left(\sum_{k=1}^{s}P_{v_k} >0\right)=1$, we assume that:
+Let $\vec{Y}$ represent the measured vector of phenotypes for a sample. We assume there exists a subset of the taxa, indexed by $\mathcal{B}\subset\{1,2,...,m\}$, that are non differentially abundant. The `dacomp` method assumes that ratios between non differentialy abundant taxa are independent of the measured phenotype. Specifically, for every subset $\{v_1,v_2,...,v_s\} \subset \mathcal{B}$, where $P\left(\sum_{k=1}^{s}P_{v_k} >0\right)=1$, we assume that:
 
 
 $$\frac{\left(P_{v_1},P_{v_2},...,P_{v_{s}}\right)}{\sum_{k=1}^{s} P_{v_{k}}}\perp \!\!\! \perp \vec{Y}.$$
 Furthermore, we assume that $P\left(\sum_{k\in\mathcal{B}}P_{v_k} >0\right)=1$. Our task is to find all differentially abundant taxa, the complement of the set $\mathcal{B}$.
 
-We show how the $j$th taxon can be tested for differential abundance given a set of reference taxa, $B = \{b_1,b_2,...,b_r\}\in\mathcal{B}$. The hypothesis of no differential abundance is given by:
+We show how the $j$th taxon can be tested for differential abundance given a set of reference taxa, $B = \{b_1,b_2,...,b_r\}\in\mathcal{B}$. The hypothesis of 'no differential abundance' is given by:
 
 
 $$ H_0^{(j)}:\quad \frac{\left(P_j,P_{b_1},P_{b_2},...,P_{b_{r}}\right)}{P_j + \sum_{k=1}^{r} P_{b_k}}\perp \!\!\! \perp \vec{Y}.$$
-This hypothesis cannot be tested directly, since \vec{P} is not observed. Brill et. al.(2019)^[@brill2019testing] discuss how this hypothesis can be tested using the observed counts.
+This hypothesis cannot be tested directly, since \vec{P} is not observed. Brill et al.(2019)^[@brill2019testing] discuss how this hypothesis can be tested using the observed counts.
 
 Let $\lambda_j$ be the minimal number of reads available in the taxa indexed by $\{j\}\cup\mathcal{B}$ across the different samples. From each sample, select exactly $\lambda_j$ reads, from the reads available under indices $\{j\}\cup\mathcal{B}$. Let $\tilde{X}_j$ denote the number of reads selected from taxon $j$ by rarefaction. Taxon $j$ is tested for differential abundance by testing:
 
 
 $$\tilde{H}_0^{(j)}: \tilde{X}_{j} \perp \!\!\! \perp \vec{Y}.$$
 
-As an output, the `dacomp` package provides $P$-values for hypothesis testing. $P$-values can be computed for several tests of association and equality of distributions. Also, the package makes use of the DS-FDR method for controlling the False Discvory Rate (FDR)^[@benjamini1995controlling]. The DS-FDR method (Jiang et. al., 2017)^[@jiang2017discrete] is a multiple testing procedure aimed at providing FDR control when the null distribution of $P$-values is discrete, and thus stochastically greater then uniform distribution. In this setting, the DS-FDR procedure is known to provide higher power compared to classical multiple hypothesis testing procedure, see Jiang et. al. (2017)^[@jiang2017discrete] for further details.
-
-For full method description, details and considerations, see Brill et. al.(2019)^[@brill2019testing].
+As an output, the `dacomp` package provides $P$-values for hypothesis testing. $P$-values can be computed for several tests of association and equality of distributions. The package also makes use of the DS-FDR method for controlling the False Discvory Rate (FDR)^[@benjamini1995controlling]. The DS-FDR method^[@jiang2017discrete] is a multiple testing procedure aimed at providing FDR control when the null distribution of $P$-values is discrete, and thus stochastically greater then the uniform distribution. In this setting, the DS-FDR procedure is known to provide higher power compared to classical multiple hypothesis testing procedure.
 
 ## Choosing reference taxa
-In order to obtain a set of reference taxa, we compute the $S_j$ statistic for each taxon $j$.
+In order to obtain a set of reference taxa, we compute the $S_j$ statistic for each taxon $j$. The $S_j$ statistic is used for classifying taxa as non differentially abundant.
 Let $X_{i,j}$ denote the number of counts obtained for taxon $j$ in the $i$th sample. We begin by computing $SD_{j,k}$, for every pair
 $\left(j,k\right) \in \{1,2,...,m\}\otimes\{1,2,...,m\}$:
 
@@ -78,7 +76,7 @@ $$ SD_{j,k} = \mathop{\large{\mathrm{sd}}}^{n}_{i=1}\left(log_{10}\left(\frac{X_
 
 where $n$ is the number of samples, and $sd$ is the sample standard deviation, taken over $n$ samples.
 
-Next, we compute $S_j$ by taking the median over value of $SD_{j,k}$, for fixed $j$:
+Next, we compute $S_j$ by taking the median over values of $SD_{j,k}$, for fixed $j$:
 
 $$ S_j = \mathop{\large{\mathrm{median}}}^{m}_{k=1, k\ne j}\left({SD}_{j,k}\right).$$
 
@@ -87,12 +85,12 @@ The selected set of reference taxa, $B$, is the set of taxa with $S_j \le S_{cri
 $$ Select\, B: \quad B = \{j|S_j \leq S_{crit}\}.$$
 The key assumption for reference selection, is that a relatively small fraction of all taxa are differentially abundant. Hence, a subset of taxa, containing no differentially abundant taxa, can be obtained by selecting a fixed value of $S_{crit}$ as a threshold.
 
-The value of $S_{crit}$ is data specific. In this vignette, we use data from the colorectal cancer dataset^[@kostic2012genomic] avaialble from the phyloseq^[@mcmurdie2013phyloseq] package. For this data, $S_{crit} = 0.6$ is selected. Other datasets may require different values.
+The value of $S_{crit}$ is data specific. In this vignette, we use data from the colorectal cancer dataset^[@kostic2012genomic] available through the phyloseq^[@mcmurdie2013phyloseq] package. For this data, $S_{crit} = 0.6$ is selected. Other datasets may require different values for $S_{crit}$.
 
 # Workflow
 This section demonstrate the workflow for statistical analysis. We begin by generating a sample dataset. The dataset will consist of two study groups (labeled 0 and 1), 50 samples in each study groups. The data will contain 1384 OTUs with `m1=100` OTUs selected (at random) as differentially abundant. The parameter `signal_strength_as_change_in_microbial_load = 0.1` indicates OTUs associated with the phenotype cause a change of 10% in the microbial load, compared to study group 0. Note that this parameter effects the ratio between different columns in the data, but not the total number of counts in a row (sample): the total number of counts in a sample is not indicative of the microbial load.
 
-```{r,eval = T,cache=TRUE}
+```{r,eval = T,cache=FALSE}
 library(dacomp)
 
 set.seed(1)
@@ -108,25 +106,31 @@ The object `data` consists of `data$counts` - a matrix with 100 rows and 1384 co
 ## Selecting reference taxa
 
 We begin our analysis by selecting a set of reference taxa. This requires a threshold, $S_{crit}=0.6$
-We also plot the histogram of $S_j$ scores, with vertical lines for the $0.5,0.7,$ and $0.9$ percentiles of $S_j$'s. This allows us to assess how high is the selected $S_{crit}$ compared to the distribution of $S_j$ in our data.
+We also plot the histogram of $S_j$ scores, with vertical lines for the $0.5,0.7,$ and $0.9$ percentiles of $S_j$s. This allows us to assess how high is the selected $S_{crit}$ compared to the distribution of $S_j$ in our data.
 
-```{r,eval = T,cache=TRUE}
+```{r,eval = T}
 #select references: (may take a minute)
 result.selected.references = dacomp.select_references(
-                              X = data$counts,
-                              median_SD_threshold = 0.6, #APPLICATION SPECIFIC
-                              verbose = F)
+                      X = data$counts,
+                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                      verbose = F)
 
-length(result.selected.references$selected_references)
+```
 
-#plot the reference selection scores (can also be used to better set the median SD threshold)
+Output obtained from printing the reference selection results:
+```{r,eval = T}
+print(result.selected.references)
+```
+
+Plot the reference selection scores (can also be used to better set the median SD threshold)
+```{r,eval = T}
 dacomp.plot_reference_scores(result.selected.references)
 ```
 
-## Testing for differential abundance
+## Inference using the Wilcoxon rank sum test
 We test taxa (not in the reference set) for differential abundance by using the function `dacomp.test`. We show two possible adjustments for multiplicity, the BH procedure (using `p.adjust`) and the DS-FDR procedure^[@jiang2017discrete]:
 
-```{r, eval = F}
+```{r, eval = T}
 #multiplicity correction levels for the BH and DS-FDR methods
 q_BH = q_DSFDR = 0.1
 
@@ -145,14 +149,28 @@ rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 rejected_DSFDR = result.test$dsfdr_rejected 
 ```
 
-## Using different non parametric tests
+Output from printing `result.test`:
+```{r,eval = T}
+print(result.test)
+```
+
+## Other reference selection methods
+  The argument `ind_reference_taxa` in the function `dacomp.test(...)` can receive one of two possible arguments:
+  * An object obtained from `dacomp.select_references(...)`. 
+  * A set of integers defining the indices of reference taxa, indices correspond to columns of the counts matrix.
+  
+  You can use a general method for selecting a set of reference taxa, then supply the vector of taxa indices using the argument `ind_reference_taxa`.
+  Note that you cannot use phenotypes data for reference selection, only for testing.
+  
+
+## Inference using other tests
 The function `dacomp.test(...)` supports several other tests for studies with two sample groups:
 
 * `DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS` - A permutation based test for a difference in means.
 
-* `DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS` - A permutation based test for a difference in means, after a log transformation. A pseudocount is added to address zeros, before taking the logarithm of the number of subsampled counts.
+* `DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS` - A permutation based test for a difference in means, after a log transformation. A pseudocount of 1 is added to the counts before taking the logarithm.
 
-* `DACOMP.TEST.NAME.TWO_PART_WILCOXON` - A two part test that includes a two-sample test for a change in the proportion of zeros, toghehther with a Wilcoxon rank sum test for detecting a difference in the distribution of the non zero components of $\tilde{X}_{j}$. See Wagner et. al. (2011)^[@wagner2011application] for additional details.
+* `DACOMP.TEST.NAME.TWO_PART_WILCOXON` - A two part test^[@wagner2011application] that combines a two-sample test for a change in the proportion of zeros, together with a Wilcoxon rank sum test for detecting a difference in the distribution of the non zero components of $\tilde{X}_{j}$.
 
 
 ```{r, eval = F}
@@ -175,12 +193,12 @@ result.test = dacomp.test(X = data$counts,
                      verbose = T,q = q_DSFDR)
 ```
 
-# Testing with $K$ sample groups
-The function `dacomp.test` supports the Kruskal Wallis test^[@kruskal1952use] for testing equality of distributions between K sample groups. To analyze results from a study with a categorical phenotype with $K$ levels, select `test = DACOMP.TEST.NAME.KRUSKAL_WALLIS` and input a vector with the group-labeling as a `y` argument,
+# Inference with $K$ groups
+The function `dacomp.test` supports the Kruskal Wallis test^[@kruskal1952use] test for equality of distributions between $K$ groups. To test for differential abundance with a categorical phenotype with $K$ levels, select `test = DACOMP.TEST.NAME.KRUSKAL_WALLIS` and input a vector with the group-labeling as a `y` argument,
 
-# Testing with paired study design
+# Inference for a paired study design
 
-To analyze results from a paired study design, with $n$ different samples, each sampled twice, format the data as follows:
+To analyze results from a paired study design with $n$ different samples, each sampled twice, format the data as follows:
 
  * Generate a matrix of counts, with the first $n$ rows corresponding to samples $1,2,...,n$ under the first condition, and rows $n+1,n+2,...,2n$ corresponding to samples $1,2,...,n$ under the second condition. This matrix is supplied as the argument `X` in `dacomp.test`
  * Use argument value `test = DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST` to select the Wilcoxon sign rank test^[@wilcoxon1945individual].
@@ -230,10 +248,10 @@ rejected_DSFDR = result.test$dsfdr_rejected
 ```
 
 
-# Testing with a continuous covariate
-The function `dacomp.test` allows testing with a continuous phenotype:
+# Inference with a continuous covariate
+The function `dacomp.test` allows for testing with a continuous phenotype:
 * The argument `y` is set to a vector of phenotype measurements by observation.
-* The argument `test` is set to `DACOMP.TEST.NAME.SPEARMAN`, the test conducted is a permutation test based on the Spearman correlation coefficient^[@Spearman] between $\tilde{X}_j$ and $Y$.
+* The argument `test` is set to `DACOMP.TEST.NAME.SPEARMAN`, the test conducted is based on the Spearman correlation coefficient^[@Spearman] between $\tilde{X}_j$ and $Y$, $P$-values are computed by permutations.
 
 See a detailed example below.
 
@@ -248,9 +266,9 @@ signal_strength_as_change_in_microbial_load = 0.1)
 
 
 result.selected.references = dacomp.select_references(
-                                  X = data$counts,
-                                  median_SD_threshold = 0.6, #APPLICATION SPECIFIC
-                                  verbose = T)
+                          X = data$counts,
+                          median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                          verbose = T)
 
 #number of selected references
 length(result.selected.references$selected_references)
@@ -273,22 +291,13 @@ rejected_DSFDR = result.test$dsfdr_rejected
 ```
 
 
-# Extending the `dacomp` package
+# Inference with used defined tests
   
-## Other reference selection methods
-  The argument `ind_reference_taxa` in the function `dacomp.test(...)` can receive one of two possible arguments:
-  * Object obtained as a result from `dacomp.select_references(...)` 
-  * A set of integers defining the indices of reference taxa (by columns of the counts matrix).
-  
-  You can use a general method for selecting a set of reference taxa, and then supply the vector of taxa indices using the argument `ind_reference_taxa`.
-  Note that you cannot use phenotypes for reference selection, only for testing.
-  
-## User defined tests
 You can use a general test, to test for association between the rarefied reads, $\tilde{X}_j$, and the phenotype vector $\vec{Y}$. To use a general test, supply the following arguments:
 
 * Set the argument `test` to `DACOMP.TEST.NAME.USER_DEFINED`. This indicates the user is supplying the test.
 * Set the argument `y` to `NULL`. If the user supplies a function running the test, the `dacomp` package does not need to access the phenotype data, the user has access to the phenotype data from the function used as an argument.
-* set the argument `nr_perm` to the number of permutations performed by the test function supplied (see additional details below)
+* set the argument `nr_perm` to the number of permutations, must be identical to the number permutations performed by the test function supplied (see additional details below).
 * Pass a function as the argument named `custom_test_function`. The test function receives a vector of rarefied counts as a single argument. The order of samples for the rarefied counts is identical to the one provided in the counts matrix. The function must return a single array of test statistics, of length `nr_perm + 1`. The first value of the array is the statistic computed for the original data. The remaining values are test statistics computed while permuting phenotype values across samples. 
 
 A detailed example is found below. The user defined test is the dcov test^[@szekely2007measuring] available as the function `dcov.test` from package `ENERGY`.
@@ -377,11 +386,13 @@ rejected_DSFDR = result.test$dsfdr_rejected
 
 ```
 
+#References
+
 <script type="text/x-mathjax-config">
    MathJax.Hub.Config({  "HTML-CSS": { minScaleAdjust: 125, availableFonts: [] }  });
 </script>
   
-  
+
   
   
   

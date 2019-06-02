@@ -31,9 +31,9 @@ dacomp.test(X, y, ind_reference_taxa, test, q = 0.05,
 An object of type "dacomp.result.object", which is a list with the follow fields:
 \itemize{
 \item{lambda}{ - The subsampling depth for each tested taxon, as in step I under `details`.}
-\item{stats_matrix}{ - A matrix of size \code{(nr_perm+1) X ncol(X)} containing the tests statistics for the data (first row) and test statistics computed for permuted valued of \code{y} (other rows).}
-\item{p.values.test}{ - A vector with P-values for the different tests of association, by taxa, obtained by permutations. Reference taxa will appear as \code{NA}.}
-\item{dsfdr_rejected}{ - A vector of taxa indices declared differentially abundant after using the DS-FDR method for multiplicity adjustment. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
+\item{stats_matrix}{ - A matrix of size \code{(nr_perm+1) X ncol(X)} containing the tests statistics for the data (first row) and test statistics computed for permuted values of \code{y} (other rows).}
+\item{p.values.test}{ - A vector with P-values for the different tests of association, by taxa. P-values obtained by permutations. P-values for reference taxa will appear as \code{NA}.}
+\item{dsfdr_rejected}{ - A vector of taxa indices declared differentially abundant by the DS-FDR method for multiplicity adjustment. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
 \item{dsfdr_threshold}{ - The selected threshold, in terms of P-values, for declaring taxa as differentialy abundant. Taxa with P-values under this threshold will be declared diffentially abundant. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
 }
 }
@@ -41,11 +41,11 @@ An object of type "dacomp.result.object", which is a list with the follow fields
 The function tests taxa for differential abundance, given a set of reference taxa used for normalization, as described in Brill et. al. (2019). The function supports several tests, by type of phenotype: two sample tests, K-sample tests, tests for association with a continous phenotype and user defined tests. See `details` below on how the input argument \code{y} shold be formatted for different tests.
 }
 \details{
-The function tests each taxon not in the reference set for differential abundance as follows. First, an identical number of reads is taken from each sample, from the reads available under the reference set of taxa, and the taxon in question. Next, a test of association is performed between the rarefied reads and the phenotype given by the argument \code{y}. P-values are computed by permutations. Finally, after all P-values are computed, the DS-FDR threshold for rejection is computed. P-values are compared to this threshold, and discoveries are announced accordingly. Reference taxa are not tested for differential abundance. See \code{vignette('dacomp_main_vignette')} for additional details and additional examples.
+The function tests each taxon not in the reference set for differential abundance as follows. First, an identical number of reads is taken from each sample, from the reads available under the reference set of taxa, and the taxon being tested. Next, a test of association is performed between the rarefied reads and the phenotype given by \code{y}. P-values are computed by permutations. Finally, after all P-values are computed, the DS-FDR threshold for rejection is computed. Hypotheses with P-values lower than the DS-FDR rejection threshold are rejected. Reference taxa are not tested for differential abundance. See \code{vignette('dacomp_main_vignette')} for additional details examples.
 
 The function supports several tests. Different tests require different formats for the arguments \code{X} and \code{y}:
 \itemize{
-\item{DACOMP.TEST.NAME.WILCOXON}{ - A Wilcoxon rank sum test between the rarefied reads from the two sample groups. \code{y} is either a vector of zeros and ones or any vector with two levels.}
+\item{DACOMP.TEST.NAME.WILCOXON}{ - A Wilcoxon rank sum test between the rarefied reads from the two sample groups. \code{y} is any vector with two levels.}
 \item{DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS}{ - A two sample test for difference in means, based on permutation. \code{y} formated as for the Wilcoxon rank sum test.}
 \item{DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS}{ - A two sample test for difference in means of the logatihm of counts, based on permutation. A pseudocount of 1 is added to the rarefied reads, so that the lograithm can be computed. \code{y} formated as for the Wilcoxon rank sum test.}
 \item{DACOMP.TEST.NAME.TWO_PART_WILCOXON}{ - The two part test of Wagner et. al. (2011), for equality of distributions between two sample groups. \code{y} formated as for the Wilcoxon rank sum test.}
@@ -119,7 +119,9 @@ rejected_DSFDR = result.test$dsfdr_rejected
 }
 }
 \references{
-Brill, Barak, Amnon Amir, and Ruth Heller. 2019. “Testing for Differential Abundance in Compositional Counts Data, with Application to Microbiome Studies.” arXiv Preprint arXiv:1904.08937.
-Jiang, L, A Amir, JT Morton, R Heller, E Arias-Castro, and R Knight. 2017. “Discrete False-Discovery Rate Improves Identification of Differentially Abundant Microbes. mSystems 2: E00092-17.” Am Soc Microbiol.
-Wagner, Brandie D, Charles E Robertson, and J Kirk Harris. 2011. “Application of Two-Part Statistics for Comparison of Sequence Variant Counts.” PloS One 6 (5). Public Library of Science: e20296.
+Brill, Barak, Amnon Amir, and Ruth Heller. 2019. Testing for Differential Abundance in Compositional Counts Data, with Application to Microbiome Studies. arXiv Preprint arXiv:1904.08937.
+
+Jiang, L, A Amir, JT Morton, R Heller, E Arias-Castro, and R Knight. 2017. Discrete False-Discovery Rate Improves Identification of Differentially Abundant Microbes. mSystems 2: E00092-17. Am Soc Microbiol.
+
+Wagner, Brandie D, Charles E Robertson, and J Kirk Harris. 2011. Application of Two-Part Statistics for Comparison of Sequence Variant Counts. PloS One 6 (5). Public Library of Science: e20296.
 }

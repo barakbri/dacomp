@@ -2,7 +2,7 @@
 % Please edit documentation in R/ReferenceScore_Plot.R
 \name{dacomp.plot_reference_scores}
 \alias{dacomp.plot_reference_scores}
-\title{Plot histogram of median SD statistics from reference selection object}
+\title{Plot histogram of median SD statistics from a reference selection result object}
 \usage{
 dacomp.plot_reference_scores(ref_select,
   label = "Histogram of medianSD statistic, across taxa",
@@ -18,7 +18,7 @@ dacomp.plot_reference_scores(ref_select,
 \item{breaks_param}{Passed as argument with the same name to the \code{hist} function.}
 }
 \description{
-Plot histogram of median SD statistics from reference selection object
+Plot histogram of median SD statistics from a reference selection result object
 }
 \examples{
 \dontrun{

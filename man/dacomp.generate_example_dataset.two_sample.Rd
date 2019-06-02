@@ -48,7 +48,9 @@ data = dacomp.generate_example_dataset.two_sample(m1 = 100,
 } 
 }
 \references{
-Brill, Barak, Amnon Amir, and Ruth Heller. 2019. “Testing for Differential Abundance in Compositional Counts Data, with Application to Microbiome Studies.” arXiv Preprint arXiv:1904.08937.
-Kostic, Aleksandar D, Dirk Gevers, Chandra Sekhar Pedamallu, Monia Michaud, Fujiko Duke, Ashlee M Earl, Akinyemi I Ojesina, et al. 2012. “Genomic Analysis Identifies Association of Fusobacterium with Colorectal Carcinoma.” Genome Research 22 (2). Cold Spring Harbor Lab: 292–98.
-McMurdie, Paul J, and Susan Holmes. 2013. “Phyloseq: An R Package for Reproducible Interactive Analysis and Graphics of Microbiome Census Data.” PloS One 8 (4). Public Library of Science: e61217.
+Brill, Barak, Amnon Amir, and Ruth Heller. 2019. Testing for Differential Abundance in Compositional Counts Data, with Application to Microbiome Studies. arXiv Preprint arXiv:1904.08937.
+
+Kostic, Aleksandar D, Dirk Gevers, Chandra Sekhar Pedamallu, Monia Michaud, Fujiko Duke, Ashlee M Earl, Akinyemi I Ojesina, et al. 2012. Genomic Analysis Identifies Association of Fusobacterium with Colorectal Carcinoma. Genome Research 22 (2). Cold Spring Harbor Lab: 292–98.
+
+McMurdie, Paul J, and Susan Holmes. 2013. Phyloseq: An R Package for Reproducible Interactive Analysis and Graphics of Microbiome Census Data. PloS One 8 (4). Public Library of Science: e61217.
 }
