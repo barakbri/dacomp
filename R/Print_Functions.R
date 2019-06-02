@@ -10,7 +10,7 @@ print.dacomp.result.object = function(obj){
   cat('DACOMP results object \n\r')
   cat(paste0('Nr. taxa tested: ',sum(!is.na(obj$lambda)),'\n\r'))
   cat(paste0('Nr. reference taxa : ',sum(is.na(obj$lambda)),'\n\r'))
-  cat(paste0('Mean lambda : ',round(mean((obj$lambda),2),na.rm = T),'\n\r'))
+  cat(paste0('Mean lambda : ',round(mean(obj$lambda, na.rm = T),2),'\n\r'))
   cat(paste0('Median lambda : ',median((obj$lambda),na.rm = T),'\n\r'))
   cat(paste0('Nr taxa identified by DS-FDR as differentially abundant: ',length(obj$dsfdr_rejected),'\n\r'))
 }
