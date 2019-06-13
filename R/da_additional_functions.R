@@ -5,6 +5,8 @@ DACOMP.TEST.NAME.TWO_PART_WILCOXON = 'TwoPartWilcoxon'
 DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST = 'SignedWilcoxon'
 DACOMP.TEST.NAME.KRUSKAL_WALLIS = 'KW'
 DACOMP.TEST.NAME.SPEARMAN = 'SPEARMAN'
+DACOMP.TEST.NAME.WELCH = 'WELCH'
+DACOMP.TEST.NAME.WELCH_LOGSCALE = 'WELCH_LOGSCALE'
 DACOMP.TEST.NAME.USER_DEFINED = 'USER_DEFINED'
 
 #define test properties:
@@ -12,14 +14,18 @@ DACOMP.TEST.NAME.USER_DEFINED = 'USER_DEFINED'
 TEST.DEF.Y.IS.0.OR.1 = c(DACOMP.TEST.NAME.WILCOXON,
                          DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
                          DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
-                         DACOMP.TEST.NAME.TWO_PART_WILCOXON)
+                         DACOMP.TEST.NAME.TWO_PART_WILCOXON,
+                         DACOMP.TEST.NAME.WELCH,
+                         DACOMP.TEST.NAME.WELCH_LOGSCALE)
 
 #Tests that require test statistics to be squared:
 TEST.DEF.SCORES.TO.BE.SQUARED = c(DACOMP.TEST.NAME.WILCOXON,
                                   DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
                                   DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
                                   DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
-                                  DACOMP.TEST.NAME.SPEARMAN)
+                                  DACOMP.TEST.NAME.SPEARMAN,
+                                  DACOMP.TEST.NAME.WELCH,
+                                  DACOMP.TEST.NAME.WELCH_LOGSCALE)
 
 # Tests the are on pairs of observations:
 TEST.DEF.TESTS.ON.PAIRS = c(DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST)
@@ -36,7 +42,9 @@ TEST.DEF.TEST.THAT.ALLOW.RVP = c(DACOMP.TEST.NAME.WILCOXON,
                                  DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
                                  DACOMP.TEST.NAME.TWO_PART_WILCOXON,
                                  #DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST, # I need a version of the RVP for paired data.
-                                 DACOMP.TEST.NAME.KRUSKAL_WALLIS)
+                                 DACOMP.TEST.NAME.KRUSKAL_WALLIS,
+                                 DACOMP.TEST.NAME.WELCH,
+                                 DACOMP.TEST.NAME.WELCH_LOGSCALE)
 
 #A list of all possible test names, also accessible to the user
 DACOMP.POSSIBLE.TEST.NAMES = c(DACOMP.TEST.NAME.WILCOXON,
@@ -46,7 +54,9 @@ DACOMP.POSSIBLE.TEST.NAMES = c(DACOMP.TEST.NAME.WILCOXON,
                               DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
                               DACOMP.TEST.NAME.KRUSKAL_WALLIS,
                               DACOMP.TEST.NAME.SPEARMAN,
-                              DACOMP.TEST.NAME.USER_DEFINED)
+                              DACOMP.TEST.NAME.USER_DEFINED,
+                              DACOMP.TEST.NAME.WELCH,
+                              DACOMP.TEST.NAME.WELCH_LOGSCALE)
 
 
 
@@ -113,7 +123,18 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.
     X_ranked_without_zeroes = X_matrix[,1]
     X_ranked_without_zeroes[X_ranked_without_zeroes>0] = rank(X_ranked_without_zeroes[X_ranked_without_zeroes>0],ties.method = 'average')
     current_stats = (rcpp_TwoPartTest_Given_Permutations(X_ranked_without_zeroes,Y_matrix)[[1]])
-  } 
+  }
+  
+  if(statistic %in% c(DACOMP.TEST.NAME.WELCH,
+                      DACOMP.TEST.NAME.WELCH_LOGSCALE)
+     ){ #welch test, either on regular or log scale
+    current_stats = rep(0,nr_bootstraps)
+    values = X_matrix[,1]
+    if(statistic == DACOMP.TEST.NAME.WELCH_LOGSCALE){
+      values = log10(values + 1)  
+    }
+    current_stats = rcpp_Welch_PermTest_Given_Permutations(values,Y_matrix)[[1]]
+  }
     
   
   if(statistic == DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST){ # signed wilcoxon

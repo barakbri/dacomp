@@ -17,3 +17,7 @@ rcpp_Compute_Wilcoxon_Signed_Rank_Stat <- function(RankedDifferences, SecondGrou
     .Call(`_dacomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat`, RankedDifferences, SecondGroupBigger)
 }
 
+rcpp_Welch_PermTest_Given_Permutations <- function(X, Y) {
+    .Call(`_dacomp_rcpp_Welch_PermTest_Given_Permutations`, X, Y)
+}
+

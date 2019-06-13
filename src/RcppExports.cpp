@@ -53,12 +53,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_Welch_PermTest_Given_Permutations
+List rcpp_Welch_PermTest_Given_Permutations(NumericVector X, IntegerMatrix Y);
+RcppExport SEXP _dacomp_rcpp_Welch_PermTest_Given_Permutations(SEXP XSEXP, SEXP YSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type X(XSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type Y(YSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_Welch_PermTest_Given_Permutations(X, Y));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_dacomp_rcpp_Wilcoxon_PermTest_Given_Permutations", (DL_FUNC) &_dacomp_rcpp_Wilcoxon_PermTest_Given_Permutations, 2},
     {"_dacomp_rcpp_Spearman_PermTest_Given_Permutations", (DL_FUNC) &_dacomp_rcpp_Spearman_PermTest_Given_Permutations, 2},
     {"_dacomp_rcpp_TwoPartTest_Given_Permutations", (DL_FUNC) &_dacomp_rcpp_TwoPartTest_Given_Permutations, 2},
     {"_dacomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat", (DL_FUNC) &_dacomp_rcpp_Compute_Wilcoxon_Signed_Rank_Stat, 2},
+    {"_dacomp_rcpp_Welch_PermTest_Given_Permutations", (DL_FUNC) &_dacomp_rcpp_Welch_PermTest_Given_Permutations, 2},
     {NULL, NULL, 0}
 };
 

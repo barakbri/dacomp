@@ -172,6 +172,11 @@ The function `dacomp.test(...)` supports several other tests for studies with tw
 
 * `DACOMP.TEST.NAME.TWO_PART_WILCOXON` - A two part test^[@wagner2011application] that combines a two-sample test for a change in the proportion of zeros, together with a Wilcoxon rank sum test for detecting a difference in the distribution of the non zero components of $\tilde{X}_{j}$.
 
+* `DACOMP.TEST.NAME.WELCH` - A Welch t-test performed over the rarefied reads.
+
+* `DACOMP.TEST.NAME.WELCH_LOGSCALE` - A Welch t-test performed over the logratithm of the rarefied reads, after an adding a pseudo-count.
+
+
 
 ```{r, eval = F}
 result.test = dacomp.test(X = data$counts,

@@ -141,3 +141,47 @@ NumericVector rcpp_Compute_Wilcoxon_Signed_Rank_Stat(NumericVector RankedDiffere
   ret(0) = stat;
   return ret;
 }
+
+
+//compute a welch t-test,
+double Compute_Welch_Stat(NumericVector X, IntegerVector Y){
+  double _n0 = 0.0;
+  double _n1 = 0.0;
+  double _sum_x_0 = 0.0;
+  double _sum_x_1 = 0.0;
+  double _sum_x2_0 = 0.0;
+  double _sum_x2_1 = 0.0;
+  
+  for(int i=0;i<X.length();i++){
+    if(Y(i) == 1){
+      _n1 = _n1+1.0;
+      _sum_x_1 += X(i);
+      _sum_x2_1 += X(i)*X(i);
+    }else{
+      _sum_x_0 += X(i);
+      _sum_x2_0 += X(i)*X(i);
+      _n0 = _n0+1.0;
+    }
+  }
+  
+  double _mean_0 = _sum_x_0/_n0;
+  double _mean_1 = _sum_x_1/_n1;
+  double _S2_0 = (_sum_x2_0 - _n0*_mean_0*_mean_0)/(_n0 - 1.0);
+  double _S2_1 = (_sum_x2_1 - _n1*_mean_1*_mean_1)/(_n1 - 1.0);
+  
+  double stat = (_mean_0 - _mean_1)/(std::sqrt( _S2_0/_n0 + _S2_1/_n1 ));
+  return stat;
+}
+
+//function for computing the wilcoxon rank sum test, over a matrix of given permutations. Each column in Y is a different permutation of the data
+// [[Rcpp::export]]
+List rcpp_Welch_PermTest_Given_Permutations(NumericVector X, IntegerMatrix Y) {
+  
+  NumericVector stats(Y.ncol());
+  for(int i=0;i<Y.ncol();i++){
+    stats(i) = Compute_Welch_Stat(X,Y(_,i));
+  }
+  List z  = List::create( stats);
+  return z ;
+}
+
