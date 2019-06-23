@@ -113,7 +113,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 #' rejected_DSFDR = result.test$dsfdr_rejected
 #' }
-dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, verbose = F ){
+dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, verbose = F, compute_ratio_normalization = F ){
   
   #Preprocess inputs, before check:
   
@@ -155,7 +155,9 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   }
   
   stats_matrix = matrix(NA, ncol = p, nrow = nr_perm+1)
+  stats_matrix_ratio_normalization = matrix(NA, ncol = p, nrow = nr_perm+1)
   rarefaction_matrix = matrix(NA,nrow = n,ncol = 1)
+  ratio_matrix = matrix(NA,nrow = n,ncol = 1)
   
   #We compute the permutation matrix. Note that this dependes on the type of test. If it is a signed rank test, permutations are only in each pair of subjects
   Y_matrix = matrix(NA, ncol = nr_perm+1, nrow = n)
@@ -213,23 +215,42 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
     
     temp_subsampled =  rhyper(n, nom, dnom,min_value)  
     rarefaction_matrix[,1] = temp_subsampled 
+    ratio_matrix[,1] = nom/(dnom+nom)
+    
     stats_matrix[,i] = Compute.resample.test(rarefaction_matrix,Y_matrix,statistic = test, user_defined_test_function = user_defined_test_function)
+    
+    if(compute_ratio_normalization){
+      stats_matrix_ratio_normalization[,i] = Compute.resample.test(ratio_matrix,Y_matrix,statistic = test, user_defined_test_function = user_defined_test_function)  
+    }else{
+      stats_matrix_ratio_normalization[,i] = 0
+    }
     
   }
   
   #computes pvalues:
   stats = stats_matrix
   p.values = rep(NA,ncol(stats))
+  p.values.ratio.normalization = rep(NA,ncol(stats))
   for(i in 1:ncol(stats)){
     p.values[i] = mean(stats[,i]>=stats[1,i])
+    if(compute_ratio_normalization){
+      p.values.ratio.normalization[i] = mean(stats_matrix_ratio_normalization[,i]>=stats_matrix_ratio_normalization[1,i])
+    }
   }
   
   #compute DS-FDR:
   if(!disable_DSFDR){
     dsfdr_threshold = dsfdr_find_thresholds(stats[,-ind_reference_taxa,drop=F],q,verbose)  
+    if(compute_ratio_normalization){
+      dsfdr_threshold_ratio_normalization = dsfdr_find_thresholds(stats_matrix_ratio_normalization[,-ind_reference_taxa,drop=F],q,F)  
+    }
   }
   
   p.values.test = p.values; p.values.test[ind_reference_taxa] = NA
+  if(compute_ratio_normalization){
+    p.values.test.ratio.normalization = p.values.ratio.normalization; p.values.test.ratio.normalization[ind_reference_taxa] = NA  
+  }
+  
   
   #return results:
   
@@ -241,6 +262,15 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
     ret$dsfdr_rejected = which(p.values.test<=dsfdr_threshold)
     ret$dsfdr_threshold = dsfdr_threshold  
   }
+  
+  if(compute_ratio_normalization){
+    ret$p.values.test.ratio.normalization = p.values.test.ratio.normalization
+    if(!disable_DSFDR){
+      ret$dsfdr_rejected_ratio_normalization = which(p.values.test.ratio.normalization<=dsfdr_threshold_ratio_normalization)
+      ret$dsfdr_threshold_ratio_normalization = dsfdr_threshold_ratio_normalization  
+    }
+  }
+  
   class(ret) = CLASS.LABEL.DACOMP_RESULT_OBJECT
   return(ret)
 }
