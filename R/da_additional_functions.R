@@ -180,8 +180,8 @@ SignedRankWilcoxon.statistic = function(X1,X2){
   res = rcpp_Compute_Wilcoxon_Signed_Rank_Stat(rank_differences,second_is_bigger)
   
   #statistic:
-  stat_mean = sum(rank_differences)/2
-  stat_var = sum(rank_differences^2)/4
+  stat_mean = sum(rank_differences,na.rm = T)/2
+  stat_var = sum(rank_differences^2,na.rm = T)/4
   stat = (res - stat_mean)/sqrt(stat_var)
   return(stat)
 }

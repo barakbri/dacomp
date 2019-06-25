@@ -1,7 +1,7 @@
 Package: dacomp
 Type: Package
 Title: Non parametric differential abundance testing for microbiome counts data.
-Version: 1.0
+Version: 1.1
 Date: 2019-04-24
 Author: Barak Brill, Amnon Amir, Ruth Heller
 Maintainer: Barak Brill <barakbri@mail.tau.ac.il>
