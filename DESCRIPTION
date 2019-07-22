@@ -3,7 +3,7 @@ Type: Package
 Title: Non parametric differential abundance testing for microbiome counts data.
 Version: 1.1
 Date: 2019-04-24
-Author: Barak Brill, Amnon Amir, Ruth Heller
+Author: Barak Brill
 Maintainer: Barak Brill <barakbri@mail.tau.ac.il>
 Description: Normalization and differential abundance testing for microbiome counts data. Based on the method of Brill, Amir and Heller (2019). The package consists of two main functions: one function for selection of reference taxa for normalization, and a second function for normalizing counts according to the taxa selected and testing for differential abundance. The DS-FDR method for multiplicity correction (Jiang et al. 2017) is implemented as a part of the multiple testing procedure.
 License: LGPL2
