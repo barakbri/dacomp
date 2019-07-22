@@ -6,7 +6,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' The function tests taxa for differential abundance, given a set of reference taxa used for normalization, as described in Brill et. al. (2019). The function supports several tests, by type of phenotype: two sample tests, K-sample tests, tests for association with a continous phenotype and user defined tests. See `details` below on how the input argument \code{y} shold be formatted for different tests.
 #'
 #' @details
-#' The function tests each taxon not in the reference set for differential abundance as follows. First, an identical number of reads is taken from each sample, from the reads available under the reference set of taxa, and the taxon being tested. Next, a test of association is performed between the rarefied reads and the phenotype given by \code{y}. P-values are computed by permutations. Finally, after all P-values are computed, the DS-FDR threshold for rejection is computed. Hypotheses with P-values lower than the DS-FDR rejection threshold are rejected. Reference taxa are not tested for differential abundance. See \code{vignette('dacomp_main_vignette')} for additional details examples.
+#' The function tests each taxon not in the reference set for differential abundance as follows. For each taxon, the following procedure is performed. First, an identical number of reads is taken from each sample, from the reads available under the reference set of taxa, and the taxon being tested. Next, a test of association is performed between the rarefied reads and the phenotype given by \code{y}. P-values are computed by permutations. Finally, after all P-values are computed, the DS-FDR threshold for rejection is computed. Hypotheses with P-values lower than the DS-FDR rejection threshold are rejected. Reference taxa are not tested for differential abundance. See \code{vignette('dacomp_main_vignette')} for additional details and examples.
 #' 
 #' The function supports several tests. Different tests require different formats for the arguments \code{X} and \code{y}:
 #' \itemize{
@@ -22,6 +22,8 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' \item{DACOMP.TEST.NAME.USER_DEFINED}{ - Indicates that a custom test is supplied using the argument \code{user_defined_test_function}. The supplied function will receive a single argument, the vector of rarefied counts and will return an array of length \code{nr_perm +1}, containing the test statistic computed for the original data, along with test statistics computed for permuted phenotypes. Test statistics must have a right sided alternative. A complete example with code snippets is found in \code{vignette('dacomp_main_vignette')}.}
 #' }
 #' 
+#' The parameter \code{compute_ratio_normalization} computes in addition to the test described above, a test of association between the phenotype \code{y} and the proportion of a tested taxon our of a subvecor containing only the tested taxon and a set of reference taxa. This testing procedure may be invalid if the probability for technical (sampling) zeros is substantially different between samples with different values of \code{y}. See Brill et al. (2019) for additional details. See "Value" below for additional output fields if this test variant is used. For scenarios with an extreme change in the microbial load of the measured ecology, e.g., a five-fold change in the microbial load between different study groups, this variant of DACOMP may have a slightly inflated FDR. See method description and simulation results in the paper for additional details.
+#' 
 #' @param X Matrix of counts, with rows representing samples, columns representing taxa. See `details` for additional information on how to format this matrix for paired study designs.
 #' @param y Vector of phenotype values by sample. See details on different formats used by different tests.
 #' @param ind_reference_taxa One of two options: Object of type 'dacomp.reference.selection.object' returned from \code{\link{dacomp.select.references}}, or a vector of indices of taxa selected as a reference set for normalization. See package vignette for additional details.
@@ -29,7 +31,8 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' @param q The required FDR level for the DS-FDR algorithm, see Jiang et. al. (2017) for details.
 #' @param nr_perm Number of permuations used for testing and computing P-values. The default number of permutations is set high enough to provide powerful inference after adjusting for multiplicity. Change the number of permutations only if you know how it effects power after correcting for multiplicity. 
 #' @param disable_DSFDR Can be used to disable the DS-FDR computation (which may take up to a minute on large datasets). The default value is \code{FALSE}.
-#' @param user_defined_test_function Argument for inputting a function for a custom test of association supplied by the user, see `details` below.
+#' @param user_defined_test_function Argument for inputing a function for a custom test of association supplied by the user, see `details` below.
+#' @param compute_ratio_normalization Argument for computing, in addition to the test described above, test based on normalization by division rather than rarefaction. See description under details.
 #' @param verbose Should messages be printed to console, indicating computation progress. The default value is \code{FALSE}.
 #'
 #' 
@@ -40,6 +43,10 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' \item{p.values.test}{ - A vector with P-values for the different tests of association, by taxa. P-values obtained by permutations. P-values for reference taxa will appear as \code{NA}.}
 #' \item{dsfdr_rejected}{ - A vector of taxa indices declared differentially abundant by the DS-FDR method for multiplicity adjustment. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
 #' \item{dsfdr_threshold}{ - The selected threshold, in terms of P-values, for declaring taxa as differentialy abundant. Taxa with P-values under this threshold will be declared diffentially abundant. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
+#' 
+#' \item{p.values.test.ratio.normalization}{ - A vector with P-values for the different tests of association, by taxa, for the "normalization by ratio" variant of DACOMP.  This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE}.}
+#' \item{dsfdr_rejected_ratio_normalization}{ -A vector of taxa indices declared differentially abundant by the DS-FDR method, similar to dsfdr_rejected, but using the P-values obtained for the "normalization by ratio" test. This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE} and DS-FDR computation is not disabled.}
+#' \item{dsfdr_threshold_ratio_normalization}{ - The selected threshold, in terms of P-values, for declaring taxa as differentialy abundant. Taxa with P-values, obtained with "normalization by ratio" type tests, under this threshold will be declared diffentially abundant. This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE} and DS-FDR computation is not disabled.}
 #' }
 #' 
 #' @references 
@@ -113,7 +120,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 #' rejected_DSFDR = result.test$dsfdr_rejected
 #' }
-dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, verbose = F, compute_ratio_normalization = F ){
+dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, compute_ratio_normalization = F, verbose = F ){
   
   #Preprocess inputs, before check:
   
