@@ -6,7 +6,7 @@ For lastest development version run:
 
 ```r
 install.packages("devtools")
-devtools::install_github('barakbri/dacomp')
+devtools::install_github("barakbri/dacomp", build_opts = c("--no-resave-data", "--no-manual"))
 ```
 
 ## Where do I start?
