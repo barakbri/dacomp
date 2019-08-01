@@ -24,5 +24,8 @@ The full paper is found on arXiv:
 
 The introduction in the package vignette cites other highly relevant works.
 
+## Reproducing paper results
+A github repository for reproducing paper results paper is found [here](https://github.com/barakbri/CompositionalAnalysis_CodeBase)
+
 ## A note on version 1.1 of the package:
 Version 1.1 of the package adds an addtional variant of the DACOMP method called "normalization by ratio". This variant of the test procedure is disabled by default. See the above paper for additional details on this variant of the `DACOMP` method.
