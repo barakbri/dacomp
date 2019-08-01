@@ -174,7 +174,6 @@ The function `dacomp.test(...)` supports several other tests for studies with tw
 
 * `DACOMP.TEST.NAME.WELCH` - A Welch t-test performed over the rarefied reads.
 
-
 * `DACOMP.TEST.NAME.WELCH_LOGSCALE` - A Welch t-test performed over the logratithm of the rarefied reads, after an adding a pseudo-count.
 
 
