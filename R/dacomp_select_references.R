@@ -16,7 +16,7 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "dacomp.reference.selection.object"
 #' 
 #' @param X Counts matrix, with rows representing samples, columns representing different taxa.
 #' @param median_SD_threshold Critical value for the `median SD` statistic. Taxa with a `median SD` statistic will be taken.
-#' @param minimal_TA The minimal number of counts required in each sample, in the taxa selected as reference. If the set of reference taxa has a sample with less than `minimal_TA` reads in the set of reference taxa selected, the function will increase the `median SD` value until all samples have at least \core{minimal_TA} reads in the selected set of reference taxa.
+#' @param minimal_TA The minimal number of counts required in each sample, in the taxa selected as reference. If the set of reference taxa has a sample with less than `minimal_TA` reads in the set of reference taxa selected, the function will increase the `median SD` value until all samples have at least \code{minimal_TA} reads in the selected set of reference taxa.
 #' @param maximal_TA If all samples have more than \code{maximal_TA} reads available under the selected set of reference taxa, the `median SD` threshold value for classifying taxa as references will be lowered, until the condition is met. 
 #' @param Pseudo_Count_used Pseudo count added to all count values, to avoid dividing by zero.
 #' @param verbose If set to \code{TRUE}, messages will be displayed, as computation progresses.
