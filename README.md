@@ -29,3 +29,6 @@ A github repository for reproducing paper results paper is found [here](https://
 
 ## A note on version 1.1 of the package:
 Version 1.1 of the package adds an addtional variant of the DACOMP method called "normalization by ratio". This variant of the test procedure is disabled by default. See the above paper for additional details on this variant of the `DACOMP` method.
+
+## A note on version 1.2 of the package:
+Version 1.2 of the package adds multiplicity adjusted P-values for the DS-FDR procedure. Adjusted P-values are returned from the `dacomp.test(...)` function, under the field `p.values.test.adjusted`. Users using the *normalization by rarefaction* option, (which is not the default), will find the DS-FDR adjusted P-values under the field `p.values.test.adjusted.ratio.normalization`.

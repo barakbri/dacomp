@@ -101,7 +101,7 @@ check.input.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_c
   
   # signal_strength_as_change_in_microbial_load - should be between 0 and 0.5
   if(!is.numeric(signal_strength_as_change_in_microbial_load))
-    stop('signal_strength_as_change_in_microbial_load must be between 0 and 0.5')
+    stop('signal_strength_as_change_in_microbial_load must be a numeric value, between 0 and 0.75')
   if(signal_strength_as_change_in_microbial_load<0 | signal_strength_as_change_in_microbial_load>0.75)
     stop('signal_strength_as_change_in_microbial_load must be between 0 and 0.75')
   
