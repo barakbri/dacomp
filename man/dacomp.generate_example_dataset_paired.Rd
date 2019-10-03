@@ -19,6 +19,7 @@ a list
 \itemize{
 \item{counts}{A counts matrix with \code{(2 * n)} rows, and 1384 columns, rows represent samples,columns represent taxa.}
 \item{select_diff_abundant}{A vector containing the indices of taxa that are differentially abundant.}
+\item{taxonomy}{A table for the taxonomic affiliation of OTUs in the simulated dataset.}
 }
 }
 \description{

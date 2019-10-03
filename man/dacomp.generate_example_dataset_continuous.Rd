@@ -2,8 +2,7 @@
 % Please edit documentation in R/dacomp_generate_example_data.R
 \name{dacomp.generate_example_dataset_continuous}
 \alias{dacomp.generate_example_dataset_continuous}
-\title{Generate a simulated dataset with a continuous phenotype, based on data from the Phyloseq package
-This function generates a dataset with a continuous Phenotype, based on the \code{kostic} dataset (Kostic et. al. 2012) from the \code{phyloseq} package (McMurdie et. al. 2012). Simulated data is generated in a procedure similar to the one presented in Brill et. al. 2019, Subsection 4.1. See additionals details below.}
+\title{Generate a simulated dataset with a continuous phenotype, based on data from the Phyloseq package}
 \usage{
 dacomp.generate_example_dataset_continuous(n, m1 = 30,
   signal_strength_as_change_in_microbial_load = 0.1)
@@ -21,10 +20,10 @@ a list
 \item{counts}{A counts matrix with \code{n} rows, and 1384 columns, rows represent samples,columns represent taxa.}
 \item{covariate}{The measured phenotype}
 \item{select_diff_abundant}{A vector containing the indices of taxa that are differentially abundant.}
+\item{taxonomy}{A table for the taxonomic affiliation of OTUs in the simulated dataset.}
 }
 }
 \description{
-Generate a simulated dataset with a continuous phenotype, based on data from the Phyloseq package
 This function generates a dataset with a continuous Phenotype, based on the \code{kostic} dataset (Kostic et. al. 2012) from the \code{phyloseq} package (McMurdie et. al. 2012). Simulated data is generated in a procedure similar to the one presented in Brill et. al. 2019, Subsection 4.1. See additionals details below.
 }
 \details{

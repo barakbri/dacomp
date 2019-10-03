@@ -22,6 +22,7 @@ a list with the followig entries
 \item{counts}{A counts matrix with \code{(n_X + n_Y)} rows, and 1384 columns, rows represent samples,columns represent taxa.}
 \item{group_labels}{A vector of group labelings, with values 0 and 1}
 \item{select_diff_abundant}{A vector containing the indices of taxa that are differentially abundant.}
+\item{taxonomy}{A table for the taxonomic affiliation of OTUs in the simulated dataset.}
 }
 }
 \description{
