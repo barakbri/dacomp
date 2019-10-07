@@ -14,7 +14,7 @@ dacomp.test(X, y, ind_reference_taxa, test, q = 0.05,
 
 \item{y}{Vector of phenotype values by sample. See details on different formats used by different tests.}
 
-\item{ind_reference_taxa}{One of two options: Object of type 'dacomp.reference.selection.object' returned from \code{\link{dacomp.select.references}}, or a vector of indices of taxa selected as a reference set for normalization. See package vignette for additional details.}
+\item{ind_reference_taxa}{One of two options: Object of type 'dacomp.reference.selection.object' returned from \code{\link{dacomp.select_references}}, or a vector of indices of taxa selected as a reference set for normalization. See package vignette for additional details.}
 
 \item{test}{One of the values in the vector \code{DACOMP.POSSIBLE.TEST.NAMES}, or one of the constants available as \code{DACOMP.TEST.NAME.*} with asterisk representing the name of the test. See 'details' for additional details and inputs required, by test.}
 

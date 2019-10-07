@@ -42,7 +42,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' 
 #' @param X Matrix of counts, with rows representing samples, columns representing taxa. See `details` for additional information on how to format this matrix for paired study designs.
 #' @param y Vector of phenotype values by sample. See details on different formats used by different tests.
-#' @param ind_reference_taxa One of two options: Object of type 'dacomp.reference.selection.object' returned from \code{\link{dacomp.select.references}}, or a vector of indices of taxa selected as a reference set for normalization. See package vignette for additional details.
+#' @param ind_reference_taxa One of two options: Object of type 'dacomp.reference.selection.object' returned from \code{\link{dacomp.select_references}}, or a vector of indices of taxa selected as a reference set for normalization. See package vignette for additional details.
 #' @param test One of the values in the vector \code{DACOMP.POSSIBLE.TEST.NAMES}, or one of the constants available as \code{DACOMP.TEST.NAME.*} with asterisk representing the name of the test. See 'details' for additional details and inputs required, by test.
 #' @param q The required FDR level for the DS-FDR algorithm, see Jiang et. al. (2017) for details.
 #' @param nr_perm Number of permuations used for testing and computing P-values. The default number of permutations is set high enough to provide powerful inference after adjusting for multiplicity. Change the number of permutations only if you know how it effects power after correcting for multiplicity. 

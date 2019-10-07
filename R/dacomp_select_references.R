@@ -21,7 +21,7 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "dacomp.reference.selection.object"
 #' @param Pseudo_Count_used Pseudo count added to all count values, to avoid dividing by zero.
 #' @param verbose If set to \code{TRUE}, messages will be displayed, as computation progresses.
 #' @param select_from The default value of \code{NULL} indicates that all taxa are valid candidates for selection. The user may limit the set of possible candidates for the reference set, by supplying a list of candidates (by indices) using this argument.
-#' @param Previous_Reference_Selection_Object If the user previously selected a set of reference taxa for the data with one threshold, and would like to select a new set of reference taxa with another threshold, the output of a previous run of \code{dacomp.select.references} can be supplied as an argument to speed up computations. See usage example in code snippet below.
+#' @param Previous_Reference_Selection_Object If the user previously selected a set of reference taxa for the data with one threshold, and would like to select a new set of reference taxa with another threshold, the output of a previous run of \code{dacomp.select_references} can be supplied as an argument to speed up computations. See usage example in code snippet below.
 #' 
 #' @return The function returns an object of type "dacomp.reference.selection.object", which is a list with the following fields:
 #' \itemize{
