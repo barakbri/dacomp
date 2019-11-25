@@ -80,7 +80,7 @@ dacomp.generate_example_dataset.two_sample = function(n_X = 30,n_Y = 30,m1 = 30,
   counts = rbind(X,Y)
   #group labels:
   group_labels = c(rep(0,n_X),rep(1,n_Y))
-  
+  colnames(counts) = rownames(kostic_taxonomy)
   ret = list(counts = counts,
              group_labels = group_labels,
              select_diff_abundant = select_diff_abundant,
