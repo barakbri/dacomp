@@ -110,8 +110,8 @@ test_that("Data generation", {
   #check returned fields
   ###************************************************
   
-  expect_equal(names(data),c("counts","group_labels","select_diff_abundant"))
-  expect_equal(names(data_2),c("counts" ,"covariate" ,"select_diff_abundant"))
+  expect_equal(names(data),c("counts","group_labels","select_diff_abundant", "taxonomy"))
+  expect_equal(names(data_2),c("counts" ,"covariate" ,"select_diff_abundant", "taxonomy"))
   
   #check dimensions of returned object
   expect_equal(dim(data$counts),c(100,1384))
