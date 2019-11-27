@@ -25,3 +25,4 @@ Meta
 *.utf8.md
 *.knit.md
 .Rproj.user
+doc
