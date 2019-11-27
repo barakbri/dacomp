@@ -211,12 +211,22 @@ dsfdr_find_thresholds = function(stats,q=0.05,verbose = F){
   
   # For each cutoff value, compute the estimated FDR
   FDR_hat_vec = rep(NA,length(C_possible_values))
+  Adj.P.Value = rep(Inf,ncol(stats))
   for(c in 1:length(C_possible_values)){
     C = C_possible_values[c]
     Vhat = sum(stats<=C)/nrow(stats)
     Rhat = sum(stats[1,]<=C)
     FDR_hat = Vhat/Rhat
     FDR_hat_vec[c] = FDR_hat
+    
+    #here we computed the DS-FDR adjusted P-values:
+    # The DS-FDR adjusted P-value is the lowest q level at which a hypothesis is rejected
+    # Hence, we start with the vector of Adj. DS-FDR set to infinity. When we see a hypothesis that was rejected,
+    # we go and check if it was rejected also for a lower level of DS-FDR. If not, we have found its adjusted P-value! Great Success!
+    Adj.P.Value.Updater = rep(Inf,ncol(stats))
+    Adj.P.Value.Updater[stats[1,]<=C] = FDR_hat
+    Adj.P.Value = pmin(Adj.P.Value,Adj.P.Value.Updater)
+    
   }
   # select the highest threshold where FDR is maintained
   selected_c_ind = (which(FDR_hat_vec<= q))
@@ -224,5 +234,5 @@ dsfdr_find_thresholds = function(stats,q=0.05,verbose = F){
   if(length(selected_c_ind)>0){
     selected_c = max(C_possible_values[selected_c_ind])
   }
-  return(selected_c)
+  return(list(selected_c = selected_c,Adj.P.Value = Adj.P.Value))
 }

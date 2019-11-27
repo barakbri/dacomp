@@ -1,4 +1,4 @@
-RUN_REGRESSION_TEST_PAPER = FALSE
+RUN_REGRESSION_TEST_PAPER = TRUE
 
 if(RUN_REGRESSION_TEST_PAPER){
   library(dacomp)
@@ -6,7 +6,7 @@ if(RUN_REGRESSION_TEST_PAPER){
   set.seed(1)
   
   original_wd = getwd()
-  setwd('E:/MCB3/CompositionalAnalysis_CodeBase/MCB_Simulation/')
+  setwd('E:/MCB3/CompositionalAnalysis_CodeBase/Scripts/')
   source(paste0('REFSIM_GenerateSettings_Index.R'))
   setwd(original_wd)
   
@@ -104,7 +104,7 @@ if(RUN_REGRESSION_TEST_PAPER){
   registerDoParallel(cl)
   start_scenario = 1
   end_scenario = 25
-  nr.reps = 1
+  nr.reps = 10
   scenario_results = foreach(s=start_scenario:end_scenario, .options.RNG=1234) %dorng% { SCENARIO_run_backwards_compatability(s,nr.reps = nr.reps,q_BH = 0.1,q_DSFDR = 0.1) }
   stopCluster(cl)
   result_table = unlist(scenario_results[[1]])

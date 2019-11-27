@@ -36,7 +36,7 @@ test_that("Test Signed Wilcoxon", {
   library(digest)
   hash_computation_result = digest::digest(result.test, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "dfe76edb4ef768e2ae62d47c12b1f422"
+  hash_gold_standard = "af2361525e8e9bc54ae5204dbfb35917"
   expect_equal(hash_computation_result,hash_gold_standard,label = 'Regression test failed on Wilcoxon signed test')
 })
 

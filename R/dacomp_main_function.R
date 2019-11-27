@@ -8,17 +8,33 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' @details
 #' The function tests each taxon not in the reference set for differential abundance as follows. For each taxon, the following procedure is performed. First, an identical number of reads is taken from each sample, from the reads available under the reference set of taxa, and the taxon being tested. Next, a test of association is performed between the rarefied reads and the phenotype given by \code{y}. P-values are computed by permutations. Finally, after all P-values are computed, the DS-FDR threshold for rejection is computed. Hypotheses with P-values lower than the DS-FDR rejection threshold are rejected. Reference taxa are not tested for differential abundance. See \code{vignette('dacomp_main_vignette')} for additional details and examples.
 #' 
-#' The function supports several tests. Different tests require different formats for the arguments \code{X} and \code{y}:
+#' The function supports several tests. Different tests require different formats for the arguments \code{X} and \code{y}.
+#' 
 #' \itemize{
-#' \item{DACOMP.TEST.NAME.WILCOXON}{ - A Wilcoxon rank sum test between the rarefied reads from the two sample groups. \code{y} is any vector with two levels.}
+#' 
+#' Two Sample Tests (treatment vs. control, healthy vs.sick): 
+#' 
+#' \item{DACOMP.TEST.NAME.WILCOXON}{ - (Preferred option for 2-sample testing) A Wilcoxon rank sum test between the rarefied reads from the two sample groups. \code{y} is any vector with two levels. For two sample testing this is the preferred test.}
 #' \item{DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS}{ - A two sample test for difference in means, based on permutation. \code{y} formated as for the Wilcoxon rank sum test.}
 #' \item{DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS}{ - A two sample test for difference in means of the logatihm of counts, based on permutation. A pseudocount of 1 is added to the rarefied reads, so that the lograithm can be computed. \code{y} formated as for the Wilcoxon rank sum test.}
 #' \item{DACOMP.TEST.NAME.TWO_PART_WILCOXON}{ - The two part test of Wagner et. al. (2011), for equality of distributions between two sample groups. \code{y} formated as for the Wilcoxon rank sum test.}
 #' \item{DACOMP.TEST.NAME.WELCH}{ - Welch t.test over the rarefied counts. P-values are computed by permutations. \code{y} formated as for the Wilcoxon rank sum test.}
 #' \item{DACOMP.TEST.NAME.WELCH_LOGSCALE}{ - Welch t.test over the logarithm of rarefied counts (after a pseudocount of 1 is added). P-values are computed by permutations. \code{y} formated as for the Wilcoxon rank sum test.}
+#' 
+#' Paired Design Tests:
+#' 
 #' \item{DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST}{ - The Wilcoxon sign rank test for paired designs. For this test, \code{X} is formatted with the first \eqn{n/2} rows corresponding to the samples measured at condition 1, and the latter \eqn{n/2} rows measured at condition 2, i.e. rows \eqn{1} and \eqn{n/2 + 1} correspond to the same physical sample, under two conditions. For this test, \code{y} is set to \code{NULL}.}
+#' 
+#' Tests of Association for Ordinal/Continuous Phenotypes:
+#' 
 #' \item{DACOMP.TEST.NAME.SPEARMAN}{ - Test of association with a continuous, univariate phenotype. \code{y} is the measured phenotype across samples. The test performed is a permutation based test for the Spearman correlation coefficient with a two sided alternative.}
+#' 
+#' K-Sample Tests:
+#' 
 #' \item{DACOMP.TEST.NAME.KRUSKAL_WALLIS}{ - Test for equality of distributions between \eqn{K} sample groups. \code{y} should be contian the group labeling of different observations.}
+#' 
+#' User Defined Tests:
+#' 
 #' \item{DACOMP.TEST.NAME.USER_DEFINED}{ - Indicates that a custom test is supplied using the argument \code{user_defined_test_function}. The supplied function will receive a single argument, the vector of rarefied counts and will return an array of length \code{nr_perm +1}, containing the test statistic computed for the original data, along with test statistics computed for permuted phenotypes. Test statistics must have a right sided alternative. A complete example with code snippets is found in \code{vignette('dacomp_main_vignette')}.}
 #' }
 #' 
@@ -26,7 +42,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' 
 #' @param X Matrix of counts, with rows representing samples, columns representing taxa. See `details` for additional information on how to format this matrix for paired study designs.
 #' @param y Vector of phenotype values by sample. See details on different formats used by different tests.
-#' @param ind_reference_taxa One of two options: Object of type 'dacomp.reference.selection.object' returned from \code{\link{dacomp.select.references}}, or a vector of indices of taxa selected as a reference set for normalization. See package vignette for additional details.
+#' @param ind_reference_taxa One of two options: Object of type 'dacomp.reference.selection.object' returned from \code{\link{dacomp.select_references}}, or a vector of indices of taxa selected as a reference set for normalization. See package vignette for additional details.
 #' @param test One of the values in the vector \code{DACOMP.POSSIBLE.TEST.NAMES}, or one of the constants available as \code{DACOMP.TEST.NAME.*} with asterisk representing the name of the test. See 'details' for additional details and inputs required, by test.
 #' @param q The required FDR level for the DS-FDR algorithm, see Jiang et. al. (2017) for details.
 #' @param nr_perm Number of permuations used for testing and computing P-values. The default number of permutations is set high enough to provide powerful inference after adjusting for multiplicity. Change the number of permutations only if you know how it effects power after correcting for multiplicity. 
@@ -41,10 +57,12 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' \item{lambda}{ - The subsampling depth for each tested taxon, as in step I under `details`.}
 #' \item{stats_matrix}{ - A matrix of size \code{(nr_perm+1) X ncol(X)} containing the tests statistics for the data (first row) and test statistics computed for permuted values of \code{y} (other rows).}
 #' \item{p.values.test}{ - A vector with P-values for the different tests of association, by taxa. P-values obtained by permutations. P-values for reference taxa will appear as \code{NA}.}
+#' \item{p.values.test.adjusted}{ A vector of P-values, adjusted for multiplicity, corresponding to \code{p.values.test}. By default, correction is done by the DS-FDR method. If \code{disable_DSFDR} is set to \code{TRUE}, the BH correction is performed. Entries lower than a value of \eqn{u} indicate a taxon declared differentially abundant when trying to control multiplicity at level \eqn{u}. Entries lower than the value defined for the parameter \code{q} will be indicated as discoveries under \code{dsfdr_rejected}}
 #' \item{dsfdr_rejected}{ - A vector of taxa indices declared differentially abundant by the DS-FDR method for multiplicity adjustment. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
 #' \item{dsfdr_threshold}{ - The selected threshold, in terms of P-values, for declaring taxa as differentialy abundant. Taxa with P-values under this threshold will be declared diffentially abundant. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
 #' 
 #' \item{p.values.test.ratio.normalization}{ - A vector with P-values for the different tests of association, by taxa, for the "normalization by ratio" variant of DACOMP.  This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE}.}
+#' \item{p.values.test.adjusted.ratio.normalization}{ A vector of P-values, adjusted for multiplicity, for the tests performed using ratio normalization (given by \code{p.values.test.ratio.normalization}). By default, correction is done by the DS-FDR method. If \code{disable_DSFDR} is set to \code{TRUE}, the BH correction is performed. Entries lower than a value of \eqn{u} indicate a taxon declared differentially abundant when trying to control multiplicity at level \eqn{u}. Entries lower than the value defined for the parameter \code{q} will be indicated as discoveries under \code{dsfdr_rejected_ratio_normalization}}
 #' \item{dsfdr_rejected_ratio_normalization}{ -A vector of taxa indices declared differentially abundant by the DS-FDR method, similar to dsfdr_rejected, but using the P-values obtained for the "normalization by ratio" test. This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE} and DS-FDR computation is not disabled.}
 #' \item{dsfdr_threshold_ratio_normalization}{ - The selected threshold, in terms of P-values, for declaring taxa as differentialy abundant. Taxa with P-values, obtained with "normalization by ratio" type tests, under this threshold will be declared diffentially abundant. This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE} and DS-FDR computation is not disabled.}
 #' }
@@ -247,16 +265,29 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   
   #compute DS-FDR:
   if(!disable_DSFDR){
-    dsfdr_threshold = dsfdr_find_thresholds(stats[,-ind_reference_taxa,drop=F],q,verbose)  
+    dsfdr_obj = dsfdr_find_thresholds(stats[,-ind_reference_taxa,drop=F],q,verbose)  
+    dsfdr_threshold = dsfdr_obj$selected_c
+    Adj.P.value.DSFDR = dsfdr_obj$Adj.P.Value
     if(compute_ratio_normalization){
-      dsfdr_threshold_ratio_normalization = dsfdr_find_thresholds(stats_matrix_ratio_normalization[,-ind_reference_taxa,drop=F],q,F)  
+      dsfdr_obj_ratio_normalization = dsfdr_find_thresholds(stats_matrix_ratio_normalization[,-ind_reference_taxa,drop=F],q,F)  
+      dsfdr_threshold_ratio_normalization = dsfdr_obj_ratio_normalization$selected_c
+      Adj.P.value.DSFDR_ratio_normalization = dsfdr_obj_ratio_normalization$Adj.P.Value
     }
   }
   
   p.values.test = p.values; p.values.test[ind_reference_taxa] = NA
-  if(compute_ratio_normalization){
-    p.values.test.ratio.normalization = p.values.ratio.normalization; p.values.test.ratio.normalization[ind_reference_taxa] = NA  
+  p.values.test.adjusted = p.adjust(p.values.test,method = 'BH')
+  if(!disable_DSFDR){
+    p.values.test.adjusted[-ind_reference_taxa] = Adj.P.value.DSFDR
   }
+  if(compute_ratio_normalization){
+    p.values.test.ratio.normalization = p.values.ratio.normalization; p.values.test.ratio.normalization[ind_reference_taxa] = NA
+    p.values.test.adjusted.ratio.normalization = p.adjust(p.values.test.ratio.normalization,method = 'BH')
+    if(!disable_DSFDR){
+      p.values.test.adjusted.ratio.normalization[-ind_reference_taxa] = Adj.P.value.DSFDR_ratio_normalization
+    }
+  }
+  
   
   
   #return results:
@@ -265,6 +296,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   ret$lambda = min_value_array
   ret$stats_matrix = stats_matrix
   ret$p.values.test = p.values.test
+  ret$p.values.test.adjusted = p.values.test.adjusted
   if(!disable_DSFDR){
     ret$dsfdr_rejected = which(p.values.test<=dsfdr_threshold)
     ret$dsfdr_threshold = dsfdr_threshold  
@@ -272,6 +304,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   
   if(compute_ratio_normalization){
     ret$p.values.test.ratio.normalization = p.values.test.ratio.normalization
+    ret$p.values.test.adjusted.ratio.normalization = p.values.test.adjusted.ratio.normalization
     if(!disable_DSFDR){
       ret$dsfdr_rejected_ratio_normalization = which(p.values.test.ratio.normalization<=dsfdr_threshold_ratio_normalization)
       ret$dsfdr_threshold_ratio_normalization = dsfdr_threshold_ratio_normalization  

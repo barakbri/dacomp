@@ -19,6 +19,7 @@
 #' \item{counts}{A counts matrix with \code{(n_X + n_Y)} rows, and 1384 columns, rows represent samples,columns represent taxa.}
 #' \item{group_labels}{A vector of group labelings, with values 0 and 1}
 #' \item{select_diff_abundant}{A vector containing the indices of taxa that are differentially abundant.}
+#' \item{taxonomy}{A table for the taxonomic affiliation of OTUs in the simulated dataset.}
 #' }
 #' 
 #' @export
@@ -54,6 +55,7 @@ dacomp.generate_example_dataset.two_sample = function(n_X = 30,n_Y = 30,m1 = 30,
   kostic = get_kostic_data()
   kostic_counts_data_healthy = kostic$kostic_counts_data_healthy
   kostic_N_reads = kostic$kostic_N_reads  
+  kostic_taxonomy = kostic$kostic_taxonomy
   
   p= ncol(kostic_counts_data_healthy)
   select_diff_abundant = sample(1:p,size = m1,replace = F)
@@ -78,10 +80,11 @@ dacomp.generate_example_dataset.two_sample = function(n_X = 30,n_Y = 30,m1 = 30,
   counts = rbind(X,Y)
   #group labels:
   group_labels = c(rep(0,n_X),rep(1,n_Y))
-  
+  colnames(counts) = rownames(kostic_taxonomy)
   ret = list(counts = counts,
              group_labels = group_labels,
-             select_diff_abundant = select_diff_abundant)
+             select_diff_abundant = select_diff_abundant,
+             taxonomy = kostic_taxonomy)
   return(ret)
 }
 
@@ -101,7 +104,7 @@ check.input.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_c
   
   # signal_strength_as_change_in_microbial_load - should be between 0 and 0.5
   if(!is.numeric(signal_strength_as_change_in_microbial_load))
-    stop('signal_strength_as_change_in_microbial_load must be between 0 and 0.5')
+    stop('signal_strength_as_change_in_microbial_load must be a numeric value, between 0 and 0.75')
   if(signal_strength_as_change_in_microbial_load<0 | signal_strength_as_change_in_microbial_load>0.75)
     stop('signal_strength_as_change_in_microbial_load must be between 0 and 0.75')
   
@@ -111,6 +114,7 @@ check.input.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_c
 
 
 #' Generate a simulated dataset with a continuous phenotype, based on data from the Phyloseq package
+#' 
 #' This function generates a dataset with a continuous Phenotype, based on the \code{kostic} dataset (Kostic et. al. 2012) from the \code{phyloseq} package (McMurdie et. al. 2012). Simulated data is generated in a procedure similar to the one presented in Brill et. al. 2019, Subsection 4.1. See additionals details below.
 #' @details 
 #' Data is generated as follows.
@@ -126,6 +130,7 @@ check.input.generate_example_dataset = function(n_X,n_Y,m1, signal_strength_as_c
 #' \item{counts}{A counts matrix with \code{n} rows, and 1384 columns, rows represent samples,columns represent taxa.}
 #' \item{covariate}{The measured phenotype}
 #' \item{select_diff_abundant}{A vector containing the indices of taxa that are differentially abundant.}
+#' \item{taxonomy}{A table for the taxonomic affiliation of OTUs in the simulated dataset.}
 #' }
 #' 
 #' @export
@@ -158,6 +163,7 @@ dacomp.generate_example_dataset_continuous = function(n, m1 = 30, signal_strengt
   kostic = get_kostic_data()
   kostic_counts_data_healthy = kostic$kostic_counts_data_healthy
   kostic_N_reads = kostic$kostic_N_reads
+  kostic_taxonomy = kostic$kostic_taxonomy
   
   p= ncol(kostic_counts_data_healthy)
   select_diff_abundant = sample(1:p,size = m1,replace = F)
@@ -179,7 +185,8 @@ dacomp.generate_example_dataset_continuous = function(n, m1 = 30, signal_strengt
   
   ret = list(counts = counts,
              covariate = u,
-             select_diff_abundant = select_diff_abundant)
+             select_diff_abundant = select_diff_abundant,
+             taxonomy = kostic_taxonomy)
   return(ret)
 }
 
@@ -209,6 +216,7 @@ check.input.generate_example_dataset_continuous = function(n,m1, signal_strength
 
 
 #' Generate an example dataset with a multivariate phenotype
+#' 
 #' Generate a simulated dataset, similar to \code{\link{dacomp.generate_example_dataset_continuous}} with the following difference: the generated dataset contains two phenotypes, instead of one.
 #' The change observed in a sample, is monotone increasing with the values of each measured covariate.
 #' 
@@ -221,6 +229,7 @@ check.input.generate_example_dataset_continuous = function(n,m1, signal_strength
 #' \item{counts}{A counts matrix with \code{n} rows, and 1384 columns, rows represent samples,columns represent taxa.}
 #' \item{covariate}{The measured phenotype, a matrix of size \code{n X 2}, rows in this matrix correspond to the rows of \code{counts}}
 #' \item{select_diff_abundant}{A vector containing the indices of taxa that are differentially abundant.}
+#' \item{taxonomy}{A table for the taxonomic affiliation of OTUs in the simulated dataset.}
 #' }
 #' 
 #' @references 
@@ -246,6 +255,7 @@ dacomp.generate_example_dataset_multivariate_example = function(n, m1 = 30, sign
   kostic = get_kostic_data()
   kostic_counts_data_healthy = kostic$kostic_counts_data_healthy
   kostic_N_reads = kostic$kostic_N_reads
+  kostic_taxonomy = kostic$kostic_taxonomy
   
   p= ncol(kostic_counts_data_healthy)
   select_diff_abundant = sample(1:p,size = m1,replace = F)
@@ -267,7 +277,8 @@ dacomp.generate_example_dataset_multivariate_example = function(n, m1 = 30, sign
   
   ret = list(counts = counts,
              covariate =cbind(u1,u2),
-             select_diff_abundant = select_diff_abundant)
+             select_diff_abundant = select_diff_abundant,
+             taxonomy = kostic_taxonomy)
   return(ret)
 }
 
@@ -284,11 +295,13 @@ get_kostic_data = function(){
   kostic_sample_data = sample_data(kostic)
   kostic_counts_data_healthy = kostic_counts
   #keep taxa that appear in  at least 2 subjects:
-  kostic_counts_data_healthy = kostic_counts_data_healthy[ , apply(kostic_counts_data_healthy>0,2,sum) >= 2 ]
+  ind_of_taxa_to_keep = apply(kostic_counts_data_healthy>0,2,sum) >= 2
+  kostic_counts_data_healthy = kostic_counts_data_healthy[ , ind_of_taxa_to_keep ]
   kostic_N_reads = median(apply(kostic_counts_data_healthy,1,sum))
   ret = list()
   ret$kostic_counts_data_healthy = kostic_counts_data_healthy
   ret$kostic_N_reads = kostic_N_reads
+  ret$kostic_taxonomy = (tax_table(kostic))[ind_of_taxa_to_keep,]
   return(ret)
 }
 
@@ -310,6 +323,7 @@ get_kostic_data = function(){
 #' \itemize{
 #' \item{counts}{A counts matrix with \code{(2 * n)} rows, and 1384 columns, rows represent samples,columns represent taxa.}
 #' \item{select_diff_abundant}{A vector containing the indices of taxa that are differentially abundant.}
+#' \item{taxonomy}{A table for the taxonomic affiliation of OTUs in the simulated dataset.}
 #' }
 #' @export
 #'
@@ -334,6 +348,7 @@ dacomp.generate_example_dataset_paired = function(n, m1 = 30, signal_strength_as
   kostic = get_kostic_data()
   kostic_counts_data_healthy = kostic$kostic_counts_data_healthy
   kostic_N_reads = kostic$kostic_N_reads
+  kostic_taxonomy = kostic$kostic_taxonomy
   
   p= ncol(kostic_counts_data_healthy)
   select_diff_abundant = sample(1:p,size = m1,replace = F)
@@ -354,6 +369,7 @@ dacomp.generate_example_dataset_paired = function(n, m1 = 30, signal_strength_as
   counts = rbind(X,Y)
   
   ret = list(counts = counts,
-             select_diff_abundant = select_diff_abundant)
+             select_diff_abundant = select_diff_abundant,
+             taxonomy = kostic_taxonomy)
   return(ret)
 }

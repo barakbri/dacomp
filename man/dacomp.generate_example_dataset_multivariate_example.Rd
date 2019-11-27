@@ -2,9 +2,7 @@
 % Please edit documentation in R/dacomp_generate_example_data.R
 \name{dacomp.generate_example_dataset_multivariate_example}
 \alias{dacomp.generate_example_dataset_multivariate_example}
-\title{Generate an example dataset with a multivariate phenotype
-Generate a simulated dataset, similar to \code{\link{dacomp.generate_example_dataset_continuous}} with the following difference: the generated dataset contains two phenotypes, instead of one.
-The change observed in a sample, is monotone increasing with the values of each measured covariate.}
+\title{Generate an example dataset with a multivariate phenotype}
 \usage{
 dacomp.generate_example_dataset_multivariate_example(n, m1 = 30,
   signal_strength_as_change_in_microbial_load = 0.1)
@@ -22,10 +20,10 @@ a list
 \item{counts}{A counts matrix with \code{n} rows, and 1384 columns, rows represent samples,columns represent taxa.}
 \item{covariate}{The measured phenotype, a matrix of size \code{n X 2}, rows in this matrix correspond to the rows of \code{counts}}
 \item{select_diff_abundant}{A vector containing the indices of taxa that are differentially abundant.}
+\item{taxonomy}{A table for the taxonomic affiliation of OTUs in the simulated dataset.}
 }
 }
 \description{
-Generate an example dataset with a multivariate phenotype
 Generate a simulated dataset, similar to \code{\link{dacomp.generate_example_dataset_continuous}} with the following difference: the generated dataset contains two phenotypes, instead of one.
 The change observed in a sample, is monotone increasing with the values of each measured covariate.
 }

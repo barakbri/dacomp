@@ -57,7 +57,7 @@ test_that("Data generation", {
   expect_error({dacomp.generate_example_dataset.two_sample(m1 = 100,
                                                n_X = 50,
                                                n_Y = 50,
-                                               signal_strength_as_change_in_microbial_load = 0.51)},info = "signal_strength_as_change_in_microbial_load > 0.5")
+                                               signal_strength_as_change_in_microbial_load = 0.751)},info = "signal_strength_as_change_in_microbial_load > 0.75")
   
   # for continous:
   #expect error if m1, n_X,n_Y,signal_strength illegal
@@ -110,8 +110,8 @@ test_that("Data generation", {
   #check returned fields
   ###************************************************
   
-  expect_equal(names(data),c("counts","group_labels","select_diff_abundant"))
-  expect_equal(names(data_2),c("counts" ,"covariate" ,"select_diff_abundant"))
+  expect_equal(names(data),c("counts","group_labels","select_diff_abundant", "taxonomy"))
+  expect_equal(names(data_2),c("counts" ,"covariate" ,"select_diff_abundant", "taxonomy"))
   
   #check dimensions of returned object
   expect_equal(dim(data$counts),c(100,1384))

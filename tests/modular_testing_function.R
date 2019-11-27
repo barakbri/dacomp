@@ -1,7 +1,7 @@
 
 Run_Test_Modular = function(report_file = 'E:/temp/dacomp_test_results.txt',
                             package_location = 'E:/dacomp/',
-                            CompositionalAnalysis_CodeBase_Location = 'E:/MCB3/CompositionalAnalysis_CodeBase/MCB_Simulation/'){
+                            CompositionalAnalysis_CodeBase_Location = 'E:/MCB3/CompositionalAnalysis_CodeBase/Scripts/'){
   sink(file = report_file)
   
   set.seed(1)

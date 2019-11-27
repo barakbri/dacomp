@@ -30,8 +30,8 @@ paired_setting_power_and_FDR = function(signal_strength=0.1,REPS = 1,n=30,m1 = 3
     rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH') <= q_BH)
     rejected_DSFDR = result.test$dsfdr_rejected
     
-    tp.bh = c(tp.bh,length(rejected_BH))
-    tp.dsfdr = c(tp.dsfdr,length(rejected_BH))
+    tp.bh = c(tp.bh,sum(rejected_BH %in% data$select_diff_abundant))
+    tp.dsfdr = c(tp.dsfdr,sum(rejected_DSFDR %in% data$select_diff_abundant))
       
     current_fdr_dsfdr = 0
     if(length(rejected_DSFDR) >0)
@@ -60,9 +60,10 @@ if(F){
   scenario_results = foreach(s=1:length(signal_vec), .options.RNG=1234,.combine = rbind) %dorng% {
     paired_setting_power_and_FDR(signal_strength = signal_vec[s],REPS = 10)
   }
-  scenario_results
+  #scenario_results
+  head(scenario_results,n = 10)
   stopCluster(cl)
-  head(scenario_results)
+  
 }
 
 

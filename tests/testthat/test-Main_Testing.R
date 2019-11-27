@@ -131,7 +131,7 @@ test_that("Test dacomp test function", {
   # check returned fields
   ###************************************************
   
-  expect_identical(names(result.test.with.class),c("lambda","stats_matrix","p.values.test","dsfdr_rejected","dsfdr_threshold" ))
+  expect_identical(names(result.test.with.class),c("lambda","stats_matrix","p.values.test","p.values.test.adjusted","dsfdr_rejected","dsfdr_threshold" ))
   
   expect_identical(sort(which(is.na(result.test.with.class$lambda))),sort(result.selected.references$selected_references),info = "check missing lambda are only the given references")
   
@@ -143,7 +143,7 @@ test_that("Test dacomp test function", {
   library(digest)
   hash_computation_result = digest::digest(result.test, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "945199b3b004cf2953d394c8e9b507eb"
+  hash_gold_standard = "09b5ac0dadd6dd77633705b84484e535"
   expect_equal(hash_computation_result,hash_gold_standard)
   
   ###************************************************
@@ -224,9 +224,25 @@ test_that("Test dacomp test function", {
   library(digest)
   hash_computation_result = digest::digest(result.test, algo="md5")
   cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard_continous = "ae703e6acef7d2a8242edfb62a593f05"
+  hash_gold_standard_continous = "916ced97f0ec353a16b20e341cc67a43"
   expect_equal(hash_computation_result,hash_gold_standard_continous)
   
+  ###************************************************
+  # test adjusted P-values for DS-FDR
+  ###************************************************
+  set.seed(1)
   
+  result.test = dacomp.test(X = data$counts,
+                            y = data$covariate,test = DACOMP.TEST.NAME.SPEARMAN,
+                            ind_reference_taxa = result.selected.references,
+                            verbose = F,q = q_DSFDR,compute_ratio_normalization = T)
+  
+  expect_equal((result.test$p.values.test<=result.test$dsfdr_threshold),
+               (result.test$p.values.test.adjusted<=q_DSFDR),
+               label = 'DS-FDR adjusted P-values not equal to indicator for rejection (for regular tests)')
+  
+  expect_equal((result.test$p.values.test.ratio.normalization <= result.test$dsfdr_threshold_ratio_normalization),
+               (result.test$p.values.test.adjusted.ratio.normalization <= q_DSFDR),
+               label = 'DS-FDR adjusted P-values not equal to indicator for rejection (for regular tests)')
   
 })
