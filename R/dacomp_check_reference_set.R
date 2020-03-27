@@ -1,11 +1,6 @@
 #Class label for object with results of a reference validation procedure
 CLASS.LABEL.REFERENCE_VALIDATION_RESULT_OBJECT = "dacomp.reference.validation.result.object"
 
-library(vegan)
-library(HHG)
-library(energy)
-
-
 #' Test reference set of taxa for validity, by multivariate K-Sample testing
 #' 
 #' The function carries out the Reference Validation Procedure (RVP), described in Brill et. al. (2019), appendix A. The test verifies that no differentially abundant taxa have entered the reference set. The input to the function includes a counts matrix of taxa selected as a reference set (rows represent samples), and a vector \code{Y} of groups labels. The function first rarefies all samples to constant depth, then tests for multivariate equality of distributions across the differet study groups.
