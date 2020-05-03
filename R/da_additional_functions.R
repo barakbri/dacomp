@@ -147,12 +147,21 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.
     
   }
   if(statistic == DACOMP.TEST.NAME.KRUSKAL_WALLIS){ #Kruskal Wallis
-    for(j in 1:nr_bootstraps){
-      add_stat = (kruskal.test(X_matrix[,1], as.factor(Y_matrix[,j]))$statistic)
-      if(is.nan(add_stat))
-        add_stat = 0
-      current_stats[j] = add_stat
-    }
+    
+    nr_groups = length(unique(Y_matrix[,1]))
+    #Y_pass = matrix(as.numeric(as.factor(Y_matrix))-1,ncol = ncol(Y_matrix))
+    Y_matrix
+    current_stats = dacomp:::rcpp_KW_PermTest_Given_Permutations(X_matrix[,1],Y_matrix,nr_groups)[[1]]
+    # for(j in 1:nr_bootstraps){
+    #   add_stat = dacomp:::rcpp_KW_test_single_permutation(X_matrix[,1],Y_pass,nr_groups)
+    #   if(is.nan(add_stat))
+    #     add_stat = 0
+    #   current_stats[j] = add_stat
+    # }
+    
+    #as of version 1.24, I am calling my C level function instead of Rs function. this is done for faster speed. I make sure to normalize the statistic to R's scale.
+    multiplicative_factor = (kruskal.test(X_matrix[,1], as.factor(Y_matrix[,1]))$statistic) / current_stats[1]
+    current_stats = current_stats*multiplicative_factor
   }
   if(statistic == DACOMP.TEST.NAME.SPEARMAN){
     ranked_X = ranked_X - mean(ranked_X)

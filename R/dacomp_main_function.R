@@ -151,7 +151,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
     nr_perm = ceiling(nr_perm)
   
   #if test is in TEST.DEF.Y.IS.0.OR.1, convert Y to 0 and 1
-  if(test %in% TEST.DEF.Y.IS.0.OR.1){
+  if(test %in% c(TEST.DEF.TESTS.OVER.GROUPS,TEST.DEF.Y.IS.0.OR.1)){
     y = as.numeric( as.factor(y) ) - 1
   }
      

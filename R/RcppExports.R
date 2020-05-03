@@ -21,3 +21,7 @@ rcpp_Welch_PermTest_Given_Permutations <- function(X, Y) {
     .Call(`_dacomp_rcpp_Welch_PermTest_Given_Permutations`, X, Y)
 }
 
+rcpp_KW_PermTest_Given_Permutations <- function(X, Y, Nr_Groups) {
+    .Call(`_dacomp_rcpp_KW_PermTest_Given_Permutations`, X, Y, Nr_Groups)
+}
+

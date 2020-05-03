@@ -174,24 +174,24 @@ test_that("Test dacomp test function", {
                             verbose = T,q = q_DSFDR)
   cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
   
-  #KW is slow - disabled for now
-  if(F){
-    cat(' KW-two groups: \n\r')
-    result.test = dacomp.test(X = data$counts,
-                              y = data$group_labels,
-                              ind_reference_taxa = result.selected.references,
-                              test = DACOMP.TEST.NAME.KRUSKAL_WALLIS,
-                              verbose = T,q = q_DSFDR)
-    cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
-    
-    cat(' KW-three groups: \n\r')
-    result.test = dacomp.test(X = data$counts,
-                              y = c(rep(0,33),rep(1,34),rep(2,33)),
-                              ind_reference_taxa = result.selected.references,
-                              test = DACOMP.TEST.NAME.KRUSKAL_WALLIS,
-                              verbose = T,q = q_DSFDR)
-    cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))  
-  }
+  #KW was slow before v 1.24. As of V1.24, KW has C level implementation!
+  
+  cat(' KW-two groups: \n\r')
+  result.test = dacomp.test(X = data$counts,
+                            y = data$group_labels,
+                            ind_reference_taxa = result.selected.references,
+                            test = DACOMP.TEST.NAME.KRUSKAL_WALLIS,
+                            verbose = T,q = q_DSFDR)
+  cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))
+  
+  cat(' KW-three groups: \n\r')
+  result.test = dacomp.test(X = data$counts,
+                            y = c(rep('A',33),rep('B',34),rep('C',33)),
+                            ind_reference_taxa = result.selected.references,
+                            test = DACOMP.TEST.NAME.KRUSKAL_WALLIS,
+                            verbose = T,q = q_DSFDR)
+  cat(paste0('TP: ',sum(result.test$dsfdr_rejected%in%data$select_diff_abundant),'/',length(result.test$dsfdr_rejected),'\n\r'))  
+  
   
   
   ###************************************************

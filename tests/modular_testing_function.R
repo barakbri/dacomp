@@ -18,6 +18,7 @@ Run_Test_Modular = function(report_file = 'E:/temp/dacomp_test_results.txt',
   DO_MAIN_TESTING <<- T
   DO_REGRESSION_TESTING <<- T
   DO_TEST_SIGNED <<-T
+  DO_KW_REGRESSION_SWITCH <<-T
   devtools::test()
   sink()  
 }

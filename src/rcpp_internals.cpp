@@ -185,3 +185,41 @@ List rcpp_Welch_PermTest_Given_Permutations(NumericVector X, IntegerMatrix Y) {
   return z ;
 }
 
+
+double KW_test_single_permutation(NumericVector X, IntegerVector Y, IntegerVector Nr_Groups){
+  int _nr_groups = Nr_Groups[0];
+  NumericVector sums(_nr_groups);
+  NumericVector counter(_nr_groups);
+  //double _total_sum=0;
+  double _nom = 0;
+  double _dnom = 0;
+  int _current_group = 0;
+  double _N = ((double)X.length());
+  double _temp = 0;
+  for(int i=0; i<_N; i++){
+    _current_group = Y(i);
+    sums[_current_group] = sums[_current_group] + X(i);
+    //_total_sum+= X[i];
+    counter[_current_group] = counter[_current_group] + 1.0;
+    _temp = (X(i) - 0.5*(_N+1.0));
+    _dnom += _temp*_temp;
+  }
+  for(int i=0; i<_nr_groups; i++){
+    _temp = (((double)sums[i])/((double)counter[i]) -  0.5*(_N+1.0));
+    _nom = _nom + _temp*_temp*((double)counter[i]);
+  }
+  return _nom/_dnom;
+}
+
+// [[Rcpp::export]]
+List rcpp_KW_PermTest_Given_Permutations(NumericVector X, IntegerMatrix Y,IntegerVector Nr_Groups){
+  
+  NumericVector stats(Y.ncol());
+  for(int i=0;i<Y.ncol();i++){
+    stats(i) = KW_test_single_permutation(X,Y(_,i),Nr_Groups);
+  }
+  List z  = List::create( stats);
+  return z ;
+}
+
+
