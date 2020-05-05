@@ -47,7 +47,7 @@ test_that("Simple Use Case", {
                            ind_reference_taxa = result.selected.references$selected_references,verbose = T,q = q_DSFDR) # can also use for example , test = 'TwoPartWilcoxon', show example
   
   rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
-  rejected_DSFDR = result.test$rejected
+  rejected_DSFDR = result.test$dsfdr_rejected
   
   
   TP = sum((rejected_BH %in% data$select_diff_abundant))
@@ -63,6 +63,14 @@ test_that("Simple Use Case", {
   cat(paste0('True positives: ',TP,', FDR: ',round(FDR,2),'\n\r'))
   
   
+  FILTER_FOR_TESTING = rep(F,ncol(data$counts))
+  FILTER_FOR_TESTING[data$select_diff_abundant] = T
+  result.test.with.taxa.filter = dacomp.test(X = data$counts,
+                            y = data$group_labels,
+                            test = DACOMP.TEST.NAME.WILCOXON,
+                            ind_reference_taxa = result.selected.references$selected_references,verbose = T,q = q_DSFDR,DSFDR_Filter = FILTER_FOR_TESTING)
+  
+  cat(paste0('True positives with filtering over tested hypotheses: ',length(result.test.with.taxa.filter$dsfdr_rejected),'\n\r'))
   ###************************************************
   # Run reference validation
   ###************************************************

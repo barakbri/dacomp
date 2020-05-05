@@ -34,3 +34,7 @@ Version 1.1 of the package adds an addtional variant of the DACOMP method called
 ## A note on version 1.2 of the package:
 Version 1.2 of the package adds multiplicity adjusted P-values for the DS-FDR procedure. Adjusted P-values are returned from the `dacomp.test(...)` function, under the field `p.values.test.adjusted`. Users using the *normalization by rarefaction* option, (which is not the default), will find the DS-FDR adjusted P-values under the field `p.values.test.adjusted.ratio.normalization`.
 
+
+## A note on version 1.24 of the package:
+Version 1.24 improves the computation time of the Krusakal Wallis test statistic (test statistics should be identical up to machine error), and allows to compute the DSFDR multiplicity adjustment for only a part of the taxa,i.e. specify which taxa are tested, see documentation for `dacomp.test(...)` for additional details.
+

@@ -50,6 +50,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' @param user_defined_test_function Argument for inputing a function for a custom test of association supplied by the user, see `details` below.
 #' @param compute_ratio_normalization Argument for computing, in addition to the test described above, test based on normalization by division rather than rarefaction. See description under details.
 #' @param verbose Should messages be printed to console, indicating computation progress. The default value is \code{FALSE}.
+#' @param DSFDR_Filter A logical (boolean) vector specifying for which taxa should the DSFDR adjusted P-values be computed. Taxa whose corresponding entries in this vector are set to \code{} are excluded from testing, and will not have DSFDR adjusted Pvalues computed. If a taxon is set to be in the reference set, and its corresponding entry is set to \code{T} in this vector, it will still be excluded from testing. 
 #'
 #' 
 #' @return An object of type "dacomp.result.object", which is a list with the follow fields:
@@ -138,7 +139,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 #' rejected_DSFDR = result.test$dsfdr_rejected
 #' }
-dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, compute_ratio_normalization = F, verbose = F ){
+dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, compute_ratio_normalization = F, verbose = F,DSFDR_Filter = rep(T,ncol(X)) ){
   
   #Preprocess inputs, before check:
   
@@ -156,7 +157,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   }
      
   #Check input validity
-  input_check_result = check.input.main(X,y,ind_reference_taxa,test, q, nr_perm, disable_DSFDR,user_defined_test_function,verbose)
+  input_check_result = check.input.main(X,y,ind_reference_taxa,test, q, nr_perm, disable_DSFDR,user_defined_test_function,verbose,DSFDR_Filter)
   if(!input_check_result)
     stop('Input check failed on dacomp.test')
       
@@ -223,7 +224,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
         cat(paste0('Testing taxon : ',i,'/',p,' \n\r'))
     
     #no need to test reference taxa
-    if(i %in% ind_reference_taxa){
+    if(i %in% ind_reference_taxa | !DSFDR_Filter[i]){
       next
     }
     
@@ -264,12 +265,14 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   }
   
   #compute DS-FDR:
+  Taxa_for_DSFDR = DSFDR_Filter
+  Taxa_for_DSFDR[ind_reference_taxa] = F
   if(!disable_DSFDR){
-    dsfdr_obj = dsfdr_find_thresholds(stats[,-ind_reference_taxa,drop=F],q,verbose)  
+    dsfdr_obj = dsfdr_find_thresholds(stats[,Taxa_for_DSFDR,drop=F],q,verbose)  
     dsfdr_threshold = dsfdr_obj$selected_c
     Adj.P.value.DSFDR = dsfdr_obj$Adj.P.Value
     if(compute_ratio_normalization){
-      dsfdr_obj_ratio_normalization = dsfdr_find_thresholds(stats_matrix_ratio_normalization[,-ind_reference_taxa,drop=F],q,F)  
+      dsfdr_obj_ratio_normalization = dsfdr_find_thresholds(stats_matrix_ratio_normalization[,Taxa_for_DSFDR,drop=F],q,F)  
       dsfdr_threshold_ratio_normalization = dsfdr_obj_ratio_normalization$selected_c
       Adj.P.value.DSFDR_ratio_normalization = dsfdr_obj_ratio_normalization$Adj.P.Value
     }
@@ -278,13 +281,13 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   p.values.test = p.values; p.values.test[ind_reference_taxa] = NA
   p.values.test.adjusted = p.adjust(p.values.test,method = 'BH')
   if(!disable_DSFDR){
-    p.values.test.adjusted[-ind_reference_taxa] = Adj.P.value.DSFDR
+    p.values.test.adjusted[Taxa_for_DSFDR] = Adj.P.value.DSFDR
   }
   if(compute_ratio_normalization){
     p.values.test.ratio.normalization = p.values.ratio.normalization; p.values.test.ratio.normalization[ind_reference_taxa] = NA
     p.values.test.adjusted.ratio.normalization = p.adjust(p.values.test.ratio.normalization,method = 'BH')
     if(!disable_DSFDR){
-      p.values.test.adjusted.ratio.normalization[-ind_reference_taxa] = Adj.P.value.DSFDR_ratio_normalization
+      p.values.test.adjusted.ratio.normalization[Taxa_for_DSFDR] = Adj.P.value.DSFDR_ratio_normalization
     }
   }
   
@@ -316,7 +319,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
 }
 
 #internal function for validating inputs on dacomp.test
-check.input.main = function(X, y, ind_reference_taxa, test, q, nr_perm, disable_DSFDR,user_defined_test_function, verbose){
+check.input.main = function(X, y, ind_reference_taxa, test, q, nr_perm, disable_DSFDR,user_defined_test_function, verbose,DSFDR_Filter){
   
   ##  dacomp.test: test X is numeric matrix of counts, 
   MSG_X = 'X must be a valid counts matrix'
@@ -397,6 +400,9 @@ check.input.main = function(X, y, ind_reference_taxa, test, q, nr_perm, disable_
       stop('For user defined test, argument user_defined_test_function must be function returning P.value')
   }
   
+  if(ncol(X) != length(DSFDR_Filter)){
+    stop('length of DSFDR_Filter not identical to ncol(X)')
+  }
   return(TRUE)
 }
 

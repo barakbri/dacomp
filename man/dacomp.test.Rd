@@ -7,7 +7,8 @@
 dacomp.test(X, y, ind_reference_taxa, test, q = 0.05,
   nr_perm = 1/(q/(ncol(X) - length(ind_reference_taxa))),
   disable_DSFDR = F, user_defined_test_function = NULL,
-  compute_ratio_normalization = F, verbose = F)
+  compute_ratio_normalization = F, verbose = F, DSFDR_Filter = rep(T,
+  ncol(X)))
 }
 \arguments{
 \item{X}{Matrix of counts, with rows representing samples, columns representing taxa. See `details` for additional information on how to format this matrix for paired study designs.}
@@ -29,6 +30,8 @@ dacomp.test(X, y, ind_reference_taxa, test, q = 0.05,
 \item{compute_ratio_normalization}{Argument for computing, in addition to the test described above, test based on normalization by division rather than rarefaction. See description under details.}
 
 \item{verbose}{Should messages be printed to console, indicating computation progress. The default value is \code{FALSE}.}
+
+\item{DSFDR_Filter}{A logical (boolean) vector specifying for which taxa should the DSFDR adjusted P-values be computed. Taxa whose corresponding entries in this vector are set to \code{} are excluded from testing, and will not have DSFDR adjusted Pvalues computed. If a taxon is set to be in the reference set, and its corresponding entry is set to \code{T} in this vector, it will still be excluded from testing.}
 }
 \value{
 An object of type "dacomp.result.object", which is a list with the follow fields:
