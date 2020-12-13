@@ -8,13 +8,13 @@
 #' Data is generated as follows.
 #' In the first step, we generate a list of vectors of relative frequencies to sample from: only healthy subjects from the kostic colorectal dataset are selected. Samples with less than 500 reads are dropped. Only OTUs that appear in 2 or more subjects are retained.
 #' In the second step, samples for group X are generated. For each sample, a vector of frequencies is chosen at random from the list generated in the first step. The observed sampled are multinomial random variables with a probability vector matching the selected frequencies, and a total number of reads realized from a Poisson distribution with a mean number of reads equal to the median number of reads across the samples listed in the first step.
-#' In the third step, samples for group Y are generated. For each sample, a vector of frequencies is chosen at random, similar to group X. The frequencies of differentially abundant taxa is increased, with the increase realized from a poisson random variable, such that the total increase in microbial load across all differentially abundant taxa is equivlant to the signal strength specified by the user. Observed counts are sampled based on the updated frequncies.
+#' In the third step, samples for group Y are generated. For each sample, a vector of frequencies is chosen at random, similar to group X. The frequencies of differentially abundant taxa is increased, with the increase realized from a poisson random variable, such that the total increase in microbial load across all differentially abundant taxa is equivlant to the signal strength specified by the user. Observed counts are sampled based on the updated frequencies.  This function requires the phyloseq package from bioconductor.
 #' @param n_X Number of samples from the first group
 #' @param n_Y Number of samples from the second group
 #' @param m1 Number of differentially abundant taxa
 #' @param signal_strength_as_change_in_microbial_load A number in the range 0-0.75, indicating the fraction of the microbial load of group Y that is added due to the simulated condition. The complement of this fraction, is the fraction of the microbial load of group Y that is distribued across taxa as in group X.
 #'
-#' @return a list with the followig entries
+#' @return a list with the following entries
 #' \itemize{
 #' \item{counts}{A counts matrix with \code{(n_X + n_Y)} rows, and 1384 columns, rows represent samples,columns represent taxa.}
 #' \item{group_labels}{A vector of group labelings, with values 0 and 1}
@@ -284,7 +284,10 @@ dacomp.generate_example_dataset_multivariate_example = function(n, m1 = 30, sign
 
 # internal function for accessing the kostic dataset from the phyloseq package
 get_kostic_data = function(){
-  library(phyloseq)
+  phyloseq_loaded = require(phyloseq)
+  if(!phyloseq_loaded){
+    stop('phyloseq package from bioconductor could not be loaded. phyloseq is required for functions of the form dacomp.generate_example_dataset_<insert data type>')
+  }
   filepath = system.file("extdata", "study_1457_split_library_seqs_and_mapping.zip", package="phyloseq")
   sink(tempfile())
   kostic = (suppressWarnings(microbio_me_qiime(filepath)))

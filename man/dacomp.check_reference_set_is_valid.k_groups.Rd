@@ -4,8 +4,12 @@
 \alias{dacomp.check_reference_set_is_valid.k_groups}
 \title{Test reference set of taxa for validity, by multivariate K-Sample testing}
 \usage{
-dacomp.check_reference_set_is_valid.k_groups(X_ref, Y, nr.perm = 10^4,
-  verbose = F)
+dacomp.check_reference_set_is_valid.k_groups(
+  X_ref,
+  Y,
+  nr.perm = 10^4,
+  verbose = F
+)
 }
 \arguments{
 \item{X_ref}{Matrix of counts, containing the reference taxa alone. Rows represent samples, columns represent taxa.}

@@ -9,6 +9,9 @@
 \arguments{
 \item{obj}{Object returned by dacomp.check_reference_set_is_valid.k_groups}
 }
+\value{
+
+}
 \description{
 Print the results of an object from type reference.validation.result.object
 }

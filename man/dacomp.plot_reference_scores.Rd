@@ -4,9 +4,12 @@
 \alias{dacomp.plot_reference_scores}
 \title{Plot histogram of median SD statistics from a reference selection result object}
 \usage{
-dacomp.plot_reference_scores(ref_select,
+dacomp.plot_reference_scores(
+  ref_select,
   label = "Histogram of medianSD statistic, across taxa",
-  quantiles_to_plot = c(0.5, 0.7, 0.9), breaks_param = 30)
+  quantiles_to_plot = c(0.5, 0.7, 0.9),
+  breaks_param = 30
+)
 }
 \arguments{
 \item{ref_select}{Computation result of \code{dacomp.select_references}}
@@ -16,6 +19,9 @@ dacomp.plot_reference_scores(ref_select,
 \item{quantiles_to_plot}{Percentiles marked by vertical lines. Default value is \code{c(0.5,0.7,0.9)}.}
 
 \item{breaks_param}{Passed as argument with the same name to the \code{hist} function.}
+}
+\value{
+
 }
 \description{
 Plot histogram of median SD statistics from a reference selection result object

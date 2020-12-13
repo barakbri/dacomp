@@ -4,11 +4,19 @@
 \alias{dacomp.test}
 \title{Test taxa for differential abundance, using a given set of reference taxa used for normalization.}
 \usage{
-dacomp.test(X, y, ind_reference_taxa, test, q = 0.05,
+dacomp.test(
+  X,
+  y,
+  ind_reference_taxa,
+  test,
+  q = 0.05,
   nr_perm = 1/(q/(ncol(X) - length(ind_reference_taxa))),
-  disable_DSFDR = F, user_defined_test_function = NULL,
-  compute_ratio_normalization = F, verbose = F, DSFDR_Filter = rep(T,
-  ncol(X)))
+  disable_DSFDR = F,
+  user_defined_test_function = NULL,
+  compute_ratio_normalization = F,
+  verbose = F,
+  DSFDR_Filter = rep(T, ncol(X))
+)
 }
 \arguments{
 \item{X}{Matrix of counts, with rows representing samples, columns representing taxa. See `details` for additional information on how to format this matrix for paired study designs.}

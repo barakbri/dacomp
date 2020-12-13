@@ -36,5 +36,8 @@ Version 1.2 of the package adds multiplicity adjusted P-values for the DS-FDR pr
 
 
 ## A note on version 1.24 of the package:
-Version 1.24 improves the computation time of the Krusakal Wallis test statistic (test statistics should be identical up to machine error), and allows to compute the DSFDR multiplicity adjustment for only a part of the taxa,i.e. specify which taxa are tested, see documentation for `dacomp.test(...)` for additional details.
+Version 1.24 improves the computation time of the Kruskal Wallis test statistic (test statistics should be identical up to machine error), and allows to compute the DSFDR multiplicity adjustment for only a part of the taxa,i.e. specify which taxa are tested, see documentation for `dacomp.test(...)` for additional details.
+
+## A note on version 1.25 of the package:
+the BioConductor package 'phyloseq' is now a suggested package, rather than a required package. It is required only for running the functions that generate a mock datasets in the example scripts.
 

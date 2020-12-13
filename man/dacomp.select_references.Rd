@@ -4,9 +4,16 @@
 \alias{dacomp.select_references}
 \title{Select a set of reference taxa, used for testing differential abundance of other taxa.}
 \usage{
-dacomp.select_references(X, median_SD_threshold, minimal_TA = 10,
-  maximal_TA = 200, Pseudo_Count_used = 1, verbose = F,
-  select_from = NULL, Previous_Reference_Selection_Object = NULL)
+dacomp.select_references(
+  X,
+  median_SD_threshold,
+  minimal_TA = 10,
+  maximal_TA = 200,
+  Pseudo_Count_used = 1,
+  verbose = F,
+  select_from = NULL,
+  Previous_Reference_Selection_Object = NULL
+)
 }
 \arguments{
 \item{X}{Counts matrix, with rows representing samples, columns representing different taxa.}

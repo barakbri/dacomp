@@ -4,8 +4,12 @@
 \alias{dacomp.generate_example_dataset.two_sample}
 \title{Generate a simulated two sample dataset, based on data from the Phyloseq package}
 \usage{
-dacomp.generate_example_dataset.two_sample(n_X = 30, n_Y = 30,
-  m1 = 30, signal_strength_as_change_in_microbial_load = 0.1)
+dacomp.generate_example_dataset.two_sample(
+  n_X = 30,
+  n_Y = 30,
+  m1 = 30,
+  signal_strength_as_change_in_microbial_load = 0.1
+)
 }
 \arguments{
 \item{n_X}{Number of samples from the first group}
@@ -17,7 +21,7 @@ dacomp.generate_example_dataset.two_sample(n_X = 30, n_Y = 30,
 \item{signal_strength_as_change_in_microbial_load}{A number in the range 0-0.75, indicating the fraction of the microbial load of group Y that is added due to the simulated condition. The complement of this fraction, is the fraction of the microbial load of group Y that is distribued across taxa as in group X.}
 }
 \value{
-a list with the followig entries
+a list with the following entries
 \itemize{
 \item{counts}{A counts matrix with \code{(n_X + n_Y)} rows, and 1384 columns, rows represent samples,columns represent taxa.}
 \item{group_labels}{A vector of group labelings, with values 0 and 1}
@@ -32,7 +36,7 @@ This function generates a two-sample dataset, based on the \code{kostic} dataset
 Data is generated as follows.
 In the first step, we generate a list of vectors of relative frequencies to sample from: only healthy subjects from the kostic colorectal dataset are selected. Samples with less than 500 reads are dropped. Only OTUs that appear in 2 or more subjects are retained.
 In the second step, samples for group X are generated. For each sample, a vector of frequencies is chosen at random from the list generated in the first step. The observed sampled are multinomial random variables with a probability vector matching the selected frequencies, and a total number of reads realized from a Poisson distribution with a mean number of reads equal to the median number of reads across the samples listed in the first step.
-In the third step, samples for group Y are generated. For each sample, a vector of frequencies is chosen at random, similar to group X. The frequencies of differentially abundant taxa is increased, with the increase realized from a poisson random variable, such that the total increase in microbial load across all differentially abundant taxa is equivlant to the signal strength specified by the user. Observed counts are sampled based on the updated frequncies.
+In the third step, samples for group Y are generated. For each sample, a vector of frequencies is chosen at random, similar to group X. The frequencies of differentially abundant taxa is increased, with the increase realized from a poisson random variable, such that the total increase in microbial load across all differentially abundant taxa is equivlant to the signal strength specified by the user. Observed counts are sampled based on the updated frequencies.  This function requires the phyloseq package from bioconductor.
 }
 \examples{
 \dontrun{

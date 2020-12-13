@@ -1,15 +1,15 @@
 Package: dacomp
 Type: Package
 Title: Non parametric differential abundance testing for microbiome counts data.
-Version: 1.24
-Date: 2020-03-27
+Version: 1.25
+Date: 2020-12-13
 Author: Barak Brill, Amnon Amir, Ruth Heller
 Maintainer: Barak Brill <barakbri@mail.tau.ac.il>
 Description: Normalization and differential abundance testing for microbiome counts data. Based on the method of Brill, Amir and Heller (2019). The package consists of two main functions: one function for selection of reference taxa for normalization, and a second function for normalizing counts according to the taxa selected and testing for differential abundance. The DS-FDR method for multiplicity correction (Jiang et al. 2017) is implemented as a part of the multiple testing procedure.
 License: LGPL2
-Imports: Rcpp (>= 0.12.17), phyloseq
+Imports: Rcpp (>= 0.12.17)
 LinkingTo: Rcpp
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Suggests: 
-    testthat (>= 2.1.0), digest, knitr, vegan,HHG,energy
+    testthat (>= 2.1.0), digest, knitr, vegan,HHG,energy,phyloseq
 VignetteBuilder: knitr

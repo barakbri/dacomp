@@ -4,8 +4,11 @@
 \alias{dacomp.generate_example_dataset_multivariate_example}
 \title{Generate an example dataset with a multivariate phenotype}
 \usage{
-dacomp.generate_example_dataset_multivariate_example(n, m1 = 30,
-  signal_strength_as_change_in_microbial_load = 0.1)
+dacomp.generate_example_dataset_multivariate_example(
+  n,
+  m1 = 30,
+  signal_strength_as_change_in_microbial_load = 0.1
+)
 }
 \arguments{
 \item{n}{Number of samples.}

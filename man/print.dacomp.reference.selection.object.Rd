@@ -9,6 +9,9 @@
 \arguments{
 \item{obj}{Object returned by dacomp.select.references(...)}
 }
+\value{
+
+}
 \description{
 Print information on the selected reference set, given an object from type reference.selection.object
 }

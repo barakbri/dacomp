@@ -9,6 +9,9 @@
 \arguments{
 \item{obj}{Object returned from dacomp.test(...)}
 }
+\value{
+
+}
 \description{
 Print the results contained in an object from type dacomp.result.object
 }

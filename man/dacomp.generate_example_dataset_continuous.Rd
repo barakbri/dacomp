@@ -4,8 +4,11 @@
 \alias{dacomp.generate_example_dataset_continuous}
 \title{Generate a simulated dataset with a continuous phenotype, based on data from the Phyloseq package}
 \usage{
-dacomp.generate_example_dataset_continuous(n, m1 = 30,
-  signal_strength_as_change_in_microbial_load = 0.1)
+dacomp.generate_example_dataset_continuous(
+  n,
+  m1 = 30,
+  signal_strength_as_change_in_microbial_load = 0.1
+)
 }
 \arguments{
 \item{n}{Number of samples}

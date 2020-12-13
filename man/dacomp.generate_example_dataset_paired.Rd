@@ -4,8 +4,11 @@
 \alias{dacomp.generate_example_dataset_paired}
 \title{Generate a simulated dataset for a paired study design.}
 \usage{
-dacomp.generate_example_dataset_paired(n, m1 = 30,
-  signal_strength_as_change_in_microbial_load = 0.1)
+dacomp.generate_example_dataset_paired(
+  n,
+  m1 = 30,
+  signal_strength_as_change_in_microbial_load = 0.1
+)
 }
 \arguments{
 \item{n}{Number of ecosystems to sample. Actual number of samples will be twice this number.}
