@@ -51,21 +51,24 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' @param compute_ratio_normalization Argument for computing, in addition to the test described above, test based on normalization by division rather than rarefaction. See description under details.
 #' @param verbose Should messages be printed to console, indicating computation progress. The default value is \code{FALSE}.
 #' @param DSFDR_Filter A logical (boolean) vector specifying for which taxa should the DSFDR adjusted P-values be computed. Taxa whose corresponding entries in this vector are set to \code{} are excluded from testing, and will not have DSFDR adjusted Pvalues computed. If a taxon is set to be in the reference set, and its corresponding entry is set to \code{T} in this vector, it will still be excluded from testing. 
-#'
-#' 
+#' @param Test_All A logical value specifying if all test (including the reference taxa) should be tested for differential abundance. When testing a reference taxon for differential abundance, it is excluded from the reference set.
+#' @param return_rarefied_values a logical value indicating if the rarefied draws used for testing should be returned as a matrix under the entry \code{rarefied_counts} in the returned object.
 #' @return An object of type "dacomp.result.object", which is a list with the follow fields:
 #' \itemize{
 #' \item{lambda}{ - The subsampling depth for each tested taxon, as in step I under `details`.}
 #' \item{stats_matrix}{ - A matrix of size \code{(nr_perm+1) X ncol(X)} containing the tests statistics for the data (first row) and test statistics computed for permuted values of \code{y} (other rows).}
 #' \item{p.values.test}{ - A vector with P-values for the different tests of association, by taxa. P-values obtained by permutations. P-values for reference taxa will appear as \code{NA}.}
-#' \item{p.values.test.adjusted}{ A vector of P-values, adjusted for multiplicity, corresponding to \code{p.values.test}. By default, correction is done by the DS-FDR method. If \code{disable_DSFDR} is set to \code{TRUE}, the BH correction is performed. Entries lower than a value of \eqn{u} indicate a taxon declared differentially abundant when trying to control multiplicity at level \eqn{u}. Entries lower than the value defined for the parameter \code{q} will be indicated as discoveries under \code{dsfdr_rejected}}
+#' \item{p.values.test.adjusted}{ - A vector of P-values, adjusted for multiplicity, corresponding to \code{p.values.test}. By default, correction is done by the DS-FDR method. If \code{disable_DSFDR} is set to \code{TRUE}, the BH correction is performed. Entries lower than a value of \eqn{u} indicate a taxon declared differentially abundant when trying to control multiplicity at level \eqn{u}. Entries lower than the value defined for the parameter \code{q} will be indicated as discoveries under \code{dsfdr_rejected}}
+#' \item{effect_size_estimates}{  - For correlation tests (Spearman), will give the spearman correlation coeffcient between rarefied counts and Y. For K-sample, 2-Sample and paired tests, will provide a string describing the ordering of mean ranks of rarefied counts, across levels of Y. }
 #' \item{dsfdr_rejected}{ - A vector of taxa indices declared differentially abundant by the DS-FDR method for multiplicity adjustment. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
 #' \item{dsfdr_threshold}{ - The selected threshold, in terms of P-values, for declaring taxa as differentialy abundant. Taxa with P-values under this threshold will be declared diffentially abundant. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
 #' 
 #' \item{p.values.test.ratio.normalization}{ - A vector with P-values for the different tests of association, by taxa, for the "normalization by ratio" variant of DACOMP.  This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE}.}
-#' \item{p.values.test.adjusted.ratio.normalization}{ A vector of P-values, adjusted for multiplicity, for the tests performed using ratio normalization (given by \code{p.values.test.ratio.normalization}). By default, correction is done by the DS-FDR method. If \code{disable_DSFDR} is set to \code{TRUE}, the BH correction is performed. Entries lower than a value of \eqn{u} indicate a taxon declared differentially abundant when trying to control multiplicity at level \eqn{u}. Entries lower than the value defined for the parameter \code{q} will be indicated as discoveries under \code{dsfdr_rejected_ratio_normalization}}
+#' \item{p.values.test.adjusted.ratio.normalization}{ - A vector of P-values, adjusted for multiplicity, for the tests performed using ratio normalization (given by \code{p.values.test.ratio.normalization}). By default, correction is done by the DS-FDR method. If \code{disable_DSFDR} is set to \code{TRUE}, the BH correction is performed. Entries lower than a value of \eqn{u} indicate a taxon declared differentially abundant when trying to control multiplicity at level \eqn{u}. Entries lower than the value defined for the parameter \code{q} will be indicated as discoveries under \code{dsfdr_rejected_ratio_normalization}}
+#' \item{effect_size_estimates_ratio}{ - Similar to \code{effect_size_estimates}, but computed over the ratio between taxon counts and total number of reads available under both the reference taxa and the tested taxon.}
 #' \item{dsfdr_rejected_ratio_normalization}{ -A vector of taxa indices declared differentially abundant by the DS-FDR method, similar to dsfdr_rejected, but using the P-values obtained for the "normalization by ratio" test. This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE} and DS-FDR computation is not disabled.}
 #' \item{dsfdr_threshold_ratio_normalization}{ - The selected threshold, in terms of P-values, for declaring taxa as differentialy abundant. Taxa with P-values, obtained with "normalization by ratio" type tests, under this threshold will be declared diffentially abundant. This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE} and DS-FDR computation is not disabled.}
+#' \item{rarefied_counts}{- The rarefied counts for each taxon-wise test, rows are samples, columns are taxa.}
 #' }
 #' 
 #' @references 
@@ -139,10 +142,10 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 #' rejected_DSFDR = result.test$dsfdr_rejected
 #' }
-dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, compute_ratio_normalization = F, verbose = F,DSFDR_Filter = rep(T,ncol(X)) ){
+dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, compute_ratio_normalization = F, verbose = F,DSFDR_Filter = rep(T,ncol(X)),Test_All = F,return_rarefied_values = F ){
   
   #Preprocess inputs, before check:
-  
+  y_original = y #we keep a copy for k-sample effect size estimates
   #in case a user inserted a reference selection object, with take the indices from the object
   if(class(ind_reference_taxa) == CLASS.LABEL.REFERENCE_SELECTION_OBJECT){
     ind_reference_taxa = ind_reference_taxa$selected_references
@@ -170,6 +173,12 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   taxa_nr_res = rep(NA,p)
   reference_values = rep(NA,n)
   lambda_selected = rep(NA,p)
+  effect_size_estimates  = rep(NA,p)
+  effect_size_estimates_ratio  = rep(NA,p)
+  
+  if(return_rarefied_values){
+    rarefied_counts =matrix(NA,nrow = n,ncol = p)
+  }
   
   # Compute reference values
   if(length(ind_reference_taxa)>1){
@@ -200,6 +209,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
       }
       Y_matrix[,i] = ind
     }
+    y_original = c(rep("First Group",n/2),rep("Second Group",n/2))
   }else if (test %in% TEST.DEF.TESTS.ON.UNIVARIATE_CONTINOUS){
     Y_matrix[,1] = rank(y,ties.method = 'average')
     Y_matrix[,1] = Y_matrix[,1] - mean(Y_matrix[,1])
@@ -224,12 +234,16 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
         cat(paste0('Testing taxon : ',i,'/',p,' \n\r'))
     
     #no need to test reference taxa
-    if(i %in% ind_reference_taxa | !DSFDR_Filter[i]){
+    if((!Test_All & i %in% ind_reference_taxa) | !DSFDR_Filter[i]){
       next
     }
     
     nom = X[,i]
     dnom = reference_values
+    
+    if(i %in% ind_reference_taxa){
+      dnom  = dnom - nom
+    }
     
     #choose rarefaction depth:
     total_reads_per_subject = nom+dnom
@@ -239,7 +253,10 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
 
     #perform subsample and test
     
-    temp_subsampled =  rhyper(n, nom, dnom,min_value)  
+    temp_subsampled =  rhyper(n, nom, dnom,min_value)
+    if(return_rarefied_values){
+      rarefied_counts[,i] = temp_subsampled
+    }
     rarefaction_matrix[,1] = temp_subsampled 
     ratio_matrix[,1] = nom/(dnom+nom)
     
@@ -251,9 +268,21 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
       stats_matrix_ratio_normalization[,i] = 0
     }
     
-  }
-  
-  #computes pvalues:
+    #compute effect size estimates
+    if(test %in% TEST.DEF.TESTS.ON.UNIVARIATE_CONTINOUS){
+      effect_size_estimates[i] = as.character(cor(rank(rarefaction_matrix[,1]),rank(Y_matrix[,1])))
+      if(compute_ratio_normalization){
+        effect_size_estimates_ratio[i] = as.character(cor(rank(ratio_matrix[,1]),rank(Y_matrix[,1])))
+      }
+    }else{
+      effect_size_estimates[i] = description_for_KS(data.frame(X_rank = rank(rarefaction_matrix[,1]),
+                                                               Y_perm = y_original))
+      if(compute_ratio_normalization){
+        effect_size_estimates_ratio[i] = description_for_KS(data.frame(X_rank = rank(ratio_matrix[,1]),
+                                                                       Y_perm = y_original))
+      }
+    }
+  }#end of iteration over taxa 
   stats = stats_matrix
   p.values = rep(NA,ncol(stats))
   p.values.ratio.normalization = rep(NA,ncol(stats))
@@ -278,13 +307,19 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
     }
   }
   
-  p.values.test = p.values; p.values.test[ind_reference_taxa] = NA
+  p.values.test = p.values
+  if(!Test_All){
+    p.values.test[ind_reference_taxa] = NA
+  }
   p.values.test.adjusted = p.adjust(p.values.test,method = 'BH')
   if(!disable_DSFDR){
     p.values.test.adjusted[Taxa_for_DSFDR] = Adj.P.value.DSFDR
   }
   if(compute_ratio_normalization){
-    p.values.test.ratio.normalization = p.values.ratio.normalization; p.values.test.ratio.normalization[ind_reference_taxa] = NA
+    p.values.test.ratio.normalization = p.values.ratio.normalization
+    if(!Test_All){
+      p.values.test.ratio.normalization[ind_reference_taxa] = NA
+    }
     p.values.test.adjusted.ratio.normalization = p.adjust(p.values.test.ratio.normalization,method = 'BH')
     if(!disable_DSFDR){
       p.values.test.adjusted.ratio.normalization[Taxa_for_DSFDR] = Adj.P.value.DSFDR_ratio_normalization
@@ -300,6 +335,7 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   ret$stats_matrix = stats_matrix
   ret$p.values.test = p.values.test
   ret$p.values.test.adjusted = p.values.test.adjusted
+  ret$effect_size_estimates = effect_size_estimates
   if(!disable_DSFDR){
     ret$dsfdr_rejected = which(p.values.test<=dsfdr_threshold)
     ret$dsfdr_threshold = dsfdr_threshold  
@@ -308,12 +344,15 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   if(compute_ratio_normalization){
     ret$p.values.test.ratio.normalization = p.values.test.ratio.normalization
     ret$p.values.test.adjusted.ratio.normalization = p.values.test.adjusted.ratio.normalization
+    ret$effect_size_estimates_ratio = effect_size_estimates_ratio
     if(!disable_DSFDR){
       ret$dsfdr_rejected_ratio_normalization = which(p.values.test.ratio.normalization<=dsfdr_threshold_ratio_normalization)
       ret$dsfdr_threshold_ratio_normalization = dsfdr_threshold_ratio_normalization  
     }
   }
-  
+  if(return_rarefied_values){
+    ret$rarefied_counts = rarefied_counts
+  }
   class(ret) = CLASS.LABEL.DACOMP_RESULT_OBJECT
   return(ret)
 }

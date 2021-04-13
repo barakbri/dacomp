@@ -11,9 +11,9 @@ author:
   affiliation: Department of Statistics and OR, Tel Aviv University
 bibliography: dacomp_bib.bib
 output:
-  BiocStyle::html_document:
-    toc_float: true
-  BiocStyle::pdf_document: default
+  html_document:
+   toc: true
+   highlight: breezedark
 package: DACOMP
 vignette: |
     %\VignetteIndexEntry{dacomp}
@@ -90,7 +90,7 @@ The value of $S_{crit}$ is data specific. In this vignette, we use data from the
 # Workflow
 This section demonstrate the workflow for statistical analysis. We begin by generating a sample dataset. The dataset will consist of two study groups (labeled 0 and 1), 50 samples in each study groups. The data will contain 1384 OTUs with `m1=100` OTUs selected (at random) as differentially abundant. The parameter `signal_strength_as_change_in_microbial_load = 0.1` indicates OTUs associated with the phenotype cause a change of 10% in the microbial load, compared to study group 0. Note that this parameter effects the ratio between different columns in the data, but not the total number of counts in a row (sample): the total number of counts in a sample is not indicative of the microbial load.
 
-```{r,eval = T,cache=FALSE}
+```{r,eval = F,cache=FALSE}
 library(dacomp)
 
 set.seed(1)
@@ -108,7 +108,7 @@ The object `data` consists of `data$counts` - a matrix with 100 rows and 1384 co
 We begin our analysis by selecting a set of reference taxa. This requires a threshold, $S_{crit}=0.6$
 We also plot the histogram of $S_j$ scores, with vertical lines for the $0.5,0.7,$ and $0.9$ percentiles of $S_j$s. This allows us to assess how high is the selected $S_{crit}$ compared to the distribution of $S_j$ in our data.
 
-```{r,eval = T}
+```{r,eval = F}
 #select references: (may take a minute)
 result.selected.references = dacomp.select_references(
                       X = data$counts,
@@ -118,19 +118,19 @@ result.selected.references = dacomp.select_references(
 ```
 
 Output obtained from printing the reference selection results:
-```{r,eval = T}
+```{r,eval = F}
 print(result.selected.references)
 ```
 
 Plot the reference selection scores (can also be used to better set the median SD threshold)
-```{r,eval = T}
+```{r,eval = F}
 dacomp.plot_reference_scores(result.selected.references)
 ```
 
 ## Inference using the Wilcoxon rank sum test
 We test taxa (not in the reference set) for differential abundance by using the function `dacomp.test`. We show two possible adjustments for multiplicity, the BH procedure (using `p.adjust`) and the DS-FDR procedure^[@jiang2017discrete]:
 
-```{r, eval = T}
+```{r, eval = F}
 #multiplicity correction levels for the BH and DS-FDR methods
 q_BH = q_DSFDR = 0.1
 
@@ -150,7 +150,7 @@ rejected_DSFDR = result.test$dsfdr_rejected
 ```
 
 Output from printing `result.test`:
-```{r,eval = T}
+```{r,eval = F}
 print(result.test)
 ```
 

@@ -131,7 +131,7 @@ test_that("Test dacomp test function", {
   # check returned fields
   ###************************************************
   
-  expect_identical(names(result.test.with.class),c("lambda","stats_matrix","p.values.test","p.values.test.adjusted","dsfdr_rejected","dsfdr_threshold" ))
+  expect_identical(names(result.test.with.class),c("lambda","stats_matrix","p.values.test","p.values.test.adjusted","effect_size_estimates","dsfdr_rejected","dsfdr_threshold" ))
   
   expect_identical(sort(which(is.na(result.test.with.class$lambda))),sort(result.selected.references$selected_references),info = "check missing lambda are only the given references")
   
@@ -140,12 +140,10 @@ test_that("Test dacomp test function", {
   ###************************************************
   # regression test
   ###************************************************
-  library(digest)
-  hash_computation_result = digest::digest(result.test, algo="md5")
-  cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "09b5ac0dadd6dd77633705b84484e535"
-  expect_equal(hash_computation_result,hash_gold_standard)
   
+  dacomp:::compare_to_gold_standard(check_name = "Main_Testing_VAL_Wilcoxon_P_values",obj_to_hash = result.test$p.values.test)
+  dacomp:::compare_to_gold_standard(check_name = "Main_Testing_VAL_Wilcoxon_Effect_Estimates",obj_to_hash = result.test$effect_size_estimates)
+
   ###************************************************
   # check other variants work, need to expand this section...
   ###************************************************
@@ -220,12 +218,9 @@ test_that("Test dacomp test function", {
   
   #sum(rejected_BH %in% data$select_diff_abundant)
   #length(rejected_BH)
+  dacomp:::compare_to_gold_standard(check_name = "Main_Testing_VAL_Spearman_P_values",obj_to_hash = result.test$p.values.test)
+  dacomp:::compare_to_gold_standard(check_name = "Main_Testing_VAL_Spearman_Effect_Estimates",obj_to_hash = result.test$effect_size_estimates)
   
-  library(digest)
-  hash_computation_result = digest::digest(result.test, algo="md5")
-  cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard_continous = "916ced97f0ec353a16b20e341cc67a43"
-  expect_equal(hash_computation_result,hash_gold_standard_continous)
   
   ###************************************************
   # test adjusted P-values for DS-FDR

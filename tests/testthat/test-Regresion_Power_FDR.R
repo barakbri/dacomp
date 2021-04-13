@@ -71,8 +71,8 @@ test_that("Regression tests to paper, power and FDR", {
   ###************************************************
   
   start_scenario = 1
-  end_scenario = 25 #25 #DEBUG
-  nr.reps = 1 #10 #DEBUG
+  end_scenario = 25
+  nr.reps = 1
 
   set.seed(1)
   res_list = list()
@@ -86,9 +86,6 @@ test_that("Regression tests to paper, power and FDR", {
   }
   
   print(result_table)
-  library(digest)
-  hash_computation_result = digest::digest(result_table, algo="md5")
-  cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "bc538dc93f245407ae4c3edc33739386"
-  expect_equal(hash_computation_result,hash_gold_standard)
+  
+  dacomp:::compare_to_gold_standard(check_name = "Regression_and_Power_VAL_result_table",obj_to_hash = result_table)
 })

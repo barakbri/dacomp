@@ -33,11 +33,8 @@ test_that("Test Signed Wilcoxon", {
   # sum(rejected_DSFDR %in% data$select_diff_abundant)
   
   #Regression test
-  library(digest)
-  hash_computation_result = digest::digest(result.test, algo="md5")
-  cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "af2361525e8e9bc54ae5204dbfb35917"
-  expect_equal(hash_computation_result,hash_gold_standard,label = 'Regression test failed on Wilcoxon signed test')
+  dacomp:::compare_to_gold_standard(check_name = "Signed_Wilcoxon_VAL_P_values",obj_to_hash = result.test$p.values.test)
+  dacomp:::compare_to_gold_standard(check_name = "Signed_Wilcoxon_VAL_Effect_Estimates",obj_to_hash = result.test$effect_size_estimates)
 })
 
 

@@ -6,7 +6,10 @@ exportPattern("dacomp.select_references")
 exportPattern("dacomp.generate_example_dataset")
 exportPattern("DACOMP.POSSIBLE.TEST.NAMES")
 exportPattern("DACOMP.TEST.NAME.")
+
+
 importFrom(Rcpp, evalCpp)
 S3method(print,dacomp.result.object)
 S3method(print,dacomp.reference.selection.object)
 S3method(print,dacomp.reference.validation.result.object)
+

@@ -15,7 +15,9 @@ dacomp.test(
   user_defined_test_function = NULL,
   compute_ratio_normalization = F,
   verbose = F,
-  DSFDR_Filter = rep(T, ncol(X))
+  DSFDR_Filter = rep(T, ncol(X)),
+  Test_All = F,
+  return_rarefied_values = F
 )
 }
 \arguments{
@@ -40,6 +42,10 @@ dacomp.test(
 \item{verbose}{Should messages be printed to console, indicating computation progress. The default value is \code{FALSE}.}
 
 \item{DSFDR_Filter}{A logical (boolean) vector specifying for which taxa should the DSFDR adjusted P-values be computed. Taxa whose corresponding entries in this vector are set to \code{} are excluded from testing, and will not have DSFDR adjusted Pvalues computed. If a taxon is set to be in the reference set, and its corresponding entry is set to \code{T} in this vector, it will still be excluded from testing.}
+
+\item{Test_All}{A logical value specifying if all test (including the reference taxa) should be tested for differential abundance. When testing a reference taxon for differential abundance, it is excluded from the reference set.}
+
+\item{return_rarefied_values}{a logical value indicating if the rarefied draws used for testing should be returned as a matrix under the entry \code{rarefied_counts} in the returned object.}
 }
 \value{
 An object of type "dacomp.result.object", which is a list with the follow fields:
@@ -47,14 +53,17 @@ An object of type "dacomp.result.object", which is a list with the follow fields
 \item{lambda}{ - The subsampling depth for each tested taxon, as in step I under `details`.}
 \item{stats_matrix}{ - A matrix of size \code{(nr_perm+1) X ncol(X)} containing the tests statistics for the data (first row) and test statistics computed for permuted values of \code{y} (other rows).}
 \item{p.values.test}{ - A vector with P-values for the different tests of association, by taxa. P-values obtained by permutations. P-values for reference taxa will appear as \code{NA}.}
-\item{p.values.test.adjusted}{ A vector of P-values, adjusted for multiplicity, corresponding to \code{p.values.test}. By default, correction is done by the DS-FDR method. If \code{disable_DSFDR} is set to \code{TRUE}, the BH correction is performed. Entries lower than a value of \eqn{u} indicate a taxon declared differentially abundant when trying to control multiplicity at level \eqn{u}. Entries lower than the value defined for the parameter \code{q} will be indicated as discoveries under \code{dsfdr_rejected}}
+\item{p.values.test.adjusted}{ - A vector of P-values, adjusted for multiplicity, corresponding to \code{p.values.test}. By default, correction is done by the DS-FDR method. If \code{disable_DSFDR} is set to \code{TRUE}, the BH correction is performed. Entries lower than a value of \eqn{u} indicate a taxon declared differentially abundant when trying to control multiplicity at level \eqn{u}. Entries lower than the value defined for the parameter \code{q} will be indicated as discoveries under \code{dsfdr_rejected}}
+\item{effect_size_estimates}{  - For correlation tests (Spearman), will give the spearman correlation coeffcient between rarefied counts and Y. For K-sample, 2-Sample and paired tests, will provide a string describing the ordering of mean ranks of rarefied counts, across levels of Y. }
 \item{dsfdr_rejected}{ - A vector of taxa indices declared differentially abundant by the DS-FDR method for multiplicity adjustment. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
 \item{dsfdr_threshold}{ - The selected threshold, in terms of P-values, for declaring taxa as differentialy abundant. Taxa with P-values under this threshold will be declared diffentially abundant. This field will not be available if \code{disable_DSFDR} is set to \code{TRUE}.}
 
 \item{p.values.test.ratio.normalization}{ - A vector with P-values for the different tests of association, by taxa, for the "normalization by ratio" variant of DACOMP.  This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE}.}
-\item{p.values.test.adjusted.ratio.normalization}{ A vector of P-values, adjusted for multiplicity, for the tests performed using ratio normalization (given by \code{p.values.test.ratio.normalization}). By default, correction is done by the DS-FDR method. If \code{disable_DSFDR} is set to \code{TRUE}, the BH correction is performed. Entries lower than a value of \eqn{u} indicate a taxon declared differentially abundant when trying to control multiplicity at level \eqn{u}. Entries lower than the value defined for the parameter \code{q} will be indicated as discoveries under \code{dsfdr_rejected_ratio_normalization}}
+\item{p.values.test.adjusted.ratio.normalization}{ - A vector of P-values, adjusted for multiplicity, for the tests performed using ratio normalization (given by \code{p.values.test.ratio.normalization}). By default, correction is done by the DS-FDR method. If \code{disable_DSFDR} is set to \code{TRUE}, the BH correction is performed. Entries lower than a value of \eqn{u} indicate a taxon declared differentially abundant when trying to control multiplicity at level \eqn{u}. Entries lower than the value defined for the parameter \code{q} will be indicated as discoveries under \code{dsfdr_rejected_ratio_normalization}}
+\item{effect_size_estimates_ratio}{ - Similar to \code{effect_size_estimates}, but computed over the ratio between taxon counts and total number of reads available under both the reference taxa and the tested taxon.}
 \item{dsfdr_rejected_ratio_normalization}{ -A vector of taxa indices declared differentially abundant by the DS-FDR method, similar to dsfdr_rejected, but using the P-values obtained for the "normalization by ratio" test. This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE} and DS-FDR computation is not disabled.}
 \item{dsfdr_threshold_ratio_normalization}{ - The selected threshold, in terms of P-values, for declaring taxa as differentialy abundant. Taxa with P-values, obtained with "normalization by ratio" type tests, under this threshold will be declared diffentially abundant. This field will be available only if  \code{compute_ratio_normalization} is set to \code{TRUE} and DS-FDR computation is not disabled.}
+\item{rarefied_counts}{- The rarefied counts for each taxon-wise test, rows are samples, columns are taxa.}
 }
 }
 \description{

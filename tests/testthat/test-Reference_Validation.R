@@ -77,11 +77,6 @@ test_that("Reference Validation", {
   ###************************************************
   # regression check on results
   ###************************************************
-  
-  library(digest)
-  hash_computation_result = digest::digest(result.ref.validity, algo="md5")
-  cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "1c08e29c70bbe84f91ec096a6285b30c"
-  expect_equal(hash_computation_result,hash_gold_standard)
+  dacomp:::compare_to_gold_standard(check_name = "Reference_Validation_VAL_result_ref_validity",obj_to_hash = result.ref.validity)
   
 })

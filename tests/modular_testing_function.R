@@ -1,7 +1,8 @@
 
-Run_Test_Modular = function(report_file = 'E:/temp/dacomp_test_results.txt',
-                            package_location = 'E:/dacomp/',
-                            CompositionalAnalysis_CodeBase_Location = 'E:/MCB3/CompositionalAnalysis_CodeBase/Scripts/'){
+Run_Test_Modular = function(report_directory = 'C:/Test_DACOMP/',
+                            package_location = 'C:/dacomp/',
+                            CompositionalAnalysis_CodeBase_Location = 'C:/MCB3/CompositionalAnalysis_CodeBase/Scripts/'){
+  report_file = paste(report_directory,'dacomp_test_results.txt')
   sink(file = report_file)
   
   set.seed(1)
@@ -19,6 +20,9 @@ Run_Test_Modular = function(report_file = 'E:/temp/dacomp_test_results.txt',
   DO_REGRESSION_TESTING <<- T
   DO_TEST_SIGNED <<-T
   DO_KW_REGRESSION_SWITCH <<-T
+  DO_PAIRED_T1E_AND_POWER_MULTIPLE_CORES <<-T
+  DO_BACKWORDS_COMPATABILITY_MULTIPLE_CORES<<-T
+  
   devtools::test()
   sink()  
 }

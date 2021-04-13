@@ -93,10 +93,6 @@ test_that("multiplication works", {
   # regression check on results
   ###************************************************
   
-  library(digest)
-  hash_computation_result = digest::digest(result.selected.references, algo="md5")
-  cat(paste0('Current MD5 of sum results: ',hash_computation_result,'\n\r'))
-  hash_gold_standard = "4a4d94536995c27c42f5c2fb5e234290"
-  expect_equal(hash_computation_result,hash_gold_standard)
+  dacomp:::compare_to_gold_standard(check_name = "Reference_Selection_VAL_Selected_References",obj_to_hash = result.selected.references)
   
 })

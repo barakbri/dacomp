@@ -67,7 +67,7 @@ DACOMP.POSSIBLE.TEST.NAMES = c(DACOMP.TEST.NAME.WILCOXON,
 # coloumns of Y_matrix are different permutations of the group labels
 # rows are samples
 # the returned statistics are a sum of individual test statistics across columns of X (test the joint null hypothesis)
-Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.WILCOXON,user_defined_test_function = NULL){
+Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.WILCOXON,user_defined_test_function = NULL,skip_squaring = F){
   
   if(ncol(X_matrix) != 1)
     stop('Error in Compute.resample.test: Function requires X_matrix with a single column')
@@ -173,7 +173,7 @@ Compute.resample.test = function(X_matrix,Y_matrix,statistic = DACOMP.TEST.NAME.
   stats = (current_stats)
   
   # tests with non negative test scores, and a two-sided hypothesis (with zero being mode of dist under )
-  if(statistic %in% TEST.DEF.SCORES.TO.BE.SQUARED){
+  if(statistic %in% TEST.DEF.SCORES.TO.BE.SQUARED & !skip_squaring){
     stats = stats^2
   }
   return(stats)
@@ -245,3 +245,4 @@ dsfdr_find_thresholds = function(stats,q=0.05,verbose = F){
   }
   return(list(selected_c = selected_c,Adj.P.Value = Adj.P.Value))
 }
+

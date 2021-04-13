@@ -1,56 +1,56 @@
-## ----setup, include=FALSE--------------------------------------------------
+## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
-## ---- eval=FALSE-----------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  install.packages("devtools")
 #  devtools::install_github("barakbri/dacomp")
 
-## ----eval = T,cache=FALSE--------------------------------------------------
-library(dacomp)
+## ----eval = F,cache=FALSE-----------------------------------------------------
+#  library(dacomp)
+#  
+#  set.seed(1)
+#  
+#  data = dacomp.generate_example_dataset.two_sample(m1 = 100,
+#          n_X = 50,
+#          n_Y = 50,
+#          signal_strength_as_change_in_microbial_load = 0.1)
 
-set.seed(1)
+## ----eval = F-----------------------------------------------------------------
+#  #select references: (may take a minute)
+#  result.selected.references = dacomp.select_references(
+#                        X = data$counts,
+#                        median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+#                        verbose = F)
+#  
 
-data = dacomp.generate_example_dataset.two_sample(m1 = 100,
-        n_X = 50,
-        n_Y = 50,
-        signal_strength_as_change_in_microbial_load = 0.1)
+## ----eval = F-----------------------------------------------------------------
+#  print(result.selected.references)
 
-## ----eval = T--------------------------------------------------------------
-#select references: (may take a minute)
-result.selected.references = dacomp.select_references(
-                      X = data$counts,
-                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
-                      verbose = F)
+## ----eval = F-----------------------------------------------------------------
+#  dacomp.plot_reference_scores(result.selected.references)
 
+## ---- eval = F----------------------------------------------------------------
+#  #multiplicity correction levels for the BH and DS-FDR methods
+#  q_BH = q_DSFDR = 0.1
+#  
+#  #Perform testing:
+#  result.test = dacomp.test(X = data$counts, #counts data
+#                       y = data$group_labels, #phenotype in y argument
+#                       # obtained from dacomp.select_references(...):
+#                       ind_reference_taxa = result.selected.references,
+#                       test = DACOMP.TEST.NAME.WILCOXON, #constant, name of test
+#                       verbose = F,q = q_DSFDR) #multiplicity adjustment level
+#  
+#  #These are the indices of taxa discoverted as differentially abundant:
+#  # by applying a BH multiplicity adjustment on the P-values:
+#  rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
+#  #by applying a DS-FDR multiplicity adjustment on the P-values:
+#  rejected_DSFDR = result.test$dsfdr_rejected
 
-## ----eval = T--------------------------------------------------------------
-print(result.selected.references)
+## ----eval = F-----------------------------------------------------------------
+#  print(result.test)
 
-## ----eval = T--------------------------------------------------------------
-dacomp.plot_reference_scores(result.selected.references)
-
-## ---- eval = T-------------------------------------------------------------
-#multiplicity correction levels for the BH and DS-FDR methods
-q_BH = q_DSFDR = 0.1
-
-#Perform testing:
-result.test = dacomp.test(X = data$counts, #counts data
-                     y = data$group_labels, #phenotype in y argument
-                     # obtained from dacomp.select_references(...):
-                     ind_reference_taxa = result.selected.references, 
-                     test = DACOMP.TEST.NAME.WILCOXON, #constant, name of test
-                     verbose = F,q = q_DSFDR) #multiplicity adjustment level
-
-#These are the indices of taxa discoverted as differentially abundant:
-# by applying a BH multiplicity adjustment on the P-values:
-rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH) 
-#by applying a DS-FDR multiplicity adjustment on the P-values:
-rejected_DSFDR = result.test$dsfdr_rejected 
-
-## ----eval = T--------------------------------------------------------------
-print(result.test)
-
-## ---- eval = F-------------------------------------------------------------
+## ---- eval = F----------------------------------------------------------------
 #  result.test = dacomp.test(X = data$counts,
 #                       y = data$group_labels,
 #                       ind_reference_taxa = result.selected.references,
@@ -69,7 +69,7 @@ print(result.test)
 #                       test = DACOMP.TEST.NAME.TWO_PART_WILCOXON,
 #                       verbose = T,q = q_DSFDR)
 
-## ---- eval = F-------------------------------------------------------------
+## ---- eval = F----------------------------------------------------------------
 #  set.seed(1)
 #  # Sample data:
 #  # 30 is the number of samples, so we will have 60 rows.
@@ -109,7 +109,7 @@ print(result.test)
 #  rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 #  rejected_DSFDR = result.test$dsfdr_rejected
 
-## ----eval = F--------------------------------------------------------------
+## ----eval = F-----------------------------------------------------------------
 #  set.seed(1)
 #  data = dacomp.generate_example_dataset_continuous(n = 100,m1 = 30,
 #  signal_strength_as_change_in_microbial_load = 0.1)
@@ -143,7 +143,7 @@ print(result.test)
 #  rejected_DSFDR = result.test$dsfdr_rejected
 #  
 
-## ----eval = F--------------------------------------------------------------
+## ----eval = F-----------------------------------------------------------------
 #  set.seed(1)
 #  #generate data, with a multivariate phenotype:
 #  

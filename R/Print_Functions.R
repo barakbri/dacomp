@@ -25,7 +25,9 @@ print.dacomp.result.object = function(obj){
 #' @examples
 print.dacomp.reference.selection.object = function(obj){
   cat('DACOMP reference selection object \n\r')
-  cat(paste0('Thereshold for median SD statistic: ',obj$median_SD_threshold,'\n\r'))
+  cat(paste0('Thereshold for selecting reference taxa: ',obj$median_SD_threshold,'\n\r'))
+  cat(paste0('For dacomp.select_references(), threshold given in units of medianSD score \n\r'))
+  cat(paste0('For dacomp.select_references.by.split(), threshold given in units of -log(PV) \n\r'))
   cat(paste0('Nr. Selected references: ',length(obj$selected_references),'\n\r'))
   cat(paste0('Minimal number of counts observed in reference taxa (across subjects): ',(obj$selected_MinAbundance),'\n\r'))
 }
@@ -46,3 +48,5 @@ print.dacomp.reference.validation.result.object = function(obj){
     cat(paste0(names(obj)[i],' = ',round(obj[[i]],5),'\n\r'))
   }
 }
+
+

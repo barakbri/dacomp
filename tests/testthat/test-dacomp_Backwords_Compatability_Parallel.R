@@ -1,15 +1,15 @@
-RUN_REGRESSION_TEST_PAPER = TRUE
 
-if(RUN_REGRESSION_TEST_PAPER){
+test_that("Test DACOMP paper scenarios with multiple cores", {
+  
+  if(!exists('DO_BACKWORDS_COMPATABILITY_MULTIPLE_CORES'))
+    skip('DO_BACKWORDS_COMPATABILITY_MULTIPLE_CORES not defined, skipping')
+  if(!DO_BACKWORDS_COMPATABILITY_MULTIPLE_CORES)
+    skip('DO_BACKWORDS_COMPATABILITY_MULTIPLE_CORES is false, skipping')
+  
+  
   library(dacomp)
   
   set.seed(1)
-  
-  original_wd = getwd()
-  setwd('E:/MCB3/CompositionalAnalysis_CodeBase/Scripts/')
-  source(paste0('REFSIM_GenerateSettings_Index.R'))
-  setwd(original_wd)
-  
   
   SCENARIO_run_backwards_compatability = function(scenario_ID,nr.reps = 20,q_BH = 0.1 , q_DSFDR = 0.1,verbose = T){
     library(dacomp)
@@ -68,11 +68,11 @@ if(RUN_REGRESSION_TEST_PAPER){
                          0)
       
       FDR_ratio = ifelse(length(rejected_BH_ratio)>0,
-                   sum(!(rejected_BH_ratio %in% data$select_diff_abundant))/length(rejected_BH_ratio),
-                   0)
-      FDR_DSFDR_ratio = ifelse(length(rejected_DSFDR_ratio)>0,
-                         sum(!(rejected_DSFDR_ratio %in% data$select_diff_abundant))/length(rejected_DSFDR_ratio),
+                         sum(!(rejected_BH_ratio %in% data$select_diff_abundant))/length(rejected_BH_ratio),
                          0)
+      FDR_DSFDR_ratio = ifelse(length(rejected_DSFDR_ratio)>0,
+                               sum(!(rejected_DSFDR_ratio %in% data$select_diff_abundant))/length(rejected_DSFDR_ratio),
+                               0)
       
       mean_TP_BH = mean_TP_BH + TP
       mean_FDR_BH = mean_FDR_BH + FDR
@@ -113,4 +113,4 @@ if(RUN_REGRESSION_TEST_PAPER){
   }  
   print(result_table)
   
-}
+})
