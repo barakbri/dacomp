@@ -7,76 +7,53 @@ test_that("Reference Validation", {
     skip('DO_REFERENCE_VALIDATION is false, skipping')
   
   cat(paste0('\n\r'))
-  
-  if(!exists('DO_SIMPLE_USE_CASE'))
-    skip('DO_SIMPLE_USE_CASE not defined, skipping')
-  if(!DO_SIMPLE_USE_CASE)
-    skip('DO_SIMPLE_USE_CASE is false, skipping')
-  
-  
-  library(dacomp)
-  
+
   ###************************************************
-  #Prepare data
+  # Run the example code
   ###************************************************
   
   set.seed(1)
+  library(dacomp)
+  #generate data with two study groups
+  data = dacomp.generate_example_dataset.two_sample(n_X = 30,n_Y = 30,m1 = 50,signal_strength_as_change_in_microbial_load = 0.1)
   
-  
-  data = dacomp.generate_example_dataset.two_sample(m1 = 100,
-                                        n_X = 50,
-                                        n_Y = 50,
-                                        signal_strength_as_change_in_microbial_load = 0.1)
-  
+  # select references. We purposely select reference taxa so that differentially abundant taxa enter the reference set. In general, select using median_SD_threshold=0, minimal_TA=100, see paper for discussion of this selection strategy
   result.selected.references = dacomp.select_references(X = data$counts,
-                                                       median_SD_threshold = 0.6, 
-                                                       verbose = F)
+                                                        median_SD_threshold = 1.3,
+                                                        maximal_TA = 1000,
+                                                        verbose = T)
+  
+  # some differentially abundant taxa entered the reference set:                                                    
+  sum(result.selected.references$selected_references %in% data$select_diff_abundant)
+  
+  #run the sensitivity analysis.
+  cleaned_references = dacomp.validate_references(X =  data$counts,
+                                                  Y =  data$group_labels,
+                                                  ref_obj = result.selected.references,
+                                                  test =DACOMP.TEST.NAME.WILCOXON,
+                                                  Q_validation = 0.1,
+                                                  Minimal_Counts_in_ref_threshold = 50,
+                                                  Reduction_Factor = 0.5,
+                                                  Verbose = T,
+                                                  disable_DSFDR = T,
+                                                  NR_perm = 1000)
+  
   
   
   ###************************************************
   #check inputs
   ###************************************************
-  expect_error(dacomp.check_reference_set_is_valid.k_groups(X_ref = 1,
-                                                           Y = data$group_labels,
-                                                           nr.perm = 10000,
-                                                           verbose = T),info = "X_ref is not matrix")
+  #now the reduced reference has no differentially abundant taxa inside....
+  expect_equal(sum(cleaned_references %in% data$select_diff_abundant),0) 
   
-  expect_error(dacomp.check_reference_set_is_valid.k_groups(X_ref = data$counts[,result.selected.references$selected_references],
-                                                           Y = data$group_labels[-1],
-                                                           nr.perm = 10000,
-                                                           verbose = T),info = "X_ref and Y do not match in size")
-  
-  expect_error(dacomp.check_reference_set_is_valid.k_groups(X_ref = data$counts[,result.selected.references$selected_references],
-                                                           Y = data$group_labels,
-                                                           nr.perm = 'A',
-                                                           verbose = T),info = "nr.perm is illegal, must be number")
-  
-  expect_error(dacomp.check_reference_set_is_valid.k_groups(X_ref = data$counts[,result.selected.references$selected_references],
-                                                           Y = data$group_labels,
-                                                           nr.perm = 50,
-                                                           verbose = T),info = "nr.perm is illegal,must be at least 1000")
-  
-  expect_warning(dacomp.check_reference_set_is_valid.k_groups(X_ref = data$counts[,1,drop=F],
-                                                           Y = data$group_labels,
-                                                           nr.perm = 1000,
-                                                           verbose = T),info = "reference with only one taxon must produce warning")
   
   ###************************************************
-  #check returned class
+  #check inputs
   ###************************************************
-  result.ref.validity = dacomp.check_reference_set_is_valid.k_groups(X_ref = data$counts[,result.selected.references$selected_references],Y = data$group_labels,nr.perm = 10000,verbose = T)
-  
-  expect_is(result.ref.validity,dacomp:::CLASS.LABEL.REFERENCE_VALIDATION_RESULT_OBJECT)
-  
-  ###************************************************
-  #check returned fields
-  ###************************************************
-  expect_equal(names(result.ref.validity),c("p.value.HHG.L2","p.value.HHG.L1","p.value.HHG.BC","p.value.energy.L2","p.value.energy.L1","p.value.energy.BC","p.value.permanova_L2","p.value.permanova_L1", "p.value.permanova_BC"))
-  
   
   ###************************************************
   # regression check on results
   ###************************************************
-  dacomp:::compare_to_gold_standard(check_name = "Reference_Validation_VAL_result_ref_validity",obj_to_hash = result.ref.validity)
+  dacomp:::compare_to_gold_standard(check_name = "Reference_Validation_VAL_result_ref_validity",obj_to_hash = cleaned_references)
   
 })

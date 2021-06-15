@@ -32,7 +32,7 @@ The `dacomp` package implements methods for detecting differentially abundant ta
 
 The DACOMP package is aimed at providing valid statistical inference while addressing the above challenges (sparsity, compositionality). The key idea is to first obtain a set of taxa which are non-differentially abundant. These taxa serve as a reference set for the null behaviour of taxa. In the second step, for each taxon tested for differential abundance, a fixed number of reads is selected from each sample from the reads available under the reference set of taxa and the tested taxon. The `dacomp` method tests for association between the number of subsampled reads that belong to the tested taxon and the measured phenotype. If the number of subsampled counts that belong to the tested taxon depends on the measured phenotype, the tested taxon alone is responsible for the association discovered (as all other taxa involved in the computation are non differentially abundant). 
 
-The structure of the vignette is as follows. In section 2 we breifly describe the DACOMP method and underlying assumptions. In section 3 we present the package workflow on data with two study groups. In Sections 4-6 we demonstrate how to detect differentially abundant taxa in studies with K study groups, paired study design and studies with continuous phenotypes. In section 7 we demonstrate how to utilize the `dacomp` workflow with other tests of association, supplied by the user. Our example will involve associating differentially abundant taxa with a pair of continuous phenotypes. The user supplied test will be the `dcov.test` test^[@szekely2007measuring] from `R` package `ENERGY`.
+The structure of the vignette is as follows. In section 2 we briefly describe the DACOMP method and underlying assumptions. In section 3 we present the package workflow on data with two study groups. In Sections 4-6 we demonstrate how to detect differentially abundant taxa in studies with K study groups, paired study design and studies with continuous phenotypes. In section 7 we demonstrate how to utilize the `dacomp` workflow with other tests of association, supplied by the user. Our example will involve associating differentially abundant taxa with a pair of continuous phenotypes. The user supplied test will be the `dcov.test` test^[@szekely2007measuring] from `R` package `ENERGY`.
 
 You can install the package using the devtools package:
 ```{r, eval=FALSE}
@@ -58,7 +58,7 @@ We show how the $j$th taxon can be tested for differential abundance given a set
 
 
 $$ H_0^{(j)}:\quad \frac{\left(P_j,P_{b_1},P_{b_2},...,P_{b_{r}}\right)}{P_j + \sum_{k=1}^{r} P_{b_k}}\perp \!\!\! \perp \vec{Y}.$$
-This hypothesis cannot be tested directly, since \vec{P} is not observed. Brill et al.(2019)^[@brill2019testing] discuss how this hypothesis can be tested using the observed counts.
+This hypothesis cannot be tested directly, since $\vec{P}$ is not observed. Brill et al.(2019)^[@brill2019testing] discuss how this hypothesis can be tested using the observed counts.
 
 Let $\lambda_j$ be the minimal number of reads available in the taxa indexed by $\{j\}\cup\mathcal{B}$ across the different samples. From each sample, select exactly $\lambda_j$ reads, from the reads available under indices $\{j\}\cup\mathcal{B}$. Let $\tilde{X}_j$ denote the number of reads selected from taxon $j$ by rarefaction. Taxon $j$ is tested for differential abundance by testing:
 
@@ -83,9 +83,10 @@ $$ S_j = \mathop{\large{\mathrm{median}}}^{m}_{k=1, k\ne j}\left({SD}_{j,k}\righ
 The selected set of reference taxa, $B$, is the set of taxa with $S_j \le S_{crit}$ , with $S_{crit}$ being a predefined threshold:
 
 $$ Select\, B: \quad B = \{j|S_j \leq S_{crit}\}.$$
-The key assumption for reference selection, is that a relatively small fraction of all taxa are differentially abundant. Hence, a subset of taxa, containing no differentially abundant taxa, can be obtained by selecting a fixed value of $S_{crit}$ as a threshold.
 
-The value of $S_{crit}$ is data specific. In this vignette, we use data from the colorectal cancer dataset^[@kostic2012genomic] available through the phyloseq^[@mcmurdie2013phyloseq] package. For this data, $S_{crit} = 0.6$ is selected. Other datasets may require different values for $S_{crit}$.
+Generally, we cannot ensure differentially abundnat taxa do not enter the reference set: differentially abundant taxa may be subject to small effect sizes making them indistinguishable from non-differentially abundant taxa. Our strategy is to select $S_{crit}$ such that the rarefaction depth $\lambda_j$ is sufficient for powerful testing (of reasonable effect sizes) but not substantially more than that, e.g.. Select the lowest value of $S_{crit}$ such that a minimum of $100$ reads are available under the reference taxa for all samples. 
+
+Still, the reference taxa may contain signal. We also advise to use a diagnostic check aimed at detecting if differentially abunant taxa have entered the reference set. The check is performed in a leave-one-out manner: each of the reference taxa is removed from the reference set, and tested for differential abundance against the remaining reference taxa. If a signal is found (by combining all $|B|$ tests using the Simes (1986) procedure), the set of reference taxa is reselected. Reference set reselection is done by lowering the value of $S_{crit}$ in a data adaptive manner, see the function \verb|dacomp.validate_references| for further details. After possibly differentially abundant taxa are excluded from the reference, testing can also be performed on the reduced reference set as well. We advise to report result for both the original and the shrunken reference set: in case a contamination is found, results with the shrunken reference may change substantially. However, small effects, which do not jeopardize the validity of the test, may still be found in the reference. In that case, results for the original and shrunken reference sets will be more similar.
 
 # Workflow
 This section demonstrate the workflow for statistical analysis. We begin by generating a sample dataset. The dataset will consist of two study groups (labeled 0 and 1), 50 samples in each study groups. The data will contain 1384 OTUs with `m1=100` OTUs selected (at random) as differentially abundant. The parameter `signal_strength_as_change_in_microbial_load = 0.1` indicates OTUs associated with the phenotype cause a change of 10% in the microbial load, compared to study group 0. Note that this parameter effects the ratio between different columns in the data, but not the total number of counts in a row (sample): the total number of counts in a sample is not indicative of the microbial load.
@@ -105,30 +106,42 @@ The object `data` consists of `data$counts` - a matrix with 100 rows and 1384 co
 
 ## Selecting reference taxa
 
-We begin our analysis by selecting a set of reference taxa. This requires a threshold, $S_{crit}=0.6$
-We also plot the histogram of $S_j$ scores, with vertical lines for the $0.5,0.7,$ and $0.9$ percentiles of $S_j$s. This allows us to assess how high is the selected $S_{crit}$ compared to the distribution of $S_j$ in our data.
+We begin our analysis by selecting a set of reference taxa. We select a set of reference taxa featuring at least $70$ reads in the reference taxa across all samples.
+
 
 ```{r,eval = F}
 #select references: (may take a minute)
 result.selected.references = dacomp.select_references(
                       X = data$counts,
-                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                      minimal_TA = 70,
                       verbose = F)
-
 ```
 
 Output obtained from printing the reference selection results:
 ```{r,eval = F}
 print(result.selected.references)
 ```
+## Diagnostic check for the reference set, and reselecting reference taxa
+We check if the reference taxa contain signal using a leave-one-out validation method: for each reference taxon, we perform a test of differential abundance vs. the remaining reference taxa. If a signal is found, the value of $S_{crit}$ is lowered, and the process is iterated until the reference set shows no signal.
 
-Plot the reference selection scores (can also be used to better set the median SD threshold)
+For our data, we actually happen to have some differentially abundant taxa in the reference set. The code snippet below can be run to show the value of $S_{crit}$ reduced dynamically, until now signal is detect in the reference set.
+
 ```{r,eval = F}
-dacomp.plot_reference_scores(result.selected.references)
+
+
+result.selected.references.cleaned = dacomp.validate_references(X = data$counts, #Counts
+      Y = data$group_labels, #Traits
+      ref_obj = result.selected.references, #reference checked, must be object from dacomp.select_references(...)
+      test = DACOMP.TEST.NAME.WILCOXON, #Test used for checking, can be same test used in dacomp.test(...)
+      Q_validation = 0.1, #FDR level for checking
+      Minimal_Counts_in_ref_threshold = 10, #reference taxa will must include at least this number of reads
+      Reduction_Factor = 0.9, #multiplicative factor used for lowering the threshold for the number of reads required in reference taxa at each iteration
+      NR_perm = 1000, #number of permutations used for testing. should be at least 1/(Q_validation/ncol(X))
+      Verbose = T)
 ```
 
 ## Inference using the Wilcoxon rank sum test
-We test taxa (not in the reference set) for differential abundance by using the function `dacomp.test`. We show two possible adjustments for multiplicity, the BH procedure (using `p.adjust`) and the DS-FDR procedure^[@jiang2017discrete]:
+We test taxa (not in the reference set) for differential abundance by using the function `dacomp.test`. We show two possible adjustments for multiplicity, the BH procedure (using `p.adjust`) and the DS-FDR procedure^[@jiang2017discrete]. WE also test using the initial selection of the reference set, and using the reduced reference set after running the validation procedure for the reference set.
 
 ```{r, eval = F}
 #multiplicity correction levels for the BH and DS-FDR methods
@@ -147,6 +160,27 @@ result.test = dacomp.test(X = data$counts, #counts data
 rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH) 
 #by applying a DS-FDR multiplicity adjustment on the P-values:
 rejected_DSFDR = result.test$dsfdr_rejected 
+
+#number of true discoveries:
+#sum(rejected_DSFDR %in% data$select_diff_abundant)
+
+#Perform testing, using the reference set after possible reselection of reference:
+result.test.cleaned.reference = dacomp.test(X = data$counts, #counts data
+                     y = data$group_labels, #phenotype in y argument
+                     # obtained from dacomp.select_references(...):
+                     ind_reference_taxa = result.selected.references.cleaned, 
+                     test = DACOMP.TEST.NAME.WILCOXON, #constant, name of test
+                     verbose = F,q = q_DSFDR) #multiplicity adjustment level
+
+#These are the indices of taxa discoverted as differentially abundant:
+# by applying a BH multiplicity adjustment on the P-values:
+rejected_BH.cleaned = which(p.adjust(result.test.cleaned.reference$p.values.test,method = 'BH')<=q_BH) 
+#by applying a DS-FDR multiplicity adjustment on the P-values:
+rejected_DSFDR.cleaned= result.test.cleaned.reference$dsfdr_rejected 
+
+#number of true discoveries is higher, see using:
+#sum(rejected_DSFDR.cleaned %in% data$select_diff_abundant)
+
 ```
 
 Output from printing `result.test`:
@@ -160,7 +194,6 @@ print(result.test)
   * A set of integers defining the indices of reference taxa, indices correspond to columns of the counts matrix.
   
   You can use a general method for selecting a set of reference taxa, then supply the vector of taxa indices using the argument `ind_reference_taxa`.
-  Note that you cannot use phenotypes data for reference selection, only for testing.
   
 
 ## Inference using other tests
@@ -181,19 +214,19 @@ The function `dacomp.test(...)` supports several other tests for studies with tw
 ```{r, eval = F}
 result.test = dacomp.test(X = data$counts,
                      y = data$group_labels,
-                     ind_reference_taxa = result.selected.references,
+                     ind_reference_taxa = result.selected.references.cleaned,
                      test = DACOMP.TEST.NAME.LOG_FOLD_DIFFERENCE_IN_MEANS,
                      verbose = T,q = q_DSFDR)
 
 result.test = dacomp.test(X = data$counts,
                      y = data$group_labels,
-                     ind_reference_taxa = result.selected.references,
+                     ind_reference_taxa = result.selected.references.cleaned,
                      test = DACOMP.TEST.NAME.DIFFERENCE_IN_MEANS,
                      verbose = T,q = q_DSFDR)
 
 result.test = dacomp.test(X = data$counts,
                      y = data$group_labels,
-                     ind_reference_taxa = result.selected.references,
+                     ind_reference_taxa = result.selected.references.cleaned,
                      test = DACOMP.TEST.NAME.TWO_PART_WILCOXON,
                      verbose = T,q = q_DSFDR)
 ```
@@ -225,27 +258,30 @@ data = dacomp.generate_example_dataset_paired(30)
 #select references:
 result.selected.references = dacomp.select_references(
                                 X = data$counts,
-                                median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                                minimal_TA = 50, #APPLICATION SPECIFIC
                                 verbose = T)
 
-
-length(result.selected.references$selected_references)
-
-#plot the reference selection scores:
-#(can also be used to better set the median SD threshold)
-dacomp.plot_reference_scores(result.selected.references)
-
+# run diagnostic check and reference-set-reselection:
+result.selected.references.cleaned = dacomp.validate_references(X = data$counts,
+                                          Y = NULL, #supply a null phenotype for a paired test, as for dacomp.test(...)
+                                          ref_obj = result.selected.references, # see descriptions in above snippets
+                                          test = DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
+                                          Q_validation = 0.1,
+                                          Minimal_Counts_in_ref_threshold = 10,
+                                          Reduction_Factor = 0.9,
+                                          NR_perm = 1000,
+                                          Verbose = T)
 
 #multiplicity correction levels for the BH and DS-FDR methods
 q_BH = q_DSFDR = 0.1
 
 #Perform testing:
 result.test = dacomp.test(
-                    X = data$counts, #counts matrix formated as required
-                    y = NULL, #supply a null phenotype
-                    ind_reference_taxa = result.selected.references,
-                    test = DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
-                    verbose = T,q = q_DSFDR)
+        X = data$counts, #counts matrix formated as required
+        y = NULL, #supply a null phenotype
+        ind_reference_taxa = result.selected.references.cleaned, #can also test with result.selected.references, best report both analyses
+        test = DACOMP.TEST.NAME.WILCOXON_SIGNED_RANK_TEST,
+        verbose = T,q = q_DSFDR)
 
 #discoveries:
 rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
@@ -272,14 +308,20 @@ signal_strength_as_change_in_microbial_load = 0.1)
 
 result.selected.references = dacomp.select_references(
                           X = data$counts,
-                          median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+                          minimal_TA = 50, #APPLICATION SPECIFIC
                           verbose = T)
 
-#number of selected references
-length(result.selected.references$selected_references)
 
-#plot the reference selection scores (can also be used to better set the median SD threshold)
-dacomp.plot_reference_scores(result.selected.references)
+#exclude possibly differentially abundant taxa from the reference:
+result.selected.references.cleaned = dacomp.validate_references(X = data$counts,
+                                                                Y = data$covariate,
+                                                                ref_obj = result.selected.references,
+                                                                test = DACOMP.TEST.NAME.SPEARMAN,
+                                                                Q_validation = 0.1,
+                                                                Minimal_Counts_in_ref_threshold = 10,
+                                                                Reduction_Factor = 0.9,
+                                                                NR_perm = 1000,
+                                                                Verbose = T)
 
 #multiplicity correction levels for the BH and DS-FDR methods
 q_BH = q_DSFDR = 0.1
@@ -287,7 +329,7 @@ q_BH = q_DSFDR = 0.1
 #Perform testing:
 result.test = dacomp.test(X = data$counts,
                       y = data$covariate,test = DACOMP.TEST.NAME.SPEARMAN,
-                      ind_reference_taxa = result.selected.references,
+                      ind_reference_taxa = result.selected.references.cleaned,
                       verbose = T,q = q_DSFDR)
 
 rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
@@ -296,7 +338,7 @@ rejected_DSFDR = result.test$dsfdr_rejected
 ```
 
 
-# Inference with used defined tests
+# Inference with user defined tests
   
 You can use a general test, to test for association between the rarefied reads, $\tilde{X}_j$, and the phenotype vector $\vec{Y}$. To use a general test, supply the following arguments:
 
@@ -329,10 +371,8 @@ head(data$covariate)
 #select references:
 result.selected.references = dacomp.select_references(
                               X = data$counts,
-                              median_SD_threshold = 0.5,
+                              minimal_TA =  50,
                               verbose = T)
-
-
 
 #multiplicity correction levels for the BH and DS-FDR methods
 q_BH = q_DSFDR = 0.1

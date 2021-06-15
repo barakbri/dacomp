@@ -23,7 +23,7 @@ test_that("Simple Use Case", {
   #select references: (may take a minute)
   ###************************************************
   result.selected.references = dacomp.select_references(X = data$counts,
-                                                       median_SD_threshold = 0.6, 
+                                                       minimal_TA = 50, 
                                                        verbose = T)
   
   length(result.selected.references$selected_references)
@@ -71,14 +71,4 @@ test_that("Simple Use Case", {
                             ind_reference_taxa = result.selected.references$selected_references,verbose = T,q = q_DSFDR,DSFDR_Filter = FILTER_FOR_TESTING)
   
   cat(paste0('True positives with filtering over tested hypotheses: ',length(result.test.with.taxa.filter$dsfdr_rejected),'\n\r'))
-  ###************************************************
-  # Run reference validation
-  ###************************************************
-  result.ref.validity = dacomp.check_reference_set_is_valid.k_groups(X_ref = data$counts[,result.selected.references$selected_references],Y = data$group_labels,nr.perm = 10000,verbose = T)
-  
-  result.ref.validity
-  
-  expect_is(result.selected.references, dacomp:::CLASS.LABEL.REFERENCE_SELECTION_OBJECT)
-  expect_is(result.test, dacomp:::CLASS.LABEL.DACOMP_RESULT_OBJECT)
-  expect_is(result.ref.validity, dacomp:::CLASS.LABEL.REFERENCE_VALIDATION_RESULT_OBJECT)
 })

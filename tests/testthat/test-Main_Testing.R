@@ -19,7 +19,7 @@ test_that("Test dacomp test function", {
                                         signal_strength_as_change_in_microbial_load = 0.1)
   
   result.selected.references = dacomp.select_references(X = data$counts,
-                                                       median_SD_threshold = 0.6, 
+                                                       minimal_TA = 50, 
                                                        verbose = F)
   
   

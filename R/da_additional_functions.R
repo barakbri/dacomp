@@ -246,3 +246,13 @@ dsfdr_find_thresholds = function(stats,q=0.05,verbose = F){
   return(list(selected_c = selected_c,Adj.P.Value = Adj.P.Value))
 }
 
+EFFECT_SIZE_SEPERATOR_STRING = ';Description:'
+
+#Aux function for providing a description,
+description_for_KS = function(dt_for_kSamples){
+  aggregated_means = aggregate(x = dt_for_kSamples$X_rank,by=list(Y_perm = dt_for_kSamples$Y_perm),mean)
+  aggregated_means = aggregated_means[order(aggregated_means$x),]
+  return(paste0(paste0(aggregated_means$Y_perm,collapse = '<='),EFFECT_SIZE_SEPERATOR_STRING,paste0(aggregated_means$x,collapse = '<=')))
+}
+
+

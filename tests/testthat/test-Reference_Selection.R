@@ -21,15 +21,6 @@ test_that("multiplication works", {
   expect_error(dacomp.select_references(X = data$counts,
                                        median_SD_threshold = -1, 
                                        verbose = F),info = "negative median SD threshold")
-  
-  expect_warning(dacomp.select_references(X = data$counts,
-                                       median_SD_threshold = 0.4, 
-                                       verbose = F),info = "medianSD under 0.5 should produce warning")
-  
-  expect_warning(dacomp.select_references(X = data$counts,
-                                         median_SD_threshold = 1.6, 
-                                         verbose = F),info = "medianSD above 1.5 should produce warning")
-  
   expect_error(dacomp.select_references(X = data$counts,
                                        median_SD_threshold = 1.0, minimal_TA = -1,
                                        verbose = F),info = "minimal_TA cannot be negative")
@@ -74,7 +65,7 @@ test_that("multiplication works", {
   expect_is(result.selected.references,class = dacomp:::CLASS.LABEL.REFERENCE_SELECTION_OBJECT)
   
   
-  expect_equal(names(result.selected.references),c("selected_references","mean_prevalence_over_the_sorted", "min_abundance_over_the_sorted", "ratio_matrix",                 
+  expect_equal(names(result.selected.references),c("selected_references","mean_prevalence_over_the_sorted", "min_abundance_over_the_sorted","which_is_min_abundance_over_the_sorted", "ratio_matrix",                 
                              "scores","selected_MinAbundance","median_SD_threshold","minimal_TA", "maximal_TA"))
   
   expect(result.selected.references$selected_MinAbundance >= result.selected.references.different.threshold$selected_MinAbundance,failure_message = 'selected_MinAbundance must be monotone non decreasing with threshold.')
@@ -85,8 +76,8 @@ test_that("multiplication works", {
                                                                            median_SD_threshold = 0.6, 
                                                                            verbose = F,Previous_Reference_Selection_Object = result.selected.references)
   expect_equal(
-    digest::digest(result.selected.references, algo="md5"),
-    digest::digest(result.selected.references.same.threshold, algo="md5"), info = "Selected references object by using previous computation of rations is not identical to original result"
+    digest::digest(result.selected.references$selected_references, algo="md5"),
+    digest::digest(result.selected.references.same.threshold$selected_references, algo="md5"), info = "Selected references object by using previous computation of rations is not identical to original result"
                )
   
   ###************************************************

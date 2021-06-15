@@ -3,11 +3,11 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 
 #' Test taxa for differential abundance, using a given set of reference taxa used for normalization.
 #' 
-#' The function tests taxa for differential abundance, given a set of reference taxa used for normalization, as described in Brill et. al. (2019). The function supports several tests, by type of phenotype: two sample tests, K-sample tests, tests for association with a continous phenotype and user defined tests. See `details` below on how the input argument \code{y} shold be formatted for different tests.
+#' The function tests taxa for differential abundance, given a set of reference taxa used for normalization, as described in Brill et. al. (2019). The function supports several tests, by type of phenotype: two sample tests, K-sample tests, tests for association with a continuous phenotype and user defined tests. See `details` below on how the input argument \code{y} shold be formatted for different tests.
 #'
 #' @details
 #' The function tests each taxon not in the reference set for differential abundance as follows. For each taxon, the following procedure is performed. First, an identical number of reads is taken from each sample, from the reads available under the reference set of taxa, and the taxon being tested. Next, a test of association is performed between the rarefied reads and the phenotype given by \code{y}. P-values are computed by permutations. Finally, after all P-values are computed, the DS-FDR threshold for rejection is computed. Hypotheses with P-values lower than the DS-FDR rejection threshold are rejected. Reference taxa are not tested for differential abundance. See \code{vignette('dacomp_main_vignette')} for additional details and examples.
-#' 
+#'
 #' The function supports several tests. Different tests require different formats for the arguments \code{X} and \code{y}.
 #' 
 #' \itemize{
@@ -38,7 +38,9 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' \item{DACOMP.TEST.NAME.USER_DEFINED}{ - Indicates that a custom test is supplied using the argument \code{user_defined_test_function}. The supplied function will receive a single argument, the vector of rarefied counts and will return an array of length \code{nr_perm +1}, containing the test statistic computed for the original data, along with test statistics computed for permuted phenotypes. Test statistics must have a right sided alternative. A complete example with code snippets is found in \code{vignette('dacomp_main_vignette')}.}
 #' }
 #' 
-#' The parameter \code{compute_ratio_normalization} computes in addition to the test described above, a test of association between the phenotype \code{y} and the proportion of a tested taxon out of a subvector containing only the tested taxon and a set of reference taxa. This procedue, described as DACOMP-ratio in Brill et al. (2019), may enjoy higher power to detect differentially abundant taxa with a low number of counts, due to avoiding rarefaction. However, for scenarios with an extreme change in the microbial load of the measured ecology, e.g., a five-fold change in the microbial load between different study groups, this variant of DACOMP may have a slightly inflated FDR. See method description and simulation results in the paper for additional details.
+#' The parameter \code{compute_ratio_normalization} computes in addition to the test described above, a test of association between the phenotype \code{y} and the proportion of a tested taxon out of a subvector containing only the tested taxon and a set of reference taxa. This procedure, described as DACOMP-ratio in Brill et al. (2019), may enjoy higher power to detect differentially abundant taxa with a low number of counts, due to avoiding rarefaction. However, for scenarios with an extreme change in the microbial load of the measured ecology, e.g., a four-fold change in the microbial load between different study groups, this variant of DACOMP may have a slightly inflated FDR. See method description and simulation results in the paper for additional details.
+#' 
+#' We suggest using this function toghether with the function \code{\link{dacomp.validate_references}}. The function \code{\link{dacomp.validate_references}} is meant to detect if differentially abundant taxa have entered the reference set, and if so, reselect the reference set. We suggest that results be reported twice: once using the original reference selected, and once using the re-selected reference set. If results agree, than it is more likely that the initial reference set selected did not feature a contamination. If results show disagreement, this could be due to a signal entering the reference set. 
 #' 
 #' @param X Matrix of counts, with rows representing samples, columns representing taxa. See `details` for additional information on how to format this matrix for paired study designs.
 #' @param y Vector of phenotype values by sample. See details on different formats used by different tests.
@@ -48,7 +50,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' @param nr_perm Number of permuations used for testing and computing P-values. The default number of permutations is set high enough to provide powerful inference after adjusting for multiplicity. Change the number of permutations only if you know how it effects power after correcting for multiplicity. 
 #' @param disable_DSFDR Can be used to disable the DS-FDR computation (which may take up to a minute on large datasets). The default value is \code{FALSE}.
 #' @param user_defined_test_function Argument for inputing a function for a custom test of association supplied by the user, see `details` below.
-#' @param compute_ratio_normalization Argument for computing, in addition to the test described above, test based on normalization by division rather than rarefaction. See description under details.
+#' @param compute_ratio_normalization Argument determines if in addition to the test described above, the function should a run test based on normalization by division rather than rarefaction. See description under details.
 #' @param verbose Should messages be printed to console, indicating computation progress. The default value is \code{FALSE}.
 #' @param DSFDR_Filter A logical (boolean) vector specifying for which taxa should the DSFDR adjusted P-values be computed. Taxa whose corresponding entries in this vector are set to \code{} are excluded from testing, and will not have DSFDR adjusted Pvalues computed. If a taxon is set to be in the reference set, and its corresponding entry is set to \code{T} in this vector, it will still be excluded from testing. 
 #' @param Test_All A logical value specifying if all test (including the reference taxa) should be tested for differential abundance. When testing a reference taxon for differential abundance, it is excluded from the reference set.
@@ -82,9 +84,13 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #'
 #' @examples
 #' \dontrun{
+#' 
+#' 
 #' library(dacomp)
 #' 
 #' set.seed(1)
+#' 
+#' # example for a study with two groups:
 #' 
 #' data = dacomp.generate_example_dataset.two_sample(m1 = 100,
 #'        n_X = 50,
@@ -93,7 +99,7 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' 
 #' #select references: (may take a minute)
 #' result.selected.references = dacomp.select_references(X = data$counts,
-#'                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+#'                                                      minimal_TA = 50, #Choosing the minimal number of reference taxa so that at least 50 reads are available under the reference for all samples
 #'                                                      verbose = T)
 #' 
 #' length(result.selected.references$selected_references)
@@ -108,21 +114,42 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' result.test = dacomp.test(X = data$counts,
 #'                       y = data$group_labels,
 #'                       ind_reference_taxa = result.selected.references,
-#'                       test = DACOMP.TEST.NAME.WILCOXON,
+#'                       test = DACOMP.TEST.NAME.WILCOXON,nr_perm = 1000,
 #'                       verbose = T,q = q_DSFDR)
 #' 
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 #' rejected_DSFDR = result.test$dsfdr_rejected
 #' 
+#' #We note that our reference set may be contaminated, i.e. include some differentially abundant taxa. Therefore, we run a diagnostic check, trying to remove possible signals from the reference, and retesting:
+#' Cleaned_references = dacomp.validate_references(X =  data$counts,
+#'                                                Y =  data$group_labels,
+#'                                                ref_obj = result.selected.references,
+#'                                                test =DACOMP.TEST.NAME.WILCOXON,
+#'                                                Q_validation = 0.1,
+#'                                                Minimal_Counts_in_ref_threshold = 10,
+#'                                                Reduction_Factor = 0.9,
+#'                                                Verbose = T,
+#'                                                disable_DSFDR = T,
+#'                                                NR_perm = 10000)
+#'                                                 
+#' result.test.with.reduced.reference = dacomp.test(X = data$counts,
+#'                        y = data$group_labels,
+#'                       ind_reference_taxa = result.selected.references,
+#'                       test = DACOMP.TEST.NAME.WILCOXON,nr_perm = 1000,
+#'                       verbose = T,q = q_DSFDR)
+#' 
+#' rejected_BH = which(p.adjust(result.test.with.reduced.reference$p.values.test,method = 'BH')<=q_BH)
+#' rejected_DSFDR = result.test.with.reduced.reference$dsfdr_rejected
+#' 
 #' # example with continous outcome
 #' set.seed(1)
 #'
 #' data = dacomp.generate_example_dataset_continuous(n = 100,m1 = 30,
-#' signal_strength_as_change_in_microbial_load = 0.1)
+#' signal_strength_as_change_in_microbial_load = 0.2)
 #'
 #'
 #' result.selected.references = dacomp.select_references(X = data$counts,
-#'                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+#'                                                      minimal_TA = 50, #Choosing the minimal number of reference taxa so that at least 50 reads are available under the reference for all samples
 #'                                                      verbose = T)
 #' #number of selected references
 #' length(result.selected.references$selected_references)
@@ -136,13 +163,35 @@ CLASS.LABEL.DACOMP_RESULT_OBJECT = "dacomp.result.object"
 #' #Perform testing:
 #' result.test = dacomp.test(X = data$counts,
 #'                          y = data$covariate,test = DACOMP.TEST.NAME.SPEARMAN,
-#'                          ind_reference_taxa = result.selected.references,
+#'                          ind_reference_taxa = result.selected.references,nr_perm = 1000,
 #'                          verbose = T,q = q_DSFDR)
 #'
 #' rejected_BH = which(p.adjust(result.test$p.values.test,method = 'BH')<=q_BH)
 #' rejected_DSFDR = result.test$dsfdr_rejected
+#' 
+#' #We note that our reference set may be contaminated, i.e. include some differentially abundant taxa. Therefore, we run a diagnostic check, trying to remove possible signals from the reference, and retesting:
+#' Cleaned_references = dacomp.validate_references(X =  data$counts,
+#'                                                Y =  data$covariate,
+#'                                                ref_obj = result.selected.references,
+#'                                                test = DACOMP.TEST.NAME.SPEARMAN,
+#'                                                Q_validation = 0.1,
+#'                                                Minimal_Counts_in_ref_threshold = 10,
+#'                                                Reduction_Factor = 0.9,
+#'                                                Verbose = T,
+#'                                                disable_DSFDR = T,
+#'                                                NR_perm = 1000)
+#' result.test.with.reduced.reference = dacomp.test(X = data$counts,
+#'                                                 y = data$covariate,
+#'                                                 ind_reference_taxa = Cleaned_references,
+#'                                                 test = DACOMP.TEST.NAME.SPEARMAN,nr_perm = 1000,
+#'                                                 verbose = T,q = q_DSFDR)
+#' 
+#' rejected_BH = which(p.adjust(result.test.with.reduced.reference$p.values.test,method = 'BH')<=q_BH)
+#' rejected_DSFDR = result.test.with.reduced.reference$dsfdr_rejected
+#' 
+#' 
 #' }
-dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol(X)-length(ind_reference_taxa))), disable_DSFDR = F,user_defined_test_function = NULL, compute_ratio_normalization = F, verbose = F,DSFDR_Filter = rep(T,ncol(X)),Test_All = F,return_rarefied_values = F ){
+dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = max(1/(q/(ncol(X))),1000), disable_DSFDR = F,user_defined_test_function = NULL, compute_ratio_normalization = F, verbose = F,DSFDR_Filter = rep(T,ncol(X)),Test_All = F,return_rarefied_values = F ){
   
   #Preprocess inputs, before check:
   y_original = y #we keep a copy for k-sample effect size estimates
@@ -270,11 +319,11 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
     
     #compute effect size estimates
     if(test %in% TEST.DEF.TESTS.ON.UNIVARIATE_CONTINOUS){
-      effect_size_estimates[i] = as.character(cor(rank(rarefaction_matrix[,1]),rank(Y_matrix[,1])))
+      effect_size_estimates[i] = suppressWarnings(as.character(cor(rank(rarefaction_matrix[,1]),rank(Y_matrix[,1])))) 
       if(compute_ratio_normalization){
-        effect_size_estimates_ratio[i] = as.character(cor(rank(ratio_matrix[,1]),rank(Y_matrix[,1])))
+        effect_size_estimates_ratio[i] = suppressWarnings(as.character(cor(rank(ratio_matrix[,1]),rank(Y_matrix[,1]))))
       }
-    }else{
+    }else if(test != DACOMP.TEST.NAME.USER_DEFINED){
       effect_size_estimates[i] = description_for_KS(data.frame(X_rank = rank(rarefaction_matrix[,1]),
                                                                Y_perm = y_original))
       if(compute_ratio_normalization){
@@ -295,7 +344,8 @@ dacomp.test = function(X,y,ind_reference_taxa,test, q=0.05, nr_perm = 1/(q/(ncol
   
   #compute DS-FDR:
   Taxa_for_DSFDR = DSFDR_Filter
-  Taxa_for_DSFDR[ind_reference_taxa] = F
+  if(!Test_All)
+    Taxa_for_DSFDR[ind_reference_taxa] = F
   if(!disable_DSFDR){
     dsfdr_obj = dsfdr_find_thresholds(stats[,Taxa_for_DSFDR,drop=F],q,verbose)  
     dsfdr_threshold = dsfdr_obj$selected_c

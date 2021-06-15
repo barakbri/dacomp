@@ -12,6 +12,9 @@ test_that("Test DACOMP paper scenarios with multiple cores", {
   set.seed(1)
   
   SCENARIO_run_backwards_compatability = function(scenario_ID,nr.reps = 20,q_BH = 0.1 , q_DSFDR = 0.1,verbose = T){
+    CompositionalAnalysis_CodeBase_Location = 'C:/MCB3/CompositionalAnalysis_CodeBase/Scripts/'
+    source(paste0(CompositionalAnalysis_CodeBase_Location,'/REFSIM_GenerateSettings_Index.R'),chdir = T)
+
     library(dacomp)
     mean_TP_BH = 0
     mean_FDR_BH = 0
@@ -104,7 +107,7 @@ test_that("Test DACOMP paper scenarios with multiple cores", {
   registerDoParallel(cl)
   start_scenario = 1
   end_scenario = 25
-  nr.reps = 10
+  nr.reps = 1
   scenario_results = foreach(s=start_scenario:end_scenario, .options.RNG=1234) %dorng% { SCENARIO_run_backwards_compatability(s,nr.reps = nr.reps,q_BH = 0.1,q_DSFDR = 0.1) }
   stopCluster(cl)
   result_table = unlist(scenario_results[[1]])

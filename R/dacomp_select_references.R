@@ -4,20 +4,21 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "dacomp.reference.selection.object"
 #' Select a set of reference taxa, used for testing differential abundance of other taxa.
 #'
 #' The function receives a table of microbiome counts, and selects a set of taxa used for normalization in  \code{\link{dacomp.test}}.
-#' The counts matrix should be formated with taxa as columns, samples as rows. No rarefaction or perliminary normalization is required.
+#' The counts matrix should be formatted with taxa as columns, samples as rows. No rarefaction or preliminary normalization is required.
 #' The first step of the computation consists of computing the standard deviation of the ratio of each pair of taxa, across subjects. Each taxon is involved in the computation of \eqn{m-1} pairwise standard deviations, with \eqn{m} being the number of taxa. The second step consists of finding the median pairwise standard deviation of each taxon, across all pairwise standard deviations computed.
 #' This value, computed for each taxon, is named the `median SD` statistic. Taxa with values of the `median SD` statistic below \code{median_SD_threshold} are selected as the reference set of taxa.
+#' By default,  `median SD` is set to 0, meaning a sufficient number of reference taxa will be selected, so that at least `minimal_TA` counts will be available under the reference taxa for all samples.
 #' See \code{vignette('dacomp_main_vignette')} for additional details and formulas.
-#' The full algorithm and additional details are found in Subsection 3.1 in Brill et. al. (2019). 
+#' The full algorithm and additional details are in Brill et. al. (2019). 
 #' 
 #' @details 
 #' Target Abundance (TA) limits: The function will attempt to use the argument \code{median_SD_threshold} as a threshold for classification. If needed, the function will increase the actual threshold used so that each sample has at least \code{minimal_TA} counts under taxa selected as reference. The function will lower the classification threshold if all samples have more than \code{maximal_Ta} reads under the selected set of reference taxa.
 #' Computation may take up to a minute or two, for large datasets.
 #' 
 #' @param X Counts matrix, with rows representing samples, columns representing different taxa.
-#' @param median_SD_threshold Critical value for the `median SD` statistic. Taxa with a `median SD` statistic will be taken.
+#' @param median_SD_threshold Critical value for the `median SD` statistic. Taxa with a `median SD` statistic smaller than this value will be taken as reference. In any case, the threshold value used will be increased until at least `minimal_TA` counts are avaiable for the reference taxa under all samples. The default parameter will select the minimal number of reference taxa until the `minimal_TA` criterion is met.
 #' @param minimal_TA The minimal number of counts required in each sample, in the taxa selected as reference. If the set of reference taxa has a sample with less than `minimal_TA` reads in the set of reference taxa selected, the function will increase the `median SD` value until all samples have at least \code{minimal_TA} reads in the selected set of reference taxa.
-#' @param maximal_TA If all samples have more than \code{maximal_TA} reads available under the selected set of reference taxa, the `median SD` threshold value for classifying taxa as references will be lowered, until the condition is met. 
+#' @param maximal_TA Relevant only if `median SD` is set to a non-default value larger than zero. If all samples have more than \code{maximal_TA} reads available under the selected set of reference taxa, the `median SD` threshold value for classifying taxa as references will be lowered, until the condition is met. 
 #' @param Pseudo_Count_used Pseudo count added to all count values, to avoid dividing by zero.
 #' @param verbose If set to \code{TRUE}, messages will be displayed, as computation progresses.
 #' @param select_from The default value of \code{NULL} indicates that all taxa are valid candidates for selection. The user may limit the set of possible candidates for the reference set, by supplying a list of candidates (by indices) using this argument.
@@ -30,6 +31,7 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "dacomp.reference.selection.object"
 #' \item{selected_references}{ - A vector with the indices of selected reference taxa.}
 #' \item{mean_prevalence_over_the_sorted}{ - A vector, containing fraction of zero counts in the reference set of taxa, across samples, if: the lowest median SD are taken as reference, two lowest median SD are taken as reference, three lowest...}
 #' \item{min_abundance_over_the_sorted}{ - A vector, containing the minimal number of counts observed in the reference set of taxa, across samples, if: the lowest median SD are taken as reference, two lowest median SD are taken as reference, three lowest...}
+#' \item{which_is_min_abundance_over_the_sorted}{ - A vector, containing the sample index for which the minimum was acheived for the entry \code{min_abundance_over_the_sorted}}
 #' \item{ratio_matrix}{ - The matrix of SD_{j,k} as defined in the paper and the package vignette.}
 #' \item{scores}{ - the median SD scores, S_j as defined in the package vignette and paper.}
 #' \item{selected_MinAbundance}{ - The minimal number of counts, available under the reference set of taxa, across subjects.}
@@ -56,7 +58,7 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "dacomp.reference.selection.object"
 #' 
 #' # Select references: (may take a minute)
 #' result.selected.references = dacomp.select_references(X = data$counts,
-#'                                                      median_SD_threshold = 0.6, #APPLICATION SPECIFIC
+#'                                                      minimal_TA = 100, #Choosing the minimal number of reference taxa so that at least 100 reads are available under the reference for all samples
 #'                                                      verbose = T)
 #' 
 #' length(result.selected.references$selected_references)
@@ -74,9 +76,9 @@ CLASS.LABEL.REFERENCE_SELECTION_OBJECT = "dacomp.reference.selection.object"
 #'
 #'
 #' } 
-dacomp.select_references = function(X, median_SD_threshold, 
-                                                           minimal_TA = 10,
-                                                           maximal_TA = 200,
+dacomp.select_references = function(X, median_SD_threshold = 0, 
+                                                           minimal_TA = 100,
+                                                           maximal_TA = minimal_TA+100,
                                                            Pseudo_Count_used = 1,
                                                            verbose = F,
                                                            select_from = NULL,
@@ -108,14 +110,11 @@ check.input.select_references = function(X, median_SD_threshold, minimal_TA,maxi
     stop(MSG_X)  
   
   # median_SD_threshold - should be a valid, not positive number. Print out warnings
-  MSG_median_SD_threshold = "median_SD_threshold must be a valid numeric value, for most data types has values in the range [0.5,1.5]"
+  MSG_median_SD_threshold = "median_SD_threshold must be a valid numeric value, >=0 , for most data types has values in the range [0.5,1.5]"
   if(!is.numeric(median_SD_threshold))
     stop(MSG_median_SD_threshold)
-  if(median_SD_threshold <= 0)
+  if(median_SD_threshold < 0)
     stop(MSG_median_SD_threshold)
-  
-  if(median_SD_threshold < 0.5 | median_SD_threshold > 1.5)
-    warning('median_SD_threshold set to abnormal value, normally in range [0.5,1.5]')
   
   # minimal_TA,maximal_TA - should be interger, reasonable range (warning), smaller then maximal_TA
   MSG_minimal_TA = "minimal_TA, maximal_TA should be positive integers, valid range for the minimal number of counts in reference taxa, across subjects"
@@ -267,6 +266,7 @@ parallel_reference_select = function(X, median_SD_threshold,
   # minimum abundance across taxa, for each possible set of references, by including one additional taxon at a time in the reference set:
   mean_prevalence_over_the_sorted = as.numeric(apply(cummulative_sorted_prevalence_mat,2,mean))
   min_abundance_over_the_sorted = as.numeric(apply(cummulative_sorted_X_mat,2,min))
+  which_is_min_abundance_over_the_sorted = as.numeric(apply(cummulative_sorted_X_mat,2,which.min))
   
   #find the possible cut point by required abundance (these will be the fall back, if there are no point to find by requested threshold:
   
@@ -301,6 +301,7 @@ parallel_reference_select = function(X, median_SD_threshold,
   ret$selected_references = selected_references
   ret$mean_prevalence_over_the_sorted = mean_prevalence_over_the_sorted
   ret$min_abundance_over_the_sorted = min_abundance_over_the_sorted
+  ret$which_is_min_abundance_over_the_sorted = which_is_min_abundance_over_the_sorted
   if(is.null(Precomputed_scores))
     ret$ratio_matrix = ratio_matrix
   ret$scores = scores

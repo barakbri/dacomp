@@ -1,5 +1,5 @@
 useDynLib(dacomp, .registration=TRUE)
-exportPattern("dacomp.check_reference_set_is_valid.k_groups")
+exportPattern("dacomp.validate_references")
 exportPattern("dacomp.test")
 exportPattern("dacomp.plot_reference_scores")
 exportPattern("dacomp.select_references")
@@ -7,9 +7,7 @@ exportPattern("dacomp.generate_example_dataset")
 exportPattern("DACOMP.POSSIBLE.TEST.NAMES")
 exportPattern("DACOMP.TEST.NAME.")
 
-
 importFrom(Rcpp, evalCpp)
 S3method(print,dacomp.result.object)
 S3method(print,dacomp.reference.selection.object)
-S3method(print,dacomp.reference.validation.result.object)
 
